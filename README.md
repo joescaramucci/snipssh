@@ -80,4 +80,4 @@ app/src/main/java/com/example/sshsnippets/
 
 ## Licenza
 
-Da definire.
+[MIT](LICENSE)
