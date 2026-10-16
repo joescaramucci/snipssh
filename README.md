@@ -2,6 +2,26 @@
 
 Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal telefono direttamente al tuo server.
 
+## Screenshot
+
+<table>
+  <tr>
+    <td><img src="docs/store/screenshots/01-hosts.png" width="220" alt="Lista host"></td>
+    <td><img src="docs/store/screenshots/02-snippet.png" width="220" alt="Snippet"></td>
+    <td><img src="docs/store/screenshots/03-terminale.png" width="220" alt="Terminale"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/store/screenshots/04-sftp.png" width="220" alt="SFTP"></td>
+    <td><img src="docs/store/screenshots/05-impostazioni.png" width="220" alt="Impostazioni"></td>
+    <td><img src="docs/store/screenshots/06-terminale-comandi.png" width="220" alt="Terminale con comandi"></td>
+  </tr>
+  <tr>
+    <td><img src="docs/store/screenshots/07-nuovo-host.png" width="220" alt="Nuovo host"></td>
+    <td><img src="docs/store/screenshots/08-verifica-chiave-host.png" width="220" alt="Verifica chiave host"></td>
+    <td><img src="docs/store/screenshots/09-sftp.png" width="220" alt="SFTP con file"></td>
+  </tr>
+</table>
+
 ## Funzionalità
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
