@@ -1,20 +1,28 @@
 package com.example.sshsnippets
 
+import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -114,6 +122,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     var history by remember(host.id) { mutableStateOf(store.loadHistory(host.id)) }
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
     val hostKeys = rememberHostKeyPrompter()
+    val activity = LocalContext.current as? Activity
 
     val theme = remember { themeById(store.terminalThemeId()) }
     var fontSp by remember { mutableFloatStateOf(store.terminalFontSize().toFloat()) }
@@ -141,8 +150,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                     scope.launch(Dispatchers.Main) { version++ }
                 },
                 onClosed = {
-                    synchronized(term) { term.feed("\r\n[disconnesso]\r\n") }
-                    scope.launch(Dispatchers.Main) { onExit() }
+                    scope.launch(Dispatchers.Main) { activity?.finishAndRemoveTask() }
                 },
             )
             status = "Connesso a ${host.hostname}"
@@ -170,13 +178,25 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
         scope.launch { ssh.send(s) }
     }
 
-    Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
-        Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onExit) { Text("< ${host.name}") }
-            Spacer(Modifier.weight(1f))
-            Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 8.dp))
+    @Composable
+    fun Header(stacked: Boolean) {
+        if (stacked) {
+            Column(Modifier.fillMaxWidth()) {
+                TextButton(onExit) { Text("< ${host.name}") }
+                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 12.dp))
+            }
+        } else {
+            Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onExit) { Text("< ${host.name}") }
+                Spacer(Modifier.weight(1f))
+                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 8.dp))
+            }
         }
-        Box(Modifier.weight(1f).fillMaxWidth().background(theme.bg).pinchToZoom(onZoom).onSizeChanged { areaSize = it }) {
+    }
+
+    @Composable
+    fun TerminalArea(modifier: Modifier) {
+        Box(modifier.background(theme.bg).pinchToZoom(onZoom).onSizeChanged { areaSize = it }) {
             LazyColumn(
                 Modifier.fillMaxSize().padding(8.dp),
                 state = listState,
@@ -193,7 +213,30 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                 }
             }
         }
-        Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp)) {
+    }
+
+    @Composable
+    fun ChipLine(vertical: Boolean, content: @Composable () -> Unit) {
+        if (vertical) {
+            Column(Modifier.padding(horizontal = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) { content() }
+        } else {
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+            ) { content() }
+        }
+    }
+
+    @Composable
+    fun SnippetsLine(vertical: Boolean) {
+        ChipLine(vertical) {
+            if (snippets.isEmpty()) {
+                Text(
+                    "Nessuno snippet: aggiungili dalla sezione Snippet",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.padding(8.dp),
+                )
+            }
             snippets.forEach { s ->
                 AssistChip(
                     onClick = {
@@ -205,34 +248,61 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                     },
                     label = { Text(s.name) },
                 )
-                Spacer(Modifier.width(4.dp))
             }
         }
-        Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp)) {
+    }
+
+    @Composable
+    fun KeysLine(vertical: Boolean) {
+        ChipLine(vertical) {
             FilterChip(selected = ctrl, onClick = { ctrl = !ctrl }, label = { Text("Ctrl") })
             listOf(
                 "Esc" to "\u001b", "Tab" to "\t", "↑" to "\u001b[A", "↓" to "\u001b[B",
                 "←" to "\u001b[D", "→" to "\u001b[C", "^C" to "\u0003", "^D" to "\u0004",
             ).forEach { (label, value) ->
-                Spacer(Modifier.width(4.dp))
                 OutlinedButton(onClick = { send(value) }, contentPadding = PaddingValues(8.dp)) { Text(label) }
             }
         }
+    }
+
+    @Composable
+    fun SuggestionsLine(vertical: Boolean) {
         val suggestions = if (ctrl || input.text.isBlank()) emptyList() else history.suggest(input.text)
         if (suggestions.isNotEmpty()) {
-            Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp)) {
+            ChipLine(vertical) {
                 suggestions.forEach { c ->
                     AssistChip(
                         onClick = { input = TextFieldValue(c, TextRange(c.length)) },
                         label = { Text(c, maxLines = 1) },
                     )
-                    Spacer(Modifier.width(4.dp))
                 }
             }
         }
+    }
+
+    @Composable
+    fun InputRow(compact: Boolean = false) {
         Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(input, { input = it }, Modifier.weight(1f), singleLine = true)
-            Button(onClick = {
+            if (compact) {
+                BasicTextField(
+                    value = input,
+                    onValueChange = { input = it },
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp)
+                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                )
+            } else {
+                OutlinedTextField(input, { input = it }, Modifier.weight(1f), singleLine = true)
+            }
+            Button(
+                modifier = if (compact) Modifier.height(40.dp) else Modifier,
+                contentPadding = if (compact) PaddingValues(horizontal = 12.dp, vertical = 0.dp) else ButtonDefaults.ContentPadding,
+                onClick = {
                 if (ctrl && input.text.length == 1) {
                     ctrl = false
                     send((input.text[0].uppercaseChar().code and 0x1f).toChar().toString())
@@ -246,6 +316,34 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                 }
                 input = TextFieldValue()
             }) { Text("Invia") }
+        }
+    }
+
+    val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    if (landscape) {
+        Row(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
+            Column(Modifier.weight(1f).fillMaxHeight()) {
+                TerminalArea(Modifier.weight(1f).fillMaxWidth())
+                InputRow(compact = true)
+            }
+            Column(
+                Modifier.width(200.dp).fillMaxHeight().verticalScroll(rememberScrollState()).padding(4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Header(stacked = true)
+                SnippetsLine(vertical = true)
+                KeysLine(vertical = true)
+                SuggestionsLine(vertical = true)
+            }
+        }
+    } else {
+        Column(Modifier.fillMaxSize().systemBarsPadding().imePadding()) {
+            Header(stacked = false)
+            TerminalArea(Modifier.weight(1f).fillMaxWidth())
+            SnippetsLine(vertical = false)
+            KeysLine(vertical = false)
+            SuggestionsLine(vertical = false)
+            InputRow()
         }
     }
 

@@ -23,7 +23,8 @@ Terminale
 - Verifica delle chiavi host alla prima connessione, con avviso se la chiave del server cambia.
 - Impostazioni del terminale: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
 - Zoom a due dita sul terminale per ingrandire o ridurre il testo.
-- Digitando `exit` la sessione si chiude e l'app torna alla lista host.
+- Digitando `exit` la sessione si chiude e l'app si chiude.
+- In orizzontale snippet e tasti rapidi sono in una colonna laterale scorrevole, e il terminale resta visibile anche con la tastiera aperta.
 
 Snippet
 - Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}}.

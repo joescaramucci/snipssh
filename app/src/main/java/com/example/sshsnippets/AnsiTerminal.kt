@@ -45,14 +45,23 @@ class AnsiTerminal(private var cols: Int, private var rows: Int, private val max
     fun resize(newCols: Int, newRows: Int) {
         if (newCols == cols && newRows == rows) return
         val absCursor = top + cursorY
+        val oldTop = top
         cols = newCols.coerceAtLeast(1)
         for (i in lines.indices) {
             val old = lines[i]
             lines[i] = Array(cols) { x -> if (x < old.size) old[x] else AnsiCell() }
         }
-        rows = newRows.coerceAtLeast(1)
-        while (lines.size < rows) lines.add(blankLine())
-        cursorY = (absCursor - top).coerceIn(0, rows - 1)
+        val newRowCount = newRows.coerceAtLeast(1)
+        // Growing pulls scrollback back into view; shrinking keeps the cursor line visible.
+        cursorY = if (newRowCount >= rows) {
+            cursorY + minOf(newRowCount - rows, oldTop)
+        } else {
+            minOf(cursorY, newRowCount - 1)
+        }
+        rows = newRowCount
+        val newTop = absCursor - cursorY
+        while (lines.size > newTop + rows) lines.removeAt(lines.lastIndex)
+        while (lines.size < newTop + rows) lines.add(blankLine())
         cursorX = cursorX.coerceAtMost(cols - 1)
     }
 

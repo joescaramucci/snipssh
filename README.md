@@ -26,7 +26,8 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
 - **Aspetto del terminale** in Impostazioni: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized. Con due dita sul terminale si ingrandisce o riduce il testo, e la dimensione viene salvata.
-- **Uscita dalla sessione**: digitando `exit` la connessione si chiude e l'app torna alla lista host.
+- **Uscita dalla sessione**: digitando `exit` la connessione si chiude e l'app si chiude.
+- **Orizzontale**: con il telefono in orizzontale la colonna destra mostra host, snippet e tasti rapidi, scorrevole; il terminale occupa la parte sinistra, con la riga di input compatta.
 - **Logo della distribuzione** accanto al nome dell'host (Debian, Ubuntu, Linux Mint, Fedora, Red Hat, Arch, Alpine, Windows, macOS, FreeBSD o generico), scelto nel form dell'host.
 - **Cronologia dei comandi** per host: mentre digiti (es. `cd`) compaiono i comandi già usati che iniziano così, dal più usato al meno usato.
 - **Snippet** con nome e variabili tipo `{{servizio}}`, lanciabili sul server con un tocco e conferma.
