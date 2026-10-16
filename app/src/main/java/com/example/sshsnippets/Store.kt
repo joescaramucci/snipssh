@@ -78,6 +78,20 @@ class Store(context: Context) {
 
     fun setBiometricLock(enabled: Boolean) = prefs.edit().putBoolean("biometric_lock", enabled).apply()
 
+    fun terminalFontSize(): Int = prefs.getInt("terminal_font_size", DEFAULT_TERMINAL_FONT_SIZE)
+        .coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)
+
+    fun setTerminalFontSize(sp: Int) =
+        prefs.edit().putInt("terminal_font_size", sp.coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)).apply()
+
+    fun terminalFontId(): String = prefs.getString("terminal_font", TerminalFonts[0].id)!!
+
+    fun setTerminalFontId(id: String) = prefs.edit().putString("terminal_font", id).apply()
+
+    fun terminalThemeId(): String = prefs.getString("terminal_theme", TerminalThemes[0].id)!!
+
+    fun setTerminalThemeId(id: String) = prefs.edit().putString("terminal_theme", id).apply()
+
     /** Contenuto del backup in chiaro: host, snippet e chiavi host. Va cifrato prima di essere salvato. */
     fun exportPayload(): String = JSONObject()
         .put("version", 1)

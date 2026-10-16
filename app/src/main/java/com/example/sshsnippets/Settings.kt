@@ -2,6 +2,10 @@ package com.example.sshsnippets
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +15,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.roundToInt
 
 private const val MIN_BACKUP_PASSWORD = 8
 private const val BACKUP_FILE_NAME = "snipssh-backup.ssb"
@@ -45,6 +54,9 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
     var exportPassword by remember { mutableStateOf<String?>(null) }
     var importBytes by remember { mutableStateOf<ByteArray?>(null) }
     var askExportPassword by remember { mutableStateOf(false) }
+    var fontSize by remember { mutableStateOf(store.terminalFontSize()) }
+    var fontId by remember { mutableStateOf(store.terminalFontId()) }
+    var themeId by remember { mutableStateOf(store.terminalThemeId()) }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/octet-stream"),
@@ -85,7 +97,10 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
         }
     }
 
-    Column(Modifier.fillMaxSize().systemBarsPadding().padding(16.dp)) {
+    val theme = themeById(themeId)
+    val previewStyle = terminalTextStyle(fontById(fontId), fontSize)
+
+    Column(Modifier.fillMaxSize().systemBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Text("Impostazioni", style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(16.dp))
 
@@ -108,6 +123,44 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                     }
                 },
             )
+        }
+
+        Spacer(Modifier.height(24.dp))
+        Text("Terminale", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Text("Dimensione carattere: $fontSize sp")
+        Slider(
+            value = fontSize.toFloat(),
+            onValueChange = { fontSize = it.roundToInt() },
+            onValueChangeFinished = { store.setTerminalFontSize(fontSize) },
+            valueRange = MIN_TERMINAL_FONT_SIZE.toFloat()..MAX_TERMINAL_FONT_SIZE.toFloat(),
+            steps = MAX_TERMINAL_FONT_SIZE - MIN_TERMINAL_FONT_SIZE - 1,
+        )
+        Spacer(Modifier.height(8.dp))
+        Text("Carattere")
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TerminalFonts.forEach { f ->
+                FilterChip(
+                    selected = fontId == f.id,
+                    onClick = { fontId = f.id; store.setTerminalFontId(f.id) },
+                    label = { Text(f.label) },
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text("Tema colori")
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TerminalThemes.forEach { t ->
+                FilterChip(
+                    selected = themeId == t.id,
+                    onClick = { themeId = t.id; store.setTerminalThemeId(t.id) },
+                    label = { Text(t.label) },
+                )
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Box(Modifier.fillMaxWidth().background(theme.bg).padding(8.dp)) {
+            Text("user@server:~$ ls -la", color = theme.fg, style = previewStyle)
         }
 
         Spacer(Modifier.height(24.dp))

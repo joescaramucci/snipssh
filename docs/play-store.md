@@ -21,6 +21,7 @@ Terminale
 - Tastiera con tasti speciali (Esc, Tab, Ctrl, frecce) per usare la shell senza tastiera fisica.
 - Cronologia dei comandi per host: mentre digiti compaiono i comandi già usati che iniziano così, dal più usato.
 - Verifica delle chiavi host alla prima connessione, con avviso se la chiave del server cambia.
+- Impostazioni del terminale: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
 
 Snippet
 - Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}}.
@@ -48,7 +49,7 @@ Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va
 ```
 SnipSSH non raccoglie, non trasmette e non condivide dati personali.
 
-- Host, credenziali, chiavi private, snippet, cronologia dei comandi e chiavi host SSH restano sul dispositivo, cifrati con EncryptedSharedPreferences (chiave nel Android Keystore).
+- Host, credenziali, chiavi private, snippet, cronologia dei comandi, preferenze del terminale e chiavi host SSH restano sul dispositivo, cifrati con EncryptedSharedPreferences (chiave nel Android Keystore).
 - Le connessioni SSH e SFTP vanno direttamente dal dispositivo al server scelto dall'utente. Lo sviluppatore non riceve né conserva alcun dato di queste connessioni.
 - Il backup viene salvato solo se l'utente lo esporta, in un file cifrato con la password scelta dall'utente. Lo sviluppatore non riceve il file.
 - L'app non usa analytics, pubblicità o SDK di tracciamento.

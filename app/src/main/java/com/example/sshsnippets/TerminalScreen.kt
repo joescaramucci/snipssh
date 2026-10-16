@@ -16,9 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -29,9 +27,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-private val TerminalTextStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp, lineHeight = 15.sp)
-private val DefaultFg = Color(0xFFE6E6E6)
-private val DefaultBg = Color(0xFF121212)
 
 private val Ansi16 = listOf(
     0xFF000000, 0xFFCD0000, 0xFF00CD00, 0xFFCDCD00, 0xFF0000EE, 0xFFCD00CD, 0xFF00CDCD, 0xFFE5E5E5,
@@ -52,11 +47,11 @@ private fun ansiColor(idx: Int): Color? = when {
     }
 }
 
-private fun styleOf(cell: AnsiCell, inverse: Boolean): SpanStyle {
+private fun styleOf(cell: AnsiCell, inverse: Boolean, theme: TerminalTheme): SpanStyle {
     val fg = ansiColor(cell.fg)
     val bg = ansiColor(cell.bg)
-    val textColor = if (inverse) (bg ?: DefaultBg) else (fg ?: DefaultFg)
-    val bgColor = if (inverse) (fg ?: DefaultFg) else bg
+    val textColor = if (inverse) (bg ?: theme.bg) else (fg ?: theme.fg)
+    val bgColor = if (inverse) (fg ?: theme.fg) else bg
     return SpanStyle(
         color = textColor,
         background = bgColor ?: Color.Unspecified,
@@ -65,7 +60,7 @@ private fun styleOf(cell: AnsiCell, inverse: Boolean): SpanStyle {
 }
 
 /** Groups adjacent cells with the same style into spans. The cursor cell is drawn inverted. */
-private fun renderLine(cells: Array<AnsiCell>, cursorCol: Int): AnnotatedString = buildAnnotatedString {
+private fun renderLine(cells: Array<AnsiCell>, cursorCol: Int, theme: TerminalTheme): AnnotatedString = buildAnnotatedString {
     var i = 0
     while (i < cells.size) {
         val first = cells[i]
@@ -75,7 +70,7 @@ private fun renderLine(cells: Array<AnsiCell>, cursorCol: Int): AnnotatedString 
             cells[j].fg == first.fg && cells[j].bg == first.bg && cells[j].bold == first.bold
         ) j++
         val text = buildString { for (k in i until j) append(cells[k].ch) }
-        pushStyle(styleOf(first, atCursor))
+        pushStyle(styleOf(first, atCursor, theme))
         append(text)
         pop()
         i = j
@@ -97,8 +92,10 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
     val hostKeys = rememberHostKeyPrompter()
 
+    val theme = remember { themeById(store.terminalThemeId()) }
+    val textStyle = remember { terminalTextStyle(fontById(store.terminalFontId()), store.terminalFontSize()) }
     val measurer = rememberTextMeasurer()
-    val probe = remember(measurer) { measurer.measure(text = "M".repeat(10), style = TerminalTextStyle).size }
+    val probe = remember(measurer, textStyle) { measurer.measure(text = "M".repeat(10), style = textStyle).size }
     val cellW = (probe.width / 10).coerceAtLeast(1)
     val cellH = probe.height.coerceAtLeast(1)
     val padPx = with(LocalDensity.current) { 16.dp.roundToPx() }
@@ -149,7 +146,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
             Spacer(Modifier.weight(1f))
             Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 8.dp))
         }
-        Box(Modifier.weight(1f).fillMaxWidth().background(DefaultBg).onSizeChanged { areaSize = it }) {
+        Box(Modifier.weight(1f).fillMaxWidth().background(theme.bg).onSizeChanged { areaSize = it }) {
             LazyColumn(
                 Modifier.fillMaxSize().padding(8.dp),
                 state = listState,
@@ -159,8 +156,8 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                     val idx = snap.lines.size - 1 - i
                     val cursor = if (idx == snap.cursorLine) snap.cursorCol else -1
                     Text(
-                        renderLine(snap.lines[idx], cursor),
-                        style = TerminalTextStyle,
+                        renderLine(snap.lines[idx], cursor, theme),
+                        style = textStyle,
                         softWrap = false,
                     )
                 }

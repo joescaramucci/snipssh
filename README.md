@@ -25,6 +25,7 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 ## Funzionalità
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
+- **Aspetto del terminale** in Impostazioni: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
 - **Cronologia dei comandi** per host: mentre digiti (es. `cd`) compaiono i comandi già usati che iniziano così, dal più usato al meno usato.
 - **Snippet** con nome e variabili tipo `{{servizio}}`, lanciabili sul server con un tocco e conferma.
 - **Host** con autenticazione a password oppure chiave privata (PEM), con passphrase opzionale.
@@ -91,6 +92,7 @@ app/src/main/java/com/example/sshsnippets/
   MainActivity.kt      schede Host / Snippet / Impostazioni
   SshSession.kt        connessione SSH, verifica chiave host
   TerminalScreen.kt    terminale e tasti rapidi
+  TerminalThemes.kt    temi, font e dimensione del terminale
   AnsiTerminal.kt      emulatore ANSI
   Sftp.kt              client e schermata SFTP
   Store.kt, Models.kt  archiviazione cifrata e modelli
@@ -102,3 +104,5 @@ app/src/main/java/com/example/sshsnippets/
 ## Licenza
 
 [MIT](LICENSE)
+
+Il font JetBrains Mono (`app/src/main/res/font/`) è distribuito con licenza SIL Open Font License 1.1, il cui testo è in [docs/fonts/JetBrainsMono-OFL.txt](docs/fonts/JetBrainsMono-OFL.txt).
