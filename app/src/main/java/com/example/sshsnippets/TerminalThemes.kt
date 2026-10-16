@@ -29,8 +29,8 @@ private val JetBrainsMono = FontFamily(
 )
 
 val TerminalFonts = listOf(
-    TerminalFont("system", "Di sistema", FontFamily.Monospace),
     TerminalFont("jetbrains", "JetBrains Mono", JetBrainsMono),
+    TerminalFont("system", "Di sistema", FontFamily.Monospace),
 )
 
 fun fontById(id: String): TerminalFont = TerminalFonts.firstOrNull { it.id == id } ?: TerminalFonts[0]
