@@ -25,6 +25,7 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 ## Funzionalità
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
+- **Cronologia dei comandi** per host: mentre digiti (es. `cd`) compaiono i comandi già usati che iniziano così, dal più usato al meno usato.
 - **Snippet** con nome e variabili tipo `{{servizio}}`, lanciabili sul server con un tocco e conferma.
 - **Host** con autenticazione a password oppure chiave privata (PEM), con passphrase opzionale.
 - **Verifica delle chiavi host** alla prima connessione, con avviso se la chiave del server cambia.

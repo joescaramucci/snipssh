@@ -15,10 +15,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -87,10 +89,11 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     val term = remember { AnsiTerminal(80, 24) }
     var version by remember { mutableIntStateOf(0) }
     var status by remember { mutableStateOf("Connessione a ${host.hostname}...") }
-    var input by remember { mutableStateOf("") }
+    var input by remember { mutableStateOf(TextFieldValue()) }
     var pending by remember { mutableStateOf<Snippet?>(null) }
     val values = remember { mutableStateMapOf<String, String>() }
     var ctrl by remember { mutableStateOf(false) }
+    var history by remember(host.id) { mutableStateOf(store.loadHistory(host.id)) }
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
     val hostKeys = rememberHostKeyPrompter()
 
@@ -188,17 +191,33 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                 OutlinedButton(onClick = { send(value) }, contentPadding = PaddingValues(8.dp)) { Text(label) }
             }
         }
+        val suggestions = if (ctrl || input.text.isBlank()) emptyList() else history.suggest(input.text)
+        if (suggestions.isNotEmpty()) {
+            Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 4.dp)) {
+                suggestions.forEach { c ->
+                    AssistChip(
+                        onClick = { input = TextFieldValue(c, TextRange(c.length)) },
+                        label = { Text(c, maxLines = 1) },
+                    )
+                    Spacer(Modifier.width(4.dp))
+                }
+            }
+        }
         Row(Modifier.padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
             OutlinedTextField(input, { input = it }, Modifier.weight(1f), singleLine = true)
             Button(onClick = {
-                val text = if (ctrl && input.length == 1) {
+                if (ctrl && input.text.length == 1) {
                     ctrl = false
-                    (input[0].uppercaseChar().code and 0x1f).toChar().toString()
+                    send((input.text[0].uppercaseChar().code and 0x1f).toChar().toString())
                 } else {
-                    input + "\n"
+                    val command = input.text.trim()
+                    if (command.isNotEmpty()) {
+                        store.recordCommand(host.id, command)
+                        history = store.loadHistory(host.id)
+                    }
+                    send(input.text + "\n")
                 }
-                send(text)
-                input = ""
+                input = TextFieldValue()
             }) { Text("Invia") }
         }
     }

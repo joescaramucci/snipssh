@@ -50,3 +50,23 @@ fun JSONObject.toSnippet() = Snippet(
 
 inline fun <T> JSONArray.mapObjects(f: (JSONObject) -> T): List<T> =
     (0 until length()).map { f(getJSONObject(it)) }
+
+/** Un comando digitato su un host: quante volte e quando è stato usato l'ultima volta (ms). */
+data class HistoryEntry(val command: String, val count: Int, val lastUsed: Long)
+
+fun HistoryEntry.toJson() = JSONObject().put("c", command).put("n", count).put("t", lastUsed)
+
+fun JSONObject.toHistoryEntry() = HistoryEntry(getString("c"), getInt("n"), getLong("t"))
+
+/** Più usato prima, a parità di conteggio il più recente. */
+val historyRelevance: Comparator<HistoryEntry> =
+    compareByDescending<HistoryEntry> { it.count }.thenByDescending { it.lastUsed }
+
+/** Comandi che iniziano con [prefix] (senza distinzione di maiuscole), esclusi quelli uguali al prefisso. */
+fun List<HistoryEntry>.suggest(prefix: String, limit: Int = 5): List<String> =
+    asSequence()
+        .filter { it.command.startsWith(prefix, ignoreCase = true) && !it.command.equals(prefix, ignoreCase = true) }
+        .sortedWith(historyRelevance)
+        .take(limit)
+        .map { it.command }
+        .toList()

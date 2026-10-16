@@ -8,6 +8,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Base64
 
+private const val MAX_HISTORY_PER_HOST = 200
+
 // Hosts hold credentials, so everything lives in encrypted preferences.
 class Store(context: Context) {
     private val prefs: SharedPreferences = EncryptedSharedPreferences.create(
@@ -29,6 +31,29 @@ class Store(context: Context) {
 
     fun saveSnippets(snippets: List<Snippet>) =
         prefs.edit().putString("snippets", JSONArray(snippets.map { it.toJson() }).toString()).apply()
+
+    /** Comandi digitati sull'host, dal più usato al meno usato. */
+    fun loadHistory(hostId: String): List<HistoryEntry> {
+        val all = JSONObject(prefs.getString("history", "{}")!!)
+        return all.optJSONArray(hostId)?.mapObjects { it.toHistoryEntry() }.orEmpty().sortedWith(historyRelevance)
+    }
+
+    /** Registra un comando digitato: incrementa il conteggio o lo aggiunge, mantenendo i più rilevanti. */
+    fun recordCommand(hostId: String, command: String) {
+        val all = JSONObject(prefs.getString("history", "{}")!!)
+        val list = all.optJSONArray(hostId)?.mapObjects { it.toHistoryEntry() }.orEmpty().toMutableList()
+        val now = System.currentTimeMillis()
+        val i = list.indexOfFirst { it.command == command }
+        if (i >= 0) {
+            val e = list.removeAt(i)
+            list.add(e.copy(count = e.count + 1, lastUsed = now))
+        } else {
+            list.add(HistoryEntry(command, 1, now))
+        }
+        val kept = list.sortedWith(historyRelevance).take(MAX_HISTORY_PER_HOST)
+        all.put(hostId, JSONArray(kept.map { it.toJson() }))
+        prefs.edit().putString("history", all.toString()).apply()
+    }
 
     /** Chiave host salvata per "host:porta", oppure null se non ancora vista. */
     fun loadHostKey(hostId: String): ByteArray? {
