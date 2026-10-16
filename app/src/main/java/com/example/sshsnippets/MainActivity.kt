@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
@@ -103,10 +104,12 @@ fun HostsScreen(
     var passphrase by remember { mutableStateOf("") }
     var keyError by remember { mutableStateOf<String?>(null) }
     var editingId by remember { mutableStateOf<String?>(null) }
+    var distro by remember { mutableStateOf("") }
 
     fun resetForm() {
         editingId = null
         name = ""; hostname = ""; port = "22"; user = ""; pass = ""; key = ""; passphrase = ""
+        distro = ""
         keyError = null
     }
 
@@ -145,6 +148,20 @@ fun HostsScreen(
                 OutlinedTextField(hostname, { hostname = it }, label = { Text("Indirizzo") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(port, { port = it }, label = { Text("Porta") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(user, { user = it }, label = { Text("Utente") }, modifier = Modifier.fillMaxWidth())
+                Text("Logo sistema", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
+                Row(Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
+                    FilterChip(selected = distro.isEmpty(), onClick = { distro = "" }, label = { Text("Nessuno") })
+                    Spacer(Modifier.width(8.dp))
+                    Distros.forEach { d ->
+                        FilterChip(
+                            selected = distro == d.id,
+                            onClick = { distro = d.id },
+                            label = { Text(d.label) },
+                            leadingIcon = { DistroBadge(d, size = 18) },
+                        )
+                        Spacer(Modifier.width(8.dp))
+                    }
+                }
                 OutlinedTextField(pass, { pass = it }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
                     key,
@@ -178,7 +195,7 @@ fun HostsScreen(
                             id = editingId ?: java.util.UUID.randomUUID().toString(),
                             name = name.ifBlank { hostname }, hostname = hostname,
                             port = port.toIntOrNull() ?: 22, username = user, password = pass,
-                            privateKey = key, keyPassphrase = passphrase,
+                            privateKey = key, keyPassphrase = passphrase, distro = distro,
                         )
                         onChange(
                             if (editingId == null) hosts + saved
@@ -192,8 +209,17 @@ fun HostsScreen(
         }
         LazyColumn(Modifier.weight(1f)) {
             items(hosts, key = { it.id }) { h ->
+                val logo = distroById(h.distro)
                 ListItem(
-                    headlineContent = { Text(h.name) },
+                    headlineContent = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (logo != null) {
+                                DistroBadge(logo, size = 24)
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            Text(h.name)
+                        }
+                    },
                     supportingContent = {
                         Column {
                             Text("${h.username}@${h.hostname}:${h.port}")
@@ -204,7 +230,7 @@ fun HostsScreen(
                                     editingId = h.id
                                     name = h.name; hostname = h.hostname; port = h.port.toString()
                                     user = h.username; pass = h.password; key = h.privateKey
-                                    passphrase = h.keyPassphrase; keyError = null
+                                    passphrase = h.keyPassphrase; keyError = null; distro = h.distro
                                     editing = true
                                 }) { Text("Modifica") }
                                 TextButton(onClick = { onForgetKey(h) }) { Text("Dimentica chiave") }

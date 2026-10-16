@@ -22,6 +22,8 @@ Terminale
 - Cronologia dei comandi per host: mentre digiti compaiono i comandi già usati che iniziano così, dal più usato.
 - Verifica delle chiavi host alla prima connessione, con avviso se la chiave del server cambia.
 - Impostazioni del terminale: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
+- Zoom a due dita sul terminale per ingrandire o ridurre il testo.
+- Digitando `exit` la sessione si chiude e l'app torna alla lista host.
 
 Snippet
 - Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}}.
@@ -30,6 +32,7 @@ Snippet
 Host
 - Password oppure chiave privata (PEM), con passphrase opzionale.
 - Importazione del file della chiave dal dispositivo.
+- Logo della distribuzione accanto al nome dell'host (Debian, Ubuntu e altre), scelto dal form.
 
 SFTP
 - Sfoglia il filesystem del server, scarica e carica file, elimina file e cartelle vuote.

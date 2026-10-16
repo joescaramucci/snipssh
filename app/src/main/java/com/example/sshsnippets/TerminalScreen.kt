@@ -11,6 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
@@ -26,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 
 private val Ansi16 = listOf(
@@ -77,6 +81,25 @@ private fun renderLine(cells: Array<AnsiCell>, cursorCol: Int, theme: TerminalTh
     }
 }
 
+/** Pinch a due dita: chiama [onZoom] con il rapporto tra la distanza attuale e quella precedente. Con un dito non consuma nulla, così lo scroll resta attivo. */
+private fun Modifier.pinchToZoom(onZoom: (Float) -> Unit): Modifier = pointerInput(Unit) {
+    awaitPointerEventScope {
+        var prevSpan = 0f
+        while (true) {
+            val event = awaitPointerEvent(PointerEventPass.Initial)
+            val down = event.changes.filter { it.pressed }
+            if (down.size >= 2) {
+                val span = (down[0].position - down[1].position).getDistance()
+                if (prevSpan > 0f && span > 0f) onZoom(span / prevSpan)
+                prevSpan = span
+                event.changes.forEach { if (it.positionChanged()) it.consume() }
+            } else {
+                prevSpan = 0f
+            }
+        }
+    }
+}
+
 @Composable
 fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
@@ -93,7 +116,14 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     val hostKeys = rememberHostKeyPrompter()
 
     val theme = remember { themeById(store.terminalThemeId()) }
-    val textStyle = remember { terminalTextStyle(fontById(store.terminalFontId()), store.terminalFontSize()) }
+    var fontSp by remember { mutableFloatStateOf(store.terminalFontSize().toFloat()) }
+    val sizeSp = fontSp.roundToInt()
+    val textStyle = remember(sizeSp) { terminalTextStyle(fontById(store.terminalFontId()), sizeSp) }
+    val onZoom: (Float) -> Unit = { factor ->
+        fontSp = (fontSp * factor).coerceIn(MIN_TERMINAL_FONT_SIZE.toFloat(), MAX_TERMINAL_FONT_SIZE.toFloat())
+        val rounded = fontSp.roundToInt()
+        if (rounded != store.terminalFontSize()) store.setTerminalFontSize(rounded)
+    }
     val measurer = rememberTextMeasurer()
     val probe = remember(measurer, textStyle) { measurer.measure(text = "M".repeat(10), style = textStyle).size }
     val cellW = (probe.width / 10).coerceAtLeast(1)
@@ -112,7 +142,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                 },
                 onClosed = {
                     synchronized(term) { term.feed("\r\n[disconnesso]\r\n") }
-                    scope.launch(Dispatchers.Main) { status = "Disconnesso"; version++ }
+                    scope.launch(Dispatchers.Main) { onExit() }
                 },
             )
             status = "Connesso a ${host.hostname}"
@@ -146,7 +176,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
             Spacer(Modifier.weight(1f))
             Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 8.dp))
         }
-        Box(Modifier.weight(1f).fillMaxWidth().background(theme.bg).onSizeChanged { areaSize = it }) {
+        Box(Modifier.weight(1f).fillMaxWidth().background(theme.bg).pinchToZoom(onZoom).onSizeChanged { areaSize = it }) {
             LazyColumn(
                 Modifier.fillMaxSize().padding(8.dp),
                 state = listState,

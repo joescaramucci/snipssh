@@ -13,6 +13,8 @@ data class Host(
     val password: String = "",
     val privateKey: String = "",
     val keyPassphrase: String = "",
+    // Id di un elemento di Distros; vuoto = nessun logo.
+    val distro: String = "",
 )
 
 data class Snippet(
@@ -35,11 +37,12 @@ data class Snippet(
 fun Host.toJson() = JSONObject()
     .put("id", id).put("name", name).put("hostname", hostname).put("port", port)
     .put("username", username).put("password", password).put("privateKey", privateKey)
-    .put("keyPassphrase", keyPassphrase)
+    .put("keyPassphrase", keyPassphrase).put("distro", distro)
 
 fun JSONObject.toHost() = Host(
     getString("id"), getString("name"), getString("hostname"), getInt("port"),
     getString("username"), optString("password"), optString("privateKey"), optString("keyPassphrase"),
+    optString("distro"),
 )
 
 fun Snippet.toJson() = JSONObject()
