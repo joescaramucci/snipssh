@@ -1,0 +1,21 @@
+# Gradle
+.gradle/
+build/
+app/build/
+*.iml
+
+# Android Studio / IntelliJ
+.idea/
+*.hprof
+
+# Locale, con percorso SDK
+local.properties
+
+# Firma: le chiavi e le password non vanno mai nel repository
+*.jks
+*.keystore
+keystore.properties
+
+# OS
+.DS_Store
+Thumbs.db
