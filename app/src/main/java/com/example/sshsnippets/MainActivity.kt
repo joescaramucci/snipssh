@@ -102,6 +102,13 @@ fun HostsScreen(
     var key by remember { mutableStateOf("") }
     var passphrase by remember { mutableStateOf("") }
     var keyError by remember { mutableStateOf<String?>(null) }
+    var editingId by remember { mutableStateOf<String?>(null) }
+
+    fun resetForm() {
+        editingId = null
+        name = ""; hostname = ""; port = "22"; user = ""; pass = ""; key = ""; passphrase = ""
+        keyError = null
+    }
 
     val keyFileLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
@@ -125,7 +132,13 @@ fun HostsScreen(
     }
 
     Column(Modifier.fillMaxSize().padding(12.dp)) {
-        Button(onClick = { editing = !editing }) { Text(if (editing) "Chiudi" else "Nuovo host") }
+        Button(onClick = {
+            if (editing) {
+                resetForm(); editing = false
+            } else {
+                resetForm(); editing = true
+            }
+        }) { Text(if (editing) "Chiudi" else "Nuovo host") }
         if (editing) {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 OutlinedTextField(name, { name = it }, label = { Text("Nome") }, modifier = Modifier.fillMaxWidth())
@@ -161,18 +174,20 @@ fun HostsScreen(
                                 return@Button
                             }
                         }
-                        onChange(
-                            hosts + Host(
-                                name = name.ifBlank { hostname }, hostname = hostname,
-                                port = port.toIntOrNull() ?: 22, username = user, password = pass,
-                                privateKey = key, keyPassphrase = passphrase,
-                            ),
+                        val saved = Host(
+                            id = editingId ?: java.util.UUID.randomUUID().toString(),
+                            name = name.ifBlank { hostname }, hostname = hostname,
+                            port = port.toIntOrNull() ?: 22, username = user, password = pass,
+                            privateKey = key, keyPassphrase = passphrase,
                         )
-                        name = ""; hostname = ""; user = ""; pass = ""; key = ""; passphrase = ""
-                        keyError = null; editing = false
+                        onChange(
+                            if (editingId == null) hosts + saved
+                            else hosts.map { if (it.id == saved.id) saved else it },
+                        )
+                        resetForm(); editing = false
                     },
                     enabled = hostname.isNotBlank() && user.isNotBlank(),
-                ) { Text("Salva") }
+                ) { Text(if (editingId == null) "Salva" else "Salva modifiche") }
             }
         }
         LazyColumn(Modifier.weight(1f)) {
@@ -185,6 +200,13 @@ fun HostsScreen(
                             Row(Modifier.horizontalScroll(rememberScrollState())) {
                                 TextButton(onClick = { onConnect(h) }) { Text("Connetti") }
                                 TextButton(onClick = { onSftp(h) }) { Text("SFTP") }
+                                TextButton(onClick = {
+                                    editingId = h.id
+                                    name = h.name; hostname = h.hostname; port = h.port.toString()
+                                    user = h.username; pass = h.password; key = h.privateKey
+                                    passphrase = h.keyPassphrase; keyError = null
+                                    editing = true
+                                }) { Text("Modifica") }
                                 TextButton(onClick = { onForgetKey(h) }) { Text("Dimentica chiave") }
                                 if (h.privateKey.isNotBlank()) {
                                     TextButton(onClick = {
