@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lang_en">English</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_ko">한국어</string>
+
+    <string name="tab_hosts">Hôtes</string>
+    <string name="tab_snippets">Snippets</string>
+    <string name="tab_settings">Réglages</string>
+
+    <string name="common_cancel">Annuler</string>
+    <string name="common_close">Fermer</string>
+    <string name="common_save">Enregistrer</string>
+    <string name="common_delete">Supprimer</string>
+    <string name="common_name">Nom</string>
+    <string name="common_password">Mot de passe</string>
+
+    <string name="host_new">Nouvel hôte</string>
+    <string name="host_address">Adresse</string>
+    <string name="host_port">Port</string>
+    <string name="host_user">Utilisateur</string>
+    <string name="host_private_key">Clé privée (PEM)</string>
+    <string name="host_passphrase">Phrase de passe de la clé (si besoin)</string>
+    <string name="host_logo">Logo du système</string>
+    <string name="host_logo_none">Aucun</string>
+    <string name="host_import_key">Importer un fichier de clé</string>
+    <string name="host_save_changes">Enregistrer les modifications</string>
+    <string name="host_edit">Modifier</string>
+    <string name="host_forget_key">Oublier la clé</string>
+    <string name="host_remove_key">Retirer la clé</string>
+    <string name="host_connect">Se connecter</string>
+    <string name="host_key_read_error">Impossible de lire le fichier : %1$s</string>
+    <string name="host_key_empty">Le fichier est vide ou illisible</string>
+    <string name="host_key_ppk">Les clés .ppk de PuTTY ne sont pas prises en charge : exportez-les au format OpenSSH</string>
+    <string name="host_key_format">Format non reconnu : une clé privée PEM/OpenSSH est requise (ex. id_ed25519)</string>
+
+    <string name="snippets_command_hint">Commande, variables : {{name}}</string>
+    <string name="snippets_add">Ajouter un snippet</string>
+    <string name="terminal_no_snippets">Aucun snippet : ajoutez-en depuis l\'onglet Snippets</string>
+
+    <string name="settings_language">Langue</string>
+    <string name="settings_biometric">Verrouillage biométrique</string>
+    <string name="settings_biometric_desc">Demande l\'empreinte ou le verrouillage de l\'écran au retour dans l\'app.</string>
+    <string name="settings_biometric_setup">Configurez une empreinte ou un verrouillage d\'écran dans les réglages Android.</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_font_size">Taille de police : %1$d sp</string>
+    <string name="settings_font">Police</string>
+    <string name="settings_theme">Thème de couleurs</string>
+    <string name="settings_backup">Sauvegarde</string>
+    <string name="settings_backup_desc">Le fichier est chiffré avec un mot de passe de votre choix. Il contient les hôtes (y compris mots de passe, clés privées et phrases de passe), les snippets et les clés d\'hôte. Conservez-le en lieu sûr.</string>
+    <string name="settings_export">Exporter</string>
+    <string name="settings_import">Importer</string>
+
+    <string name="backup_password">Mot de passe de la sauvegarde</string>
+    <string name="backup_repeat_password">Répétez le mot de passe</string>
+    <string name="backup_password_min">Au moins %1$d caractères. Si vous le perdez, la sauvegarde ne pourra pas être récupérée.</string>
+    <string name="backup_exported">Sauvegarde exportée.</string>
+    <string name="backup_export_failed">Échec de l\'exportation : %1$s</string>
+    <string name="backup_import_done">Sauvegarde importée. Les données précédentes ont été remplacées.</string>
+    <string name="backup_invalid">Ce n\'est pas un fichier de sauvegarde valide.</string>
+    <string name="backup_wrong_password">Mot de passe incorrect ou fichier invalide.</string>
+    <string name="backup_read_failed">Échec de la lecture : %1$s</string>
+    <string name="file_unreadable">Le fichier est illisible</string>
+    <string name="file_write_failed">Impossible d\'écrire le fichier</string>
+
+    <string name="lock_title">Déverrouiller SSH Snippets</string>
+    <string name="lock_locked">Application verrouillée</string>
+    <string name="lock_unlock">Déverrouiller</string>
+    <string name="lock_no_biometric">Aucune empreinte ni verrouillage d\'écran n\'est configuré, l\'app ne peut donc pas être déverrouillée. Vous pouvez désactiver le verrouillage.</string>
+    <string name="lock_disable">Désactiver le verrouillage</string>
+
+    <string name="terminal_connecting">Connexion à %1$s...</string>
+    <string name="terminal_connected">Connecté à %1$s</string>
+    <string name="terminal_error">Erreur : %1$s</string>
+    <string name="terminal_run">Exécuter</string>
+    <string name="terminal_send">Envoyer</string>
+    <string name="terminal_ctrl">Ctrl</string>
+
+    <string name="hostkey_message">%1$s n\'est pas encore connu.\n\nEmpreinte de la clé :\n%2$s\n\nSe connecter et l\'enregistrer ?</string>
+    <string name="hostkey_accept">Accepter</string>
+    <string name="hostkey_reject">Refuser</string>
+    <string name="ssh_key_rejected">Clé d\'hôte non acceptée</string>
+    <string name="ssh_connect_failed">Impossible de se connecter à %1$s : %2$s</string>
+    <string name="ssh_key_changed">ATTENTION : la clé d\'hôte de %1$s a changé (%2$s). Connexion bloquée par sécurité. Si le serveur a été réinstallé, utilisez Oublier la clé dans la liste des hôtes.</string>
+
+    <string name="sftp_back">Retour</string>
+    <string name="sftp_up">Remonter</string>
+    <string name="sftp_refresh">Actualiser</string>
+    <string name="sftp_upload">Envoyer</string>
+    <string name="sftp_download">Télécharger</string>
+    <string name="sftp_delete_title">Supprimer %1$s ?</string>
+    <string name="sftp_delete_folder">Le dossier doit être vide.</string>
+    <string name="sftp_delete_file">Le fichier sera supprimé du serveur.</string>
+
+    <string name="distro_generic">Linux générique</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_solarized">Solarized</string>
+    <string name="font_system">Système</string>
+</resources>

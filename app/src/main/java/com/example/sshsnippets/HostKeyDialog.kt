@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -40,11 +41,9 @@ fun HostKeyDialog(prompter: HostKeyPrompter) {
     val p = prompter.pending ?: return
     AlertDialog(
         onDismissRequest = { prompter.answer(false) },
-        title = { Text("Nuovo host") },
-        text = {
-            Text("${p.hostname} non è ancora noto.\n\nImpronta della chiave:\n${p.fingerprint}\n\nSi connette e la salvi?")
-        },
-        confirmButton = { TextButton(onClick = { prompter.answer(true) }) { Text("Accetta") } },
-        dismissButton = { TextButton(onClick = { prompter.answer(false) }) { Text("Rifiuta") } },
+        title = { Text(stringResource(R.string.host_new)) },
+        text = { Text(stringResource(R.string.hostkey_message, p.hostname, p.fingerprint)) },
+        confirmButton = { TextButton(onClick = { prompter.answer(true) }) { Text(stringResource(R.string.hostkey_accept)) } },
+        dismissButton = { TextButton(onClick = { prompter.answer(false) }) { Text(stringResource(R.string.hostkey_reject)) } },
     )
 }

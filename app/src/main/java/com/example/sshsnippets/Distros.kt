@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.sp
  * Sistema operativo associabile a un host. Il logo è un badge con il colore del marchio e le iniziali,
  * non il logo ufficiale, che è un marchio registrato.
  */
-class Distro(val id: String, val label: String, val color: Color, val initials: String)
+class Distro(val id: String, val label: String, val color: Color, val initials: String, val labelRes: Int? = null)
 
 val Distros = listOf(
     Distro("debian", "Debian", Color(0xFFA80030), "D"),
@@ -30,7 +30,7 @@ val Distros = listOf(
     Distro("windows", "Microsoft Windows", Color(0xFF0078D4), "W"),
     Distro("macos", "macOS", Color(0xFF6E6E73), "mac"),
     Distro("freebsd", "FreeBSD", Color(0xFFAB2B28), "BSD"),
-    Distro("linux", "Linux generico", Color(0xFF5F6368), "L"),
+    Distro("linux", "Linux", Color(0xFF5F6368), "L", R.string.distro_generic),
 )
 
 fun distroById(id: String): Distro? = Distros.firstOrNull { it.id == id }

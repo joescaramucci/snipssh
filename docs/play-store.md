@@ -22,12 +22,13 @@ Terminale
 - Cronologia dei comandi per host: mentre digiti compaiono i comandi già usati che iniziano così, dal più usato.
 - Verifica delle chiavi host alla prima connessione, con avviso se la chiave del server cambia.
 - Impostazioni del terminale: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
+- Lingue: inglese (predefinito), italiano, spagnolo, francese, tedesco, cinese semplificato, russo e coreano. Si cambiano in Impostazioni.
 - Zoom a due dita sul terminale per ingrandire o ridurre il testo.
 - Digitando `exit` la sessione si chiude e l'app si chiude.
 - In orizzontale snippet e tasti rapidi sono in una colonna laterale scorrevole, e il terminale resta visibile anche con la tastiera aperta.
 
 Snippet
-- Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}}.
+- Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}} (lettere senza accenti, cifre e underscore).
 - Lancia uno snippet sul server con un tocco e conferma.
 
 Host
@@ -80,6 +81,7 @@ Permessi dichiarati in `AndroidManifest.xml`: solo `INTERNET`. Il blocco biometr
 
 - `minSdk` 26 (Android 8.0).
 - `targetSdk` e `compileSdk` 36. Verifica nella Console il requisito corrente per le nuove app e gli aggiornamenti.
+- Versione 0.2.0 (`versionCode` 2, `versionName` "0.2.0" in `app/build.gradle.kts`).
 - Formato: Android App Bundle (`app/build/outputs/bundle/release/app-release.aab`), firmato con la upload key.
 - Play App Signing: abilitalo al primo caricamento. Google gestisce la chiave di firma finale.
 - Upload key: `C:\Users\joe\.android\release\sshsnippets-upload.jks`. Fanne una copia di sicurezza fuori dal computer. Se perdi la password, serve il supporto Google per reimpostarla.
@@ -92,7 +94,13 @@ File in [docs/store/](./store/):
 - [feature-graphic-1024x500.png](./store/feature-graphic-1024x500.png): grafica in evidenza, 1024 x 500.
 - [screenshots/](./store/screenshots/): screenshot telefono 1080 x 2160 (rapporto 2:1, il massimo accettato da Play). Ordine consigliato: host (`01`), snippet (`02`), terminale (`03`), SFTP (`04`), impostazioni (`05`), terminale con comandi (`06`), nuovo host (`07`), verifica chiave host (`08`), SFTP con file (`09`).
 
-Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server di prova, alla risoluzione 1080 x 2160. Gli screenshot `03`, `05` e `06` sono stati rifatti con dati fittizi (host `web-01`, Ubuntu 24.04, font JetBrains Mono, tema Scuro). Gli screenshot `07` e `08` mostrano ancora il server di prova (`LocalTest`, `10.0.2.2`): prima di pubblicare, sostituiscili con screenshot con dati fittizi ma realistici, senza hostname o IP reali.
+Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server di prova, ritagliate a 1080 x 2160 (rapporto 2:1). Stato attuale:
+
+- `07` (nuovo host) e `08` (verifica chiave host) sono in inglese, con dati fittizi (host `web-01 production`, indirizzo dell'emulatore `10.0.2.2:2222`). Nessun hostname o IP reale.
+- `03`, `05` e `06` sono stati rifatti con dati fittizi (host `web-01`, Ubuntu 24.04, font JetBrains Mono, tema Scuro), ma l'interfaccia è in italiano.
+- `01`, `02`, `04` e `09` sono ancora in italiano e possono contenere dati del server di prova.
+
+Prima del caricamento sulla scheda in inglese, rifai gli screenshot in inglese con l'app impostata su English, usando solo dati fittizi.
 
 Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prompt `>_` su sfondo `#1C1B1F`.
 
@@ -105,7 +113,8 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 - [ ] Questionario contenuti e classificazione età compilati.
 - [ ] Dichiarazione di sicurezza per le app con crittografia (export compliance): l'app usa crittografia standard (SSH, AES-GCM).
 - [ ] Test chiuso: se l'account personale è stato creato di recente, Google richiede un test chiuso con almeno 12 tester per 14 giorni prima della produzione. Verifica nella Console la regola corrente.
-- [ ] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino.
+- [ ] Screenshot rifatti in inglese, con dati fittizi (vedi sopra).
+- [ ] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino, cambio lingua.
 
 ## Limiti da dichiarare agli utenti
 
@@ -114,4 +123,6 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 - Nessuna sincronizzazione cloud: il backup è un file cifrato che l'utente gestisce.
 - SFTP non cancella le cartelle non vuote.
 - Importare un backup sostituisce i dati presenti nell'app.
+- Le variabili `{{...}}` degli snippet accettano solo lettere ASCII, cifre e underscore. Nomi con accenti o alfabeti non latini non vengono riconosciuti.
+- Il messaggio di avviso per una chiave host cambiata arriva dalla libreria SSH ed è in inglese in tutte le lingue.
 - Chiavi host ed25519: la connessione con un server che offre solo `ssh-ed25519` come chiave host fallisce. Con RSA o ECDSA la connessione funziona. Da dichiarare nella descrizione o risolvere prima del rilascio.

@@ -1,5 +1,6 @@
 package com.example.sshsnippets
 
+import android.content.Context
 import com.jcraft.jsch.ChannelShell
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
@@ -18,6 +19,7 @@ class HostKeyRejectedException(message: String) : Exception(message)
  * [confirmHostKey] riceve l'impronta di una chiave mai vista e restituisce true se l'utente la accetta.
  */
 suspend fun openVerifiedSession(
+    context: Context,
     host: Host,
     store: Store,
     confirmHostKey: suspend (fingerprint: String) -> Boolean,
@@ -39,16 +41,19 @@ suspend fun openVerifiedSession(
         probe.disconnect()
     }
     val seen = probeRepo.lastSeen
-        ?: throw HostKeyRejectedException("Connessione a ${host.hostname} non riuscita: ${probeError?.message}")
+        ?: throw HostKeyRejectedException(
+            context.getString(R.string.ssh_connect_failed, host.hostname, probeError?.message.orEmpty()),
+        )
 
     when {
         known == null -> {
-            if (!confirmHostKey(hostKeyFingerprint(seen))) throw HostKeyRejectedException("Chiave host non accettata")
+            if (!confirmHostKey(hostKeyFingerprint(seen))) {
+                throw HostKeyRejectedException(context.getString(R.string.ssh_key_rejected))
+            }
             store.saveHostKey(hostId, seen)
         }
         !known.contentEquals(seen) -> throw HostKeyRejectedException(
-            "ATTENZIONE: la chiave host di ${host.hostname} è cambiata (${hostKeyFingerprint(seen)}). " +
-                "Connessione bloccata per sicurezza. Se il server è stato reinstallato, usa \"Dimentica chiave\" nella lista host."
+            context.getString(R.string.ssh_key_changed, host.hostname, hostKeyFingerprint(seen)),
         )
     }
 
@@ -64,7 +69,7 @@ suspend fun openVerifiedSession(
     s
 }
 
-class SshSession(private val host: Host, private val store: Store) {
+class SshSession(private val context: Context, private val host: Host, private val store: Store) {
     private var session: Session? = null
     private var channel: ChannelShell? = null
     private var out: OutputStream? = null
@@ -80,7 +85,7 @@ class SshSession(private val host: Host, private val store: Store) {
         onOutput: (String) -> Unit,
         onClosed: () -> Unit,
     ) = withContext(Dispatchers.IO) {
-        val s = openVerifiedSession(host, store, confirmHostKey)
+        val s = openVerifiedSession(context, host, store, confirmHostKey)
         val ch = s.openChannel("shell") as ChannelShell
         ch.setPtyType("xterm-256color", cols, rows, 0, 0)
         val input = InputStreamReader(ch.inputStream, Charsets.UTF_8)

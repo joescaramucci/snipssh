@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lang_en">English</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_ko">한국어</string>
+
+    <string name="tab_hosts">Hosts</string>
+    <string name="tab_snippets">Snippets</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <string name="common_cancel">Cancelar</string>
+    <string name="common_close">Cerrar</string>
+    <string name="common_save">Guardar</string>
+    <string name="common_delete">Eliminar</string>
+    <string name="common_name">Nombre</string>
+    <string name="common_password">Contraseña</string>
+
+    <string name="host_new">Nuevo host</string>
+    <string name="host_address">Dirección</string>
+    <string name="host_port">Puerto</string>
+    <string name="host_user">Usuario</string>
+    <string name="host_private_key">Clave privada (PEM)</string>
+    <string name="host_passphrase">Frase de contraseña de la clave (si la tiene)</string>
+    <string name="host_logo">Logo del sistema</string>
+    <string name="host_logo_none">Ninguno</string>
+    <string name="host_import_key">Importar archivo de clave</string>
+    <string name="host_save_changes">Guardar cambios</string>
+    <string name="host_edit">Editar</string>
+    <string name="host_forget_key">Olvidar clave</string>
+    <string name="host_remove_key">Quitar clave</string>
+    <string name="host_connect">Conectar</string>
+    <string name="host_key_read_error">No se puede leer el archivo: %1$s</string>
+    <string name="host_key_empty">El archivo está vacío o no se puede leer</string>
+    <string name="host_key_ppk">Las claves .ppk de PuTTY no son compatibles: expórtalas en formato OpenSSH</string>
+    <string name="host_key_format">Formato no reconocido: se necesita una clave privada PEM/OpenSSH (p. ej. id_ed25519)</string>
+
+    <string name="snippets_command_hint">Comando, variables: {{name}}</string>
+    <string name="snippets_add">Añadir snippet</string>
+    <string name="terminal_no_snippets">No hay snippets: añádelos desde la pestaña Snippets</string>
+
+    <string name="settings_language">Idioma</string>
+    <string name="settings_biometric">Bloqueo biométrico</string>
+    <string name="settings_biometric_desc">Pide huella o bloqueo de pantalla al volver a la app.</string>
+    <string name="settings_biometric_setup">Configura una huella o un bloqueo de pantalla en los ajustes de Android.</string>
+    <string name="settings_terminal">Terminal</string>
+    <string name="settings_font_size">Tamaño de fuente: %1$d sp</string>
+    <string name="settings_font">Fuente</string>
+    <string name="settings_theme">Tema de color</string>
+    <string name="settings_backup">Copia de seguridad</string>
+    <string name="settings_backup_desc">El archivo se cifra con una contraseña que eliges. Contiene hosts (incluidas contraseñas, claves privadas y frases de contraseña), snippets y claves de host. Guárdalo en un lugar seguro.</string>
+    <string name="settings_export">Exportar</string>
+    <string name="settings_import">Importar</string>
+
+    <string name="backup_password">Contraseña de la copia</string>
+    <string name="backup_repeat_password">Repite la contraseña</string>
+    <string name="backup_password_min">Al menos %1$d caracteres. Si la pierdes, la copia no se puede recuperar.</string>
+    <string name="backup_exported">Copia de seguridad exportada.</string>
+    <string name="backup_export_failed">Error al exportar: %1$s</string>
+    <string name="backup_import_done">Copia importada. Los datos anteriores se han sustituido.</string>
+    <string name="backup_invalid">No es un archivo de copia de seguridad válido.</string>
+    <string name="backup_wrong_password">Contraseña incorrecta o archivo no válido.</string>
+    <string name="backup_read_failed">Error al leer: %1$s</string>
+    <string name="file_unreadable">El archivo no se puede leer</string>
+    <string name="file_write_failed">No se puede escribir el archivo</string>
+
+    <string name="lock_title">Desbloquear SSH Snippets</string>
+    <string name="lock_locked">App bloqueada</string>
+    <string name="lock_unlock">Desbloquear</string>
+    <string name="lock_no_biometric">No hay huella ni bloqueo de pantalla configurados, así que la app no se puede desbloquear. Puedes desactivar el bloqueo.</string>
+    <string name="lock_disable">Desactivar bloqueo</string>
+
+    <string name="terminal_connecting">Conectando a %1$s...</string>
+    <string name="terminal_connected">Conectado a %1$s</string>
+    <string name="terminal_error">Error: %1$s</string>
+    <string name="terminal_run">Ejecutar</string>
+    <string name="terminal_send">Enviar</string>
+    <string name="terminal_ctrl">Ctrl</string>
+
+    <string name="hostkey_message">%1$s aún no es conocido.\n\nHuella de la clave:\n%2$s\n\n¿Conectar y guardarla?</string>
+    <string name="hostkey_accept">Aceptar</string>
+    <string name="hostkey_reject">Rechazar</string>
+    <string name="ssh_key_rejected">Clave del host no aceptada</string>
+    <string name="ssh_connect_failed">No se puede conectar a %1$s: %2$s</string>
+    <string name="ssh_key_changed">ADVERTENCIA: la clave del host de %1$s ha cambiado (%2$s). Conexión bloqueada por seguridad. Si el servidor se reinstaló, usa Olvidar clave en la lista de hosts.</string>
+
+    <string name="sftp_back">Atrás</string>
+    <string name="sftp_up">Arriba</string>
+    <string name="sftp_refresh">Actualizar</string>
+    <string name="sftp_upload">Subir archivo</string>
+    <string name="sftp_download">Descargar</string>
+    <string name="sftp_delete_title">¿Eliminar %1$s?</string>
+    <string name="sftp_delete_folder">La carpeta debe estar vacía.</string>
+    <string name="sftp_delete_file">El archivo se eliminará del servidor.</string>
+
+    <string name="distro_generic">Linux genérico</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_solarized">Solarized</string>
+    <string name="font_system">Sistema</string>
+</resources>

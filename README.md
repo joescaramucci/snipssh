@@ -25,6 +25,7 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 ## Funzionalità
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
+- **Lingue**: inglese (predefinito), italiano, spagnolo, francese, tedesco, cinese semplificato, russo e coreano. Si scelgono in Impostazioni e l'app si aggiorna subito.
 - **Aspetto del terminale** in Impostazioni: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized. Con due dita sul terminale si ingrandisce o riduce il testo, e la dimensione viene salvata.
 - **Uscita dalla sessione**: digitando `exit` la connessione si chiude e l'app si chiude.
 - **Orizzontale**: con il telefono in orizzontale la colonna destra mostra host, snippet e tasti rapidi, scorrevole; il terminale occupa la parte sinistra, con la riga di input compatta.
@@ -78,6 +79,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 
 - Il terminale non supporta applicazioni a schermo intero come `vim` o `htop`.
 - Server che offrono solo chiavi host `ssh-ed25519` non si connettono. RSA ed ECDSA funzionano.
+- Le variabili degli snippet accettano solo lettere ASCII, cifre e `_` (`{{servizio}}` sì, `{{è}}` o `{{nome città}}` no).
 - Le chiavi sono associate al singolo host, non condivise.
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.
 - SFTP non cancella le cartelle non vuote.
@@ -93,6 +95,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 ```
 app/src/main/java/com/example/sshsnippets/
   MainActivity.kt      schede Host / Snippet / Impostazioni
+  Locales.kt           lingue disponibili e lingua predefinita
   SshSession.kt        connessione SSH, verifica chiave host
   TerminalScreen.kt    terminale e tasti rapidi
   TerminalThemes.kt    temi, font e dimensione del terminale
@@ -102,6 +105,8 @@ app/src/main/java/com/example/sshsnippets/
   HostKeys.kt          chiavi host note (TOFU)
   AppLock.kt           blocco biometrico
   Backup.kt            export / import cifrato
+
+app/src/main/res/values*/strings.xml   testi (inglese predefinito, poi it, es, fr, de, zh-rCN, ru, ko)
 ```
 
 ## Licenza

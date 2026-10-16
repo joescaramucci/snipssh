@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
@@ -82,7 +83,7 @@ fun promptBiometric(activity: FragmentActivity, title: String, onSuccess: () -> 
         .setTitle(title)
         .setAllowedAuthenticators(biometricAuthenticators())
         // Sotto Android 11 il prompt con credenziali di sistema non ha il pulsante "Annulla" automatico.
-        .apply { if (Build.VERSION.SDK_INT < 30) setNegativeButtonText("Annulla") }
+        .apply { if (Build.VERSION.SDK_INT < 30) setNegativeButtonText(activity.getString(R.string.common_cancel)) }
         .build()
     val prompt = BiometricPrompt(
         activity,
@@ -98,8 +99,9 @@ fun promptBiometric(activity: FragmentActivity, title: String, onSuccess: () -> 
 fun LockScreen(lock: AppLockViewModel) {
     val activity = LocalContext.current as FragmentActivity
     val usable = remember { canAuthenticate(activity) }
+    val title = stringResource(R.string.lock_title)
     LaunchedEffect(Unit) {
-        if (usable) promptBiometric(activity, "Sblocca SSH Snippets") { lock.unlock() }
+        if (usable) promptBiometric(activity, title) { lock.unlock() }
     }
     Surface(Modifier.fillMaxSize().pointerInput(Unit) { detectTapGestures {} }) {
         Column(
@@ -107,20 +109,19 @@ fun LockScreen(lock: AppLockViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("App bloccata", style = MaterialTheme.typography.headlineSmall)
+            Text(stringResource(R.string.lock_locked), style = MaterialTheme.typography.headlineSmall)
             Spacer(Modifier.height(16.dp))
             if (usable) {
-                Button(onClick = { promptBiometric(activity, "Sblocca SSH Snippets") { lock.unlock() } }) {
-                    Text("Sblocca")
+                Button(onClick = { promptBiometric(activity, title) { lock.unlock() } }) {
+                    Text(stringResource(R.string.lock_unlock))
                 }
             } else {
                 Text(
-                    "Non risulta alcuna impronta o blocco schermo configurato, quindi non è possibile sbloccare. " +
-                        "Puoi disattivare il blocco.",
+                    stringResource(R.string.lock_no_biometric),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(Modifier.height(16.dp))
-                Button(onClick = { lock.setEnabled(false) }) { Text("Disattiva blocco") }
+                Button(onClick = { lock.setEnabled(false) }) { Text(stringResource(R.string.lock_disable)) }
             }
         }
     }

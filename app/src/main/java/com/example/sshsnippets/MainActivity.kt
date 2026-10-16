@@ -1,5 +1,6 @@
 package com.example.sshsnippets
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -13,9 +14,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -26,6 +29,10 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : FragmentActivity() {
     private val lock: AppLockViewModel by viewModels()
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(localizedContext(newBase, Store(newBase).appLanguage()))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +52,7 @@ fun App(store: Store, lock: AppLockViewModel) {
     var snippets by remember { mutableStateOf(store.loadSnippets()) }
     var active by remember { mutableStateOf<Host?>(null) }
     var sftpHost by remember { mutableStateOf<Host?>(null) }
-    var tab by remember { mutableIntStateOf(0) }
+    var tab by rememberSaveable { mutableStateOf(0) }
 
     Surface(Modifier.fillMaxSize()) {
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
@@ -57,9 +64,9 @@ fun App(store: Store, lock: AppLockViewModel) {
                 s != null -> SftpScreen(s, store, lock) { sftpHost = null }
                 else -> Column(Modifier.fillMaxSize().systemBarsPadding()) {
                     TabRow(tab) {
-                        Tab(tab == 0, { tab = 0 }, text = { Text("Host") })
-                        Tab(tab == 1, { tab = 1 }, text = { Text("Snippet") })
-                        Tab(tab == 2, { tab = 2 }, text = { Text("Impostazioni") })
+                        Tab(tab == 0, { tab = 0 }, text = { Text(stringResource(R.string.tab_hosts)) })
+                        Tab(tab == 1, { tab = 1 }, text = { Text(stringResource(R.string.tab_snippets)) })
+                        Tab(tab == 2, { tab = 2 }, text = { Text(stringResource(R.string.tab_settings)) })
                     }
                     when (tab) {
                         0 -> HostsScreen(
@@ -120,7 +127,7 @@ fun HostsScreen(
                     val text = withContext(Dispatchers.IO) {
                         context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                     }
-                    val error = validatePrivateKey(text)
+                    val error = validatePrivateKey(text)?.let { context.getString(it) }
                     if (error == null) {
                         key = text!!.trim()
                         keyError = null
@@ -128,7 +135,7 @@ fun HostsScreen(
                         keyError = error
                     }
                 } catch (e: Exception) {
-                    keyError = "Impossibile leggere il file: ${e.message ?: e.javaClass.simpleName}"
+                    keyError = context.getString(R.string.host_key_read_error, e.message ?: e.javaClass.simpleName)
                 }
             }
         }
@@ -141,32 +148,32 @@ fun HostsScreen(
             } else {
                 resetForm(); editing = true
             }
-        }) { Text(if (editing) "Chiudi" else "Nuovo host") }
+        }) { Text(stringResource(if (editing) R.string.common_close else R.string.host_new)) }
         if (editing) {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                OutlinedTextField(name, { name = it }, label = { Text("Nome") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(hostname, { hostname = it }, label = { Text("Indirizzo") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(port, { port = it }, label = { Text("Porta") }, modifier = Modifier.fillMaxWidth())
-                OutlinedTextField(user, { user = it }, label = { Text("Utente") }, modifier = Modifier.fillMaxWidth())
-                Text("Logo sistema", style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.common_name)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(hostname, { hostname = it }, label = { Text(stringResource(R.string.host_address)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(port, { port = it }, label = { Text(stringResource(R.string.host_port)) }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(user, { user = it }, label = { Text(stringResource(R.string.host_user)) }, modifier = Modifier.fillMaxWidth())
+                Text(stringResource(R.string.host_logo), style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(top = 8.dp))
                 Row(Modifier.horizontalScroll(rememberScrollState()).padding(vertical = 4.dp)) {
-                    FilterChip(selected = distro.isEmpty(), onClick = { distro = "" }, label = { Text("Nessuno") })
+                    FilterChip(selected = distro.isEmpty(), onClick = { distro = "" }, label = { Text(stringResource(R.string.host_logo_none)) })
                     Spacer(Modifier.width(8.dp))
                     Distros.forEach { d ->
                         FilterChip(
                             selected = distro == d.id,
                             onClick = { distro = d.id },
-                            label = { Text(d.label) },
+                            label = { Text(labelText(d.labelRes, d.label)) },
                             leadingIcon = { DistroBadge(d, size = 18) },
                         )
                         Spacer(Modifier.width(8.dp))
                     }
                 }
-                OutlinedTextField(pass, { pass = it }, label = { Text("Password") }, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(pass, { pass = it }, label = { Text(stringResource(R.string.common_password)) }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
                     key,
                     { key = it; keyError = null },
-                    label = { Text("Chiave privata (PEM)") },
+                    label = { Text(stringResource(R.string.host_private_key)) },
                     isError = keyError != null,
                     supportingText = { keyError?.let { Text(it) } },
                     modifier = Modifier.fillMaxWidth(),
@@ -174,11 +181,11 @@ fun HostsScreen(
                 Button(onClick = {
                     lock.expectExternalActivity()
                     keyFileLauncher.launch(arrayOf("*/*"))
-                }) { Text("Importa file chiave") }
+                }) { Text(stringResource(R.string.host_import_key)) }
                 OutlinedTextField(
                     passphrase,
                     { passphrase = it },
-                    label = { Text("Passphrase della chiave (se presente)") },
+                    label = { Text(stringResource(R.string.host_passphrase)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -187,7 +194,7 @@ fun HostsScreen(
                     onClick = {
                         if (key.isNotBlank()) {
                             validatePrivateKey(key)?.let {
-                                keyError = it
+                                keyError = context.getString(it)
                                 return@Button
                             }
                         }
@@ -204,7 +211,7 @@ fun HostsScreen(
                         resetForm(); editing = false
                     },
                     enabled = hostname.isNotBlank() && user.isNotBlank(),
-                ) { Text(if (editingId == null) "Salva" else "Salva modifiche") }
+                ) { Text(stringResource(if (editingId == null) R.string.common_save else R.string.host_save_changes)) }
             }
         }
         LazyColumn(Modifier.weight(1f)) {
@@ -224,7 +231,7 @@ fun HostsScreen(
                         Column {
                             Text("${h.username}@${h.hostname}:${h.port}")
                             Row(Modifier.horizontalScroll(rememberScrollState())) {
-                                TextButton(onClick = { onConnect(h) }) { Text("Connetti") }
+                                TextButton(onClick = { onConnect(h) }) { Text(stringResource(R.string.host_connect)) }
                                 TextButton(onClick = { onSftp(h) }) { Text("SFTP") }
                                 TextButton(onClick = {
                                     editingId = h.id
@@ -232,14 +239,14 @@ fun HostsScreen(
                                     user = h.username; pass = h.password; key = h.privateKey
                                     passphrase = h.keyPassphrase; keyError = null; distro = h.distro
                                     editing = true
-                                }) { Text("Modifica") }
-                                TextButton(onClick = { onForgetKey(h) }) { Text("Dimentica chiave") }
+                                }) { Text(stringResource(R.string.host_edit)) }
+                                TextButton(onClick = { onForgetKey(h) }) { Text(stringResource(R.string.host_forget_key)) }
                                 if (h.privateKey.isNotBlank()) {
                                     TextButton(onClick = {
                                         onChange(hosts.map { if (it.id == h.id) it.copy(privateKey = "", keyPassphrase = "") else it })
-                                    }) { Text("Rimuovi chiave") }
+                                    }) { Text(stringResource(R.string.host_remove_key)) }
                                 }
-                                TextButton(onClick = { onChange(hosts - h) }) { Text("Elimina") }
+                                TextButton(onClick = { onChange(hosts - h) }) { Text(stringResource(R.string.common_delete)) }
                             }
                         }
                     },
@@ -255,20 +262,20 @@ fun SnippetsScreen(snippets: List<Snippet>, onChange: (List<Snippet>) -> Unit) {
     var name by remember { mutableStateOf("") }
     var cmd by remember { mutableStateOf("") }
     Column(Modifier.fillMaxSize().padding(12.dp)) {
-        OutlinedTextField(name, { name = it }, label = { Text("Nome") }, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(cmd, { cmd = it }, label = { Text("Comando, variabili: {{nome}}") }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.common_name)) }, modifier = Modifier.fillMaxWidth())
+        OutlinedTextField(cmd, { cmd = it }, label = { Text(stringResource(R.string.snippets_command_hint)) }, modifier = Modifier.fillMaxWidth())
         Button(onClick = {
             if (name.isNotBlank() && cmd.isNotBlank()) {
                 onChange(snippets + Snippet(name = name, command = cmd))
                 name = ""; cmd = ""
             }
-        }) { Text("Aggiungi snippet") }
+        }) { Text(stringResource(R.string.snippets_add)) }
         LazyColumn(Modifier.weight(1f)) {
             items(snippets, key = { it.id }) { s ->
                 ListItem(
                     headlineContent = { Text(s.name) },
                     supportingContent = { Text(s.command, fontFamily = FontFamily.Monospace) },
-                    trailingContent = { TextButton(onClick = { onChange(snippets - s) }) { Text("Elimina") } },
+                    trailingContent = { TextButton(onClick = { onChange(snippets - s) }) { Text(stringResource(R.string.common_delete)) } },
                 )
                 HorizontalDivider()
             }

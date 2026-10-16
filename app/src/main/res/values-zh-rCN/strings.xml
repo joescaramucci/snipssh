@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lang_en">English</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_ko">한국어</string>
+
+    <string name="tab_hosts">主机</string>
+    <string name="tab_snippets">代码片段</string>
+    <string name="tab_settings">设置</string>
+
+    <string name="common_cancel">取消</string>
+    <string name="common_close">关闭</string>
+    <string name="common_save">保存</string>
+    <string name="common_delete">删除</string>
+    <string name="common_name">名称</string>
+    <string name="common_password">密码</string>
+
+    <string name="host_new">新建主机</string>
+    <string name="host_address">地址</string>
+    <string name="host_port">端口</string>
+    <string name="host_user">用户</string>
+    <string name="host_private_key">私钥 (PEM)</string>
+    <string name="host_passphrase">密钥口令（如有）</string>
+    <string name="host_logo">系统标志</string>
+    <string name="host_logo_none">无</string>
+    <string name="host_import_key">导入密钥文件</string>
+    <string name="host_save_changes">保存更改</string>
+    <string name="host_edit">编辑</string>
+    <string name="host_forget_key">忘记密钥</string>
+    <string name="host_remove_key">移除密钥</string>
+    <string name="host_connect">连接</string>
+    <string name="host_key_read_error">无法读取文件：%1$s</string>
+    <string name="host_key_empty">文件为空或无法读取</string>
+    <string name="host_key_ppk">不支持 PuTTY .ppk 密钥：请以 OpenSSH 格式导出</string>
+    <string name="host_key_format">格式无法识别：需要 PEM/OpenSSH 私钥（例如 id_ed25519）</string>
+
+    <string name="snippets_command_hint">命令，变量：{{name}}</string>
+    <string name="snippets_add">添加代码片段</string>
+    <string name="terminal_no_snippets">没有代码片段：请在“代码片段”选项卡中添加</string>
+
+    <string name="settings_language">语言</string>
+    <string name="settings_biometric">生物识别锁</string>
+    <string name="settings_biometric_desc">返回应用时需要指纹或屏幕锁。</string>
+    <string name="settings_biometric_setup">请在 Android 设置中设置指纹或屏幕锁。</string>
+    <string name="settings_terminal">终端</string>
+    <string name="settings_font_size">字号：%1$d sp</string>
+    <string name="settings_font">字体</string>
+    <string name="settings_theme">配色主题</string>
+    <string name="settings_backup">备份</string>
+    <string name="settings_backup_desc">文件使用您选择的密码加密。包含主机（包括密码、私钥和口令）、代码片段和主机密钥。请妥善保管。</string>
+    <string name="settings_export">导出</string>
+    <string name="settings_import">导入</string>
+
+    <string name="backup_password">备份密码</string>
+    <string name="backup_repeat_password">重复密码</string>
+    <string name="backup_password_min">至少 %1$d 个字符。如果丢失，备份将无法恢复。</string>
+    <string name="backup_exported">备份已导出。</string>
+    <string name="backup_export_failed">导出失败：%1$s</string>
+    <string name="backup_import_done">备份已导入。之前的数据已被替换。</string>
+    <string name="backup_invalid">不是有效的备份文件。</string>
+    <string name="backup_wrong_password">密码错误或文件无效。</string>
+    <string name="backup_read_failed">读取失败：%1$s</string>
+    <string name="file_unreadable">文件无法读取</string>
+    <string name="file_write_failed">无法写入文件</string>
+
+    <string name="lock_title">解锁 SSH Snippets</string>
+    <string name="lock_locked">应用已锁定</string>
+    <string name="lock_unlock">解锁</string>
+    <string name="lock_no_biometric">未设置指纹或屏幕锁，无法解锁应用。您可以关闭锁定。</string>
+    <string name="lock_disable">关闭锁定</string>
+
+    <string name="terminal_connecting">正在连接 %1$s...</string>
+    <string name="terminal_connected">已连接到 %1$s</string>
+    <string name="terminal_error">错误：%1$s</string>
+    <string name="terminal_run">运行</string>
+    <string name="terminal_send">发送</string>
+    <string name="terminal_ctrl">Ctrl</string>
+
+    <string name="hostkey_message">%1$s 尚未被识别。\n\n密钥指纹：\n%2$s\n\n连接并保存？</string>
+    <string name="hostkey_accept">接受</string>
+    <string name="hostkey_reject">拒绝</string>
+    <string name="ssh_key_rejected">未接受主机密钥</string>
+    <string name="ssh_connect_failed">无法连接到 %1$s：%2$s</string>
+    <string name="ssh_key_changed">警告：%1$s 的主机密钥已更改（%2$s）。出于安全考虑已阻止连接。如果服务器已重装，请在主机列表中使用“忘记密钥”。</string>
+
+    <string name="sftp_back">返回</string>
+    <string name="sftp_up">上级</string>
+    <string name="sftp_refresh">刷新</string>
+    <string name="sftp_upload">上传</string>
+    <string name="sftp_download">下载</string>
+    <string name="sftp_delete_title">删除 %1$s？</string>
+    <string name="sftp_delete_folder">文件夹必须为空。</string>
+    <string name="sftp_delete_file">该文件将从服务器删除。</string>
+
+    <string name="distro_generic">通用 Linux</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_solarized">Solarized</string>
+    <string name="font_system">系统</string>
+</resources>

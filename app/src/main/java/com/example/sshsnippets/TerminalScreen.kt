@@ -24,6 +24,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextRange
@@ -111,10 +112,11 @@ private fun Modifier.pinchToZoom(onZoom: (Float) -> Unit): Modifier = pointerInp
 @Composable
 fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: () -> Unit) {
     val scope = rememberCoroutineScope()
-    val ssh = remember { SshSession(host, store) }
+    val context = LocalContext.current
+    val ssh = remember { SshSession(context, host, store) }
     val term = remember { AnsiTerminal(80, 24) }
     var version by remember { mutableIntStateOf(0) }
-    var status by remember { mutableStateOf("Connessione a ${host.hostname}...") }
+    var status by remember { mutableStateOf(context.getString(R.string.terminal_connecting, host.hostname)) }
     var input by remember { mutableStateOf(TextFieldValue()) }
     var pending by remember { mutableStateOf<Snippet?>(null) }
     val values = remember { mutableStateMapOf<String, String>() }
@@ -122,7 +124,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     var history by remember(host.id) { mutableStateOf(store.loadHistory(host.id)) }
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
     val hostKeys = rememberHostKeyPrompter()
-    val activity = LocalContext.current as? Activity
+    val activity = context as? Activity
 
     val theme = remember { themeById(store.terminalThemeId()) }
     var fontSp by remember { mutableFloatStateOf(store.terminalFontSize().toFloat()) }
@@ -153,9 +155,9 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                     scope.launch(Dispatchers.Main) { activity?.finishAndRemoveTask() }
                 },
             )
-            status = "Connesso a ${host.hostname}"
+            status = context.getString(R.string.terminal_connected, host.hostname)
         } catch (e: Exception) {
-            status = "Errore: ${e.message}"
+            status = context.getString(R.string.terminal_error, e.message ?: e.javaClass.simpleName)
         }
     }
 
@@ -231,8 +233,8 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     fun SnippetsLine(vertical: Boolean) {
         ChipLine(vertical) {
             if (snippets.isEmpty()) {
-                Text(
-                    "Nessuno snippet: aggiungili dalla sezione Snippet",
+                    Text(
+                        stringResource(R.string.terminal_no_snippets),
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.padding(8.dp),
                 )
@@ -255,7 +257,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     @Composable
     fun KeysLine(vertical: Boolean) {
         ChipLine(vertical) {
-            FilterChip(selected = ctrl, onClick = { ctrl = !ctrl }, label = { Text("Ctrl") })
+            FilterChip(selected = ctrl, onClick = { ctrl = !ctrl }, label = { Text(stringResource(R.string.terminal_ctrl)) })
             listOf(
                 "Esc" to "\u001b", "Tab" to "\t", "↑" to "\u001b[A", "↓" to "\u001b[B",
                 "←" to "\u001b[D", "→" to "\u001b[C", "^C" to "\u0003", "^D" to "\u0004",
@@ -315,7 +317,7 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                     send(input.text + "\n")
                 }
                 input = TextFieldValue()
-            }) { Text("Invia") }
+            }) { Text(stringResource(R.string.terminal_send)) }
         }
     }
 
@@ -362,9 +364,9 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
                 TextButton(onClick = {
                     send(s.render(values) + if (s.sendEnter) "\n" else "")
                     pending = null
-                }) { Text("Esegui") }
+                }) { Text(stringResource(R.string.terminal_run)) }
             },
-            dismissButton = { TextButton(onClick = { pending = null }) { Text("Annulla") } },
+            dismissButton = { TextButton(onClick = { pending = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
 

@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.jcraft.jsch.ChannelSftp
@@ -80,9 +81,9 @@ class SftpClient private constructor(private val session: Session, private val c
     }
 
     companion object {
-        suspend fun open(host: Host, store: Store, confirmHostKey: suspend (String) -> Boolean): SftpClient =
+        suspend fun open(context: Context, host: Host, store: Store, confirmHostKey: suspend (String) -> Boolean): SftpClient =
             withContext(Dispatchers.IO) {
-                val session = openVerifiedSession(host, store, confirmHostKey)
+                val session = openVerifiedSession(context, host, store, confirmHostKey)
                 try {
                     val channel = session.openChannel("sftp") as ChannelSftp
                     channel.connect(10_000)
@@ -147,7 +148,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     LaunchedEffect(host) {
         busy = true
         try {
-            val c = SftpClient.open(host, store) { fingerprint -> prompter.confirm(host.hostname, fingerprint) }
+            val c = SftpClient.open(context, host, store) { fingerprint -> prompter.confirm(host.hostname, fingerprint) }
             client = c
             load(c, c.home())
         } catch (e: Exception) {
@@ -166,7 +167,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                 val target = joinPath(path, displayName(context, uri) ?: "file")
                 withContext(Dispatchers.IO) {
                     context.contentResolver.openInputStream(uri)?.use { c.upload(target, it) }
-                        ?: throw IOException("File non leggibile")
+                        ?: throw IOException(context.getString(R.string.file_unreadable))
                 }
                 load(c, path)
             }
@@ -182,7 +183,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             withClient { c ->
                 withContext(Dispatchers.IO) {
                     context.contentResolver.openOutputStream(uri)?.use { c.download(remote, it) }
-                        ?: throw IOException("Impossibile scrivere il file")
+                        ?: throw IOException(context.getString(R.string.file_write_failed))
                 }
             }
         }
@@ -190,7 +191,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
 
     Column(Modifier.fillMaxSize().systemBarsPadding().padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("Indietro") }
+            TextButton(onClick = onBack) { Text(stringResource(R.string.sftp_back)) }
             Text("SFTP ${host.hostname}", style = MaterialTheme.typography.titleMedium)
         }
         Text(path, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
@@ -198,18 +199,18 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             TextButton(
                 enabled = client != null && !busy && path.length > 1,
                 onClick = { withClient { c -> load(c, parentOf(path)) } },
-            ) { Text("Su") }
+            ) { Text(stringResource(R.string.sftp_up)) }
             TextButton(
                 enabled = client != null && !busy,
                 onClick = { withClient { c -> load(c, path) } },
-            ) { Text("Aggiorna") }
+            ) { Text(stringResource(R.string.sftp_refresh)) }
             TextButton(
                 enabled = client != null && !busy,
                 onClick = {
                     lock.expectExternalActivity()
                     uploadLauncher.launch(arrayOf("*/*"))
                 },
-            ) { Text("Carica") }
+            ) { Text(stringResource(R.string.sftp_upload)) }
         }
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
@@ -232,9 +233,9 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                                         lock.expectExternalActivity()
                                         saveLauncher.launch(e.name)
                                     },
-                                ) { Text("Scarica") }
+                                ) { Text(stringResource(R.string.sftp_download)) }
                             }
-                            TextButton(enabled = !busy, onClick = { toDelete = e }) { Text("Elimina") }
+                            TextButton(enabled = !busy, onClick = { toDelete = e }) { Text(stringResource(R.string.common_delete)) }
                         }
                     },
                 )
@@ -246,9 +247,13 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     toDelete?.let { d ->
         AlertDialog(
             onDismissRequest = { toDelete = null },
-            title = { Text("Eliminare ${d.name}?") },
+            title = { Text(stringResource(R.string.sftp_delete_title, d.name)) },
             text = {
-                Text(if (d.isDir) "La cartella deve essere vuota." else "Il file verrà eliminato dal server.")
+                Text(
+                    stringResource(
+                        if (d.isDir) R.string.sftp_delete_folder else R.string.sftp_delete_file,
+                    ),
+                )
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -258,9 +263,9 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                         c.delete(target, d.isDir)
                         load(c, path)
                     }
-                }) { Text("Elimina") }
+                }) { Text(stringResource(R.string.common_delete)) }
             },
-            dismissButton = { TextButton(onClick = { toDelete = null }) { Text("Annulla") } },
+            dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
 

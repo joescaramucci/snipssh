@@ -1,5 +1,6 @@
 package com.example.sshsnippets
 
+import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -35,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
@@ -57,6 +59,7 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
     var fontSize by remember { mutableStateOf(store.terminalFontSize()) }
     var fontId by remember { mutableStateOf(store.terminalFontId()) }
     var themeId by remember { mutableStateOf(store.terminalThemeId()) }
+    var appLang by remember { mutableStateOf(store.appLanguage()) }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/octet-stream"),
@@ -71,11 +74,11 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                     }
                     withContext(Dispatchers.IO) {
                         context.contentResolver.openOutputStream(uri)?.use { it.write(data) }
-                            ?: throw IllegalStateException("Impossibile scrivere il file")
+                            ?: throw IllegalStateException(context.getString(R.string.file_write_failed))
                     }
-                    "Backup esportato."
+                    context.getString(R.string.backup_exported)
                 } catch (e: Exception) {
-                    "Esportazione fallita: ${e.message ?: e.javaClass.simpleName}"
+                    context.getString(R.string.backup_export_failed, e.message ?: e.javaClass.simpleName)
                 }
             }
         }
@@ -87,11 +90,11 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                 status = try {
                     importBytes = withContext(Dispatchers.IO) {
                         context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-                            ?: throw IllegalStateException("File non leggibile")
+                            ?: throw IllegalStateException(context.getString(R.string.file_unreadable))
                     }
                     null
                 } catch (e: Exception) {
-                    "Lettura fallita: ${e.message ?: e.javaClass.simpleName}"
+                    context.getString(R.string.backup_read_failed, e.message ?: e.javaClass.simpleName)
                 }
             }
         }
@@ -101,14 +104,33 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
     val previewStyle = terminalTextStyle(fontById(fontId), fontSize)
 
     Column(Modifier.fillMaxSize().systemBarsPadding().verticalScroll(rememberScrollState()).padding(16.dp)) {
-        Text("Impostazioni", style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.tab_settings), style = MaterialTheme.typography.titleLarge)
         Spacer(Modifier.height(16.dp))
+
+        Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppLanguages.forEach { lang ->
+                FilterChip(
+                    selected = appLang == lang.tag,
+                    onClick = {
+                        if (appLang != lang.tag) {
+                            appLang = lang.tag
+                            store.setAppLanguage(lang.tag)
+                            (context as? Activity)?.recreate()
+                        }
+                    },
+                    label = { Text(stringResource(lang.labelRes)) },
+                )
+            }
+        }
+        Spacer(Modifier.height(24.dp))
 
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Blocco biometrico")
+                Text(stringResource(R.string.settings_biometric))
                 Text(
-                    "Richiede impronta o blocco schermo quando torni nell'app.",
+                    stringResource(R.string.settings_biometric_desc),
                     style = MaterialTheme.typography.bodySmall,
                 )
             }
@@ -116,7 +138,7 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                 checked = biometric,
                 onCheckedChange = { wanted ->
                     if (wanted && !canAuthenticate(context)) {
-                        status = "Configura impronta o blocco schermo nelle impostazioni di Android."
+                        status = context.getString(R.string.settings_biometric_setup)
                     } else {
                         biometric = wanted
                         lock.setEnabled(wanted)
@@ -126,9 +148,9 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
         }
 
         Spacer(Modifier.height(24.dp))
-        Text("Terminale", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.settings_terminal), style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.height(8.dp))
-        Text("Dimensione carattere: $fontSize sp")
+        Text(stringResource(R.string.settings_font_size, fontSize))
         Slider(
             value = fontSize.toFloat(),
             onValueChange = { fontSize = it.roundToInt() },
@@ -137,24 +159,24 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
             steps = MAX_TERMINAL_FONT_SIZE - MIN_TERMINAL_FONT_SIZE - 1,
         )
         Spacer(Modifier.height(8.dp))
-        Text("Carattere")
+        Text(stringResource(R.string.settings_font))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TerminalFonts.forEach { f ->
                 FilterChip(
                     selected = fontId == f.id,
                     onClick = { fontId = f.id; store.setTerminalFontId(f.id) },
-                    label = { Text(f.label) },
+                    label = { Text(labelText(f.labelRes, f.label)) },
                 )
             }
         }
         Spacer(Modifier.height(8.dp))
-        Text("Tema colori")
+        Text(stringResource(R.string.settings_theme))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TerminalThemes.forEach { t ->
                 FilterChip(
                     selected = themeId == t.id,
                     onClick = { themeId = t.id; store.setTerminalThemeId(t.id) },
-                    label = { Text(t.label) },
+                    label = { Text(stringResource(t.labelRes)) },
                 )
             }
         }
@@ -164,20 +186,19 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
         }
 
         Spacer(Modifier.height(24.dp))
-        Text("Backup", style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.settings_backup), style = MaterialTheme.typography.titleMedium)
         Text(
-            "Il file è cifrato con una password che scegli tu. Contiene host (incluse password, chiavi private " +
-                "e passphrase), snippet e chiavi host. Conservalo in un posto sicuro.",
+            stringResource(R.string.settings_backup_desc),
             style = MaterialTheme.typography.bodySmall,
         )
         Spacer(Modifier.height(8.dp))
         Row {
-            Button(onClick = { askExportPassword = true }) { Text("Esporta") }
+            Button(onClick = { askExportPassword = true }) { Text(stringResource(R.string.settings_export)) }
             Spacer(Modifier.width(8.dp))
             Button(onClick = {
                 lock.expectExternalActivity()
                 importLauncher.launch(arrayOf("*/*"))
-            }) { Text("Importa") }
+            }) { Text(stringResource(R.string.settings_import)) }
         }
 
         status?.let {
@@ -188,8 +209,8 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
 
     if (askExportPassword) {
         PasswordDialog(
-            title = "Password del backup",
-            confirmLabel = "Esporta",
+            title = stringResource(R.string.backup_password),
+            confirmLabel = stringResource(R.string.settings_export),
             requireConfirm = true,
             onConfirm = { password ->
                 askExportPassword = false
@@ -203,8 +224,8 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
 
     importBytes?.let { data ->
         PasswordDialog(
-            title = "Password del backup",
-            confirmLabel = "Importa",
+            title = stringResource(R.string.backup_password),
+            confirmLabel = stringResource(R.string.settings_import),
             requireConfirm = false,
             onConfirm = { password ->
                 importBytes = null
@@ -213,11 +234,11 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                         val json = withContext(Dispatchers.IO) { decryptBackup(data, password) }
                         store.importPayload(json)
                         onRestored()
-                        "Backup importato. I dati precedenti sono stati sostituiti."
+                        context.getString(R.string.backup_import_done)
                     } catch (e: IllegalArgumentException) {
-                        e.message ?: "File non valido"
+                        context.getString(R.string.backup_invalid)
                     } catch (e: Exception) {
-                        "Password errata o file non valido."
+                        context.getString(R.string.backup_wrong_password)
                     }
                 }
             },
@@ -246,7 +267,7 @@ private fun PasswordDialog(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Password") },
+                    label = { Text(stringResource(R.string.common_password)) },
                     visualTransformation = PasswordVisualTransformation(),
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
@@ -255,13 +276,13 @@ private fun PasswordDialog(
                     OutlinedTextField(
                         value = repeat,
                         onValueChange = { repeat = it },
-                        label = { Text("Ripeti password") },
+                        label = { Text(stringResource(R.string.backup_repeat_password)) },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     Text(
-                        "Minimo $MIN_BACKUP_PASSWORD caratteri. Se la perdi il backup non può essere recuperato.",
+                        stringResource(R.string.backup_password_min, MIN_BACKUP_PASSWORD),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
@@ -270,6 +291,6 @@ private fun PasswordDialog(
         confirmButton = {
             TextButton(enabled = valid, onClick = { onConfirm(password) }) { Text(confirmLabel) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Annulla") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } },
     )
 }

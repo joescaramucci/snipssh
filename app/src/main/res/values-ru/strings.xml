@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lang_en">English</string>
+    <string name="lang_it">Italiano</string>
+    <string name="lang_es">Español</string>
+    <string name="lang_fr">Français</string>
+    <string name="lang_de">Deutsch</string>
+    <string name="lang_zh">中文</string>
+    <string name="lang_ru">Русский</string>
+    <string name="lang_ko">한국어</string>
+
+    <string name="tab_hosts">Хосты</string>
+    <string name="tab_snippets">Сниппеты</string>
+    <string name="tab_settings">Настройки</string>
+
+    <string name="common_cancel">Отмена</string>
+    <string name="common_close">Закрыть</string>
+    <string name="common_save">Сохранить</string>
+    <string name="common_delete">Удалить</string>
+    <string name="common_name">Имя</string>
+    <string name="common_password">Пароль</string>
+
+    <string name="host_new">Новый хост</string>
+    <string name="host_address">Адрес</string>
+    <string name="host_port">Порт</string>
+    <string name="host_user">Пользователь</string>
+    <string name="host_private_key">Приватный ключ (PEM)</string>
+    <string name="host_passphrase">Пароль ключа (если есть)</string>
+    <string name="host_logo">Логотип системы</string>
+    <string name="host_logo_none">Нет</string>
+    <string name="host_import_key">Импорт файла ключа</string>
+    <string name="host_save_changes">Сохранить изменения</string>
+    <string name="host_edit">Изменить</string>
+    <string name="host_forget_key">Забыть ключ</string>
+    <string name="host_remove_key">Удалить ключ</string>
+    <string name="host_connect">Подключиться</string>
+    <string name="host_key_read_error">Не удалось прочитать файл: %1$s</string>
+    <string name="host_key_empty">Файл пуст или не читается</string>
+    <string name="host_key_ppk">Ключи PuTTY .ppk не поддерживаются: экспортируйте их в формате OpenSSH</string>
+    <string name="host_key_format">Неизвестный формат: нужен приватный ключ PEM/OpenSSH (например, id_ed25519)</string>
+
+    <string name="snippets_command_hint">Команда, переменные: {{name}}</string>
+    <string name="snippets_add">Добавить сниппет</string>
+    <string name="terminal_no_snippets">Нет сниппетов: добавьте их на вкладке «Сниппеты»</string>
+
+    <string name="settings_language">Язык</string>
+    <string name="settings_biometric">Биометрическая блокировка</string>
+    <string name="settings_biometric_desc">При возврате в приложение потребуется отпечаток или блокировка экрана.</string>
+    <string name="settings_biometric_setup">Настройте отпечаток или блокировку экрана в настройках Android.</string>
+    <string name="settings_terminal">Терминал</string>
+    <string name="settings_font_size">Размер шрифта: %1$d sp</string>
+    <string name="settings_font">Шрифт</string>
+    <string name="settings_theme">Цветовая тема</string>
+    <string name="settings_backup">Резервная копия</string>
+    <string name="settings_backup_desc">Файл зашифрован паролем, который вы выбираете. Он содержит хосты (включая пароли, приватные ключи и пароли ключей), сниппеты и ключи хостов. Храните его в надежном месте.</string>
+    <string name="settings_export">Экспорт</string>
+    <string name="settings_import">Импорт</string>
+
+    <string name="backup_password">Пароль резервной копии</string>
+    <string name="backup_repeat_password">Повторите пароль</string>
+    <string name="backup_password_min">Не менее %1$d символов. Если пароль будет утерян, резервную копию нельзя будет восстановить.</string>
+    <string name="backup_exported">Резервная копия экспортирована.</string>
+    <string name="backup_export_failed">Ошибка экспорта: %1$s</string>
+    <string name="backup_import_done">Резервная копия импортирована. Предыдущие данные заменены.</string>
+    <string name="backup_invalid">Это не файл резервной копии.</string>
+    <string name="backup_wrong_password">Неверный пароль или файл повреждён.</string>
+    <string name="backup_read_failed">Ошибка чтения: %1$s</string>
+    <string name="file_unreadable">Файл не читается</string>
+    <string name="file_write_failed">Не удалось записать файл</string>
+
+    <string name="lock_title">Разблокировать SSH Snippets</string>
+    <string name="lock_locked">Приложение заблокировано</string>
+    <string name="lock_unlock">Разблокировать</string>
+    <string name="lock_no_biometric">Отпечаток или блокировка экрана не настроены, поэтому приложение нельзя разблокировать. Можно отключить блокировку.</string>
+    <string name="lock_disable">Отключить блокировку</string>
+
+    <string name="terminal_connecting">Подключение к %1$s...</string>
+    <string name="terminal_connected">Подключено к %1$s</string>
+    <string name="terminal_error">Ошибка: %1$s</string>
+    <string name="terminal_run">Выполнить</string>
+    <string name="terminal_send">Отправить</string>
+    <string name="terminal_ctrl">Ctrl</string>
+
+    <string name="hostkey_message">%1$s пока неизвестен.\n\nОтпечаток ключа:\n%2$s\n\nПодключиться и сохранить?</string>
+    <string name="hostkey_accept">Принять</string>
+    <string name="hostkey_reject">Отклонить</string>
+    <string name="ssh_key_rejected">Ключ хоста не принят</string>
+    <string name="ssh_connect_failed">Не удалось подключиться к %1$s: %2$s</string>
+    <string name="ssh_key_changed">ВНИМАНИЕ: ключ хоста %1$s изменился (%2$s). Подключение заблокировано из соображений безопасности. Если сервер переустанавливали, используйте «Забыть ключ» в списке хостов.</string>
+
+    <string name="sftp_back">Назад</string>
+    <string name="sftp_up">Вверх</string>
+    <string name="sftp_refresh">Обновить</string>
+    <string name="sftp_upload">Загрузить</string>
+    <string name="sftp_download">Скачать</string>
+    <string name="sftp_delete_title">Удалить %1$s?</string>
+    <string name="sftp_delete_folder">Папка должна быть пустой.</string>
+    <string name="sftp_delete_file">Файл будет удалён с сервера.</string>
+
+    <string name="distro_generic">Generic Linux</string>
+    <string name="theme_dark">Тёмная</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_solarized">Solarized</string>
+    <string name="font_system">Системный</string>
+</resources>

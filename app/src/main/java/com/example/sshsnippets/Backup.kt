@@ -46,7 +46,7 @@ fun encryptBackup(plain: String, password: String): ByteArray {
 fun decryptBackup(data: ByteArray, password: String): String {
     val headerLen = MAGIC.size + SALT_LEN + IV_LEN
     require(data.size > headerLen && data.copyOfRange(0, MAGIC.size).contentEquals(MAGIC)) {
-        "File di backup non valido"
+        "Not a valid backup file."
     }
     val salt = data.copyOfRange(MAGIC.size, MAGIC.size + SALT_LEN)
     val iv = data.copyOfRange(MAGIC.size + SALT_LEN, headerLen)

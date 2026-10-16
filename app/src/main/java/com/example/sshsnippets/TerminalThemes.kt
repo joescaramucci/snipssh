@@ -11,17 +11,17 @@ const val MIN_TERMINAL_FONT_SIZE = 8
 const val MAX_TERMINAL_FONT_SIZE = 24
 const val DEFAULT_TERMINAL_FONT_SIZE = 12
 
-class TerminalTheme(val id: String, val label: String, val fg: Color, val bg: Color)
+class TerminalTheme(val id: String, val labelRes: Int, val fg: Color, val bg: Color)
 
 val TerminalThemes = listOf(
-    TerminalTheme("dark", "Scuro", Color(0xFFE6E6E6), Color(0xFF121212)),
-    TerminalTheme("light", "Chiaro", Color(0xFF1E1E1E), Color(0xFFF5F5F5)),
-    TerminalTheme("solarized", "Solarized", Color(0xFF839496), Color(0xFF002B36)),
+    TerminalTheme("dark", R.string.theme_dark, Color(0xFFE6E6E6), Color(0xFF121212)),
+    TerminalTheme("light", R.string.theme_light, Color(0xFF1E1E1E), Color(0xFFF5F5F5)),
+    TerminalTheme("solarized", R.string.theme_solarized, Color(0xFF839496), Color(0xFF002B36)),
 )
 
 fun themeById(id: String): TerminalTheme = TerminalThemes.firstOrNull { it.id == id } ?: TerminalThemes[0]
 
-class TerminalFont(val id: String, val label: String, val family: FontFamily)
+class TerminalFont(val id: String, val label: String, val family: FontFamily, val labelRes: Int? = null)
 
 private val JetBrainsMono = FontFamily(
     Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
@@ -30,7 +30,7 @@ private val JetBrainsMono = FontFamily(
 
 val TerminalFonts = listOf(
     TerminalFont("jetbrains", "JetBrains Mono", JetBrainsMono),
-    TerminalFont("system", "Di sistema", FontFamily.Monospace),
+    TerminalFont("system", "System", FontFamily.Monospace, R.string.font_system),
 )
 
 fun fontById(id: String): TerminalFont = TerminalFonts.firstOrNull { it.id == id } ?: TerminalFonts[0]

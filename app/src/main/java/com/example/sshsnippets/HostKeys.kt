@@ -27,12 +27,11 @@ class StoredHostKeys(private val known: ByteArray?) : HostKeyRepository {
     override fun getHostKey(host: String?, type: String?): Array<HostKey> = emptyArray()
 }
 
-/** Restituisce il motivo per cui il testo non è una chiave privata utilizzabile, oppure null se è valido. */
-fun validatePrivateKey(text: String?): String? = when {
-    text.isNullOrBlank() -> "Il file è vuoto o non leggibile"
-    text.contains("PuTTY-User-Key-File") -> "Le chiavi .ppk non sono supportate: esportale in formato OpenSSH"
-    !text.contains("-----BEGIN") || !text.contains("PRIVATE KEY") ->
-        "Formato non riconosciuto: serve una chiave privata PEM/OpenSSH (es. id_ed25519)"
+/** Restituisce l'id della stringa con il motivo per cui il testo non è una chiave privata utilizzabile, oppure null se è valido. */
+fun validatePrivateKey(text: String?): Int? = when {
+    text.isNullOrBlank() -> R.string.host_key_empty
+    text.contains("PuTTY-User-Key-File") -> R.string.host_key_ppk
+    !text.contains("-----BEGIN") || !text.contains("PRIVATE KEY") -> R.string.host_key_format
     else -> null
 }
 
