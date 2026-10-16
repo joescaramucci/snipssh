@@ -55,7 +55,7 @@ SnipSSH non raccoglie, non trasmette e non condivide dati personali.
 - Per eliminare tutti i dati: disinstalla l'app oppure cancella i dati dalle impostazioni Android.
 
 Contatto: scaramucci@yahoo.com
-Data di ultimo aggiornamento: <inserire data>
+Data di ultimo aggiornamento: 16 ottobre 2026
 ```
 
 ## Modulo Data Safety (Play Console)
