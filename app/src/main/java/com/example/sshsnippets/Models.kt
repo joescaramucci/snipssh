@@ -22,7 +22,8 @@ data class Snippet(
     val command: String,
     val sendEnter: Boolean = true,
 ) {
-    private val varRegex get() = Regex("\\{\\{\\s*(\\w+)\\s*}}")
+    // Le graffe di chiusura vanno escapate: il runtime Android le rifiuta altrimenti.
+    private val varRegex get() = Regex("\\{\\{\\s*(\\w+)\\s*\\}\\}")
 
     fun variables(): List<String> =
         varRegex.findAll(command).map { it.groupValues[1] }.distinct().toList()
