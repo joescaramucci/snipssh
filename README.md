@@ -76,11 +76,14 @@ Traduzioni, icone dei loghi e font vengono copiate dalle risorse Android a ogni 
 |---|---|
 | Versione | 0.2.0 (`versionCode` 2) |
 | Android | minSdk 26 (Android 8.0), targetSdk 36, compileSdk 36 |
-| Linguaggio e build | Kotlin 1.9.24, Android Gradle Plugin 8.5.2, JVM target 17 |
-| Interfaccia | Jetpack Compose (BOM 2024.06.00), Material 3 |
-| Client SSH | JSch 2.28.8 (`com.github.mwiede:jsch`) |
+| Windows | Windows 10/11 a 64 bit, Compose Desktop 1.6.11, JDK 17; exe portabile, MSI e setup EXE (non firmati, per utente) |
+| Moduli Gradle | `:core` (Kotlin/JVM, logica condivisa), `:app` (Android), `:desktop` (Windows) |
+| Linguaggio e build | Kotlin 1.9.24, Gradle 8.7, Android Gradle Plugin 8.5.2, JVM target 17 |
+| Interfaccia | Jetpack Compose (BOM 2024.06.00) e Compose Desktop, Material 3 |
+| Client SSH/SFTP | JSch 2.28.8 (`com.github.mwiede:jsch`), condiviso tra Android e Windows |
 | Chiavi host | RSA, ECDSA e ed25519 (ed25519 tramite BouncyCastle `bcprov-jdk18on` 1.86) |
-| Archiviazione | dati locali cifrati con `EncryptedSharedPreferences` |
+| Archiviazione | Android: `EncryptedSharedPreferences`; Windows: file in `%APPDATA%\SnipSSH` cifrato AES-256-GCM, chiave protetta con DPAPI |
+| Blocco biometrico | solo Android |
 | Backup | file cifrato protetto da password scelta dall'utente |
 | Temi | 8 temi app, 3 temi terminale (Scuro, Chiaro, Solarized) |
 | Font terminale | JetBrains Mono (licenza OFL) o font di sistema |
