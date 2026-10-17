@@ -111,10 +111,14 @@
     <string name="sftp_delete_folder">Элементов внутри (%1$d) будут безвозвратно удалены.</string>
     <string name="sftp_delete_folder_empty">Папка пуста.</string>
     <string name="sftp_chmod">Права</string>
+    <string name="sftp_rename">Переименовать</string>
+    <string name="sftp_rename_title">Переименовать %1$s</string>
     <string name="sftp_chmod_title">Права: %1$s</string>
     <string name="sftp_mode_octal">Восьмеричный режим (напр. 0755)</string>
     <string name="sftp_owner">Владелец</string>
     <string name="sftp_group">Группа</string>
+    <string name="sftp_owner_desc">Пользователь, которому принадлежит файл.</string>
+    <string name="sftp_group_desc">Группа, к которой относится файл. Её участники получают права группы.</string>
     <string name="sftp_other">Остальные</string>
     <string name="sftp_delete_file">Файл будет удалён с сервера.</string>
 

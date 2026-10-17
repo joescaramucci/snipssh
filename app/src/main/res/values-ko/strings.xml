@@ -111,10 +111,14 @@
     <string name="sftp_delete_folder">내부의 항목 %1$d개가 영구적으로 삭제됩니다.</string>
     <string name="sftp_delete_folder_empty">폴더가 비어 있습니다.</string>
     <string name="sftp_chmod">권한</string>
+    <string name="sftp_rename">이름 변경</string>
+    <string name="sftp_rename_title">%1$s 이름 변경</string>
     <string name="sftp_chmod_title">권한: %1$s</string>
     <string name="sftp_mode_octal">8진수 모드 (예: 0755)</string>
     <string name="sftp_owner">소유자</string>
     <string name="sftp_group">그룹</string>
+    <string name="sftp_owner_desc">파일을 소유한 사용자입니다.</string>
+    <string name="sftp_group_desc">파일이 속한 그룹입니다. 그룹 구성원에게 그룹 권한이 적용됩니다.</string>
     <string name="sftp_other">기타</string>
     <string name="sftp_delete_file">서버에서 파일이 삭제됩니다.</string>
 

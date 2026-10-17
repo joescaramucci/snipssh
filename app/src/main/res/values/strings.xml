@@ -111,10 +111,14 @@
     <string name="sftp_delete_folder">%1$d items inside will be deleted permanently.</string>
     <string name="sftp_delete_folder_empty">The folder is empty.</string>
     <string name="sftp_chmod">Permissions</string>
+    <string name="sftp_rename">Rename</string>
+    <string name="sftp_rename_title">Rename %1$s</string>
     <string name="sftp_chmod_title">Permissions: %1$s</string>
     <string name="sftp_mode_octal">Octal mode (e.g. 0755)</string>
     <string name="sftp_owner">Owner</string>
     <string name="sftp_group">Group</string>
+    <string name="sftp_owner_desc">The user who owns the file.</string>
+    <string name="sftp_group_desc">The group the file belongs to. Its members get the group permissions.</string>
     <string name="sftp_other">Other</string>
     <string name="sftp_delete_file">The file will be deleted from the server.</string>
 

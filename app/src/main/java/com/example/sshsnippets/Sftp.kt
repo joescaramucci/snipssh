@@ -121,6 +121,8 @@ class SftpClient private constructor(private val session: Session, private val c
 
     suspend fun chmod(remote: String, mode: Int) = op { it.chmod(mode and PERMISSION_MASK, remote) }
 
+    suspend fun rename(remote: String, target: String) = op { it.rename(remote, target) }
+
     private fun childrenOf(ch: ChannelSftp, path: String): List<ChannelSftp.LsEntry> {
         @Suppress("UNCHECKED_CAST")
         val entries = ch.ls(path) as Vector<ChannelSftp.LsEntry>
@@ -191,6 +193,7 @@ private fun lsDate(mtimeSeconds: Long): String {
 }
 
 private val MODE_GROUP_LABELS = listOf(R.string.sftp_owner, R.string.sftp_group, R.string.sftp_other)
+private val MODE_GROUP_DESCRIPTIONS = listOf(R.string.sftp_owner_desc, R.string.sftp_group_desc, null)
 private val MODE_FLAGS = listOf("r", "w", "x")
 
 /** Bit per (gruppo, flag): proprietario = 0o400/0o200/0o100, gruppo = 0o40/0o20/0o10, altri = 0o4/0o2/0o1. */
@@ -238,6 +241,14 @@ private fun ChmodDialog(name: String, initialMode: Int, onDismiss: () -> Unit, o
                             }
                         }
                     }
+                    MODE_GROUP_DESCRIPTIONS[group]?.let { descRes ->
+                        Text(
+                            stringResource(descRes),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 6.dp),
+                        )
+                    }
                 }
             }
         },
@@ -270,6 +281,8 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     var toDelete by remember { mutableStateOf<RemoteEntry?>(null) }
     var deleteCount by remember { mutableIntStateOf(0) }
     var toChmod by remember { mutableStateOf<RemoteEntry?>(null) }
+    var toRename by remember { mutableStateOf<RemoteEntry?>(null) }
+    var renameText by remember { mutableStateOf("") }
     var downloadPath by remember { mutableStateOf<String?>(null) }
     var homeDir by remember { mutableStateOf("/") }
     var pathInput by remember { mutableStateOf("") }
@@ -445,6 +458,15 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                             modifier = buttonModifier,
                             contentPadding = small,
                             onClick = {
+                                renameText = e.name
+                                toRename = e
+                            },
+                        ) { Text(stringResource(R.string.sftp_rename), style = SmallActionStyle) }
+                        TextButton(
+                            enabled = !busy,
+                            modifier = buttonModifier,
+                            contentPadding = small,
+                            onClick = {
                                 if (e.isDir) {
                                     withClient { c ->
                                         deleteCount = c.countTree(joinPath(path, e.name))
@@ -488,6 +510,32 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                 }) { Text(stringResource(R.string.common_delete)) }
             },
             dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
+        )
+    }
+
+    toRename?.let { r ->
+        val newName = renameText.trim()
+        val valid = newName.isNotEmpty() && !newName.contains('/') && newName != r.name
+        AlertDialog(
+            onDismissRequest = { toRename = null },
+            title = { Text(stringResource(R.string.sftp_rename_title, r.name)) },
+            text = {
+                OutlinedTextField(
+                    value = renameText,
+                    onValueChange = { renameText = it },
+                    singleLine = true,
+                )
+            },
+            confirmButton = {
+                TextButton(enabled = valid, onClick = {
+                    toRename = null
+                    withClient { c ->
+                        c.rename(joinPath(path, r.name), joinPath(path, newName))
+                        load(c, path)
+                    }
+                }) { Text(stringResource(R.string.common_save)) }
+            },
+            dismissButton = { TextButton(onClick = { toRename = null }) { Text(stringResource(R.string.common_cancel)) } },
         )
     }
 
