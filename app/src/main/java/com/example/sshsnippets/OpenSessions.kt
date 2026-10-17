@@ -1,7 +1,5 @@
 package com.example.sshsnippets
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -14,6 +12,13 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
+
+/** Servizi che dipendono dalla piattaforma: testi localizzati e avvisi brevi. */
+interface AppPlatform {
+    val messages: SshMessages
+    fun string(id: ResId, vararg args: Any?): String
+    fun toast(text: String?)
+}
 
 sealed interface SessionState {
     data object Connecting : SessionState
@@ -65,17 +70,17 @@ object OpenSessions {
     val hostKeys = HostKeyPrompter()
 
     private lateinit var store: Store
-    private lateinit var context: Context
-    private val messages get() = AndroidSshMessages(context)
+    private lateinit var platform: AppPlatform
+    private val messages get() = platform.messages
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     val active: OpenTab?
         get() = list.firstOrNull { it.id == activeId }
 
-    /** Va chiamata da MainActivity con il contesto nella lingua scelta dall'utente. */
-    fun attach(store: Store, context: Context) {
+    /** Va chiamata all'avvio dell'app con i servizi della piattaforma. */
+    fun attach(store: Store, platform: AppPlatform) {
         this.store = store
-        this.context = context
+        this.platform = platform
     }
 
     fun open(host: Host) {
@@ -128,12 +133,12 @@ object OpenSessions {
                     tab.load(c, target)
                 } else {
                     tab.load(c, tab.homeDir)
-                    tab.error = context.getString(R.string.sftp_landing_missing, landing)
+                    tab.error = platform.string(R.string.sftp_landing_missing, landing)
                 }
                 tab.state.value = SessionState.Connected
             } catch (e: HostKeyRejectedException) {
                 close(tab)
-                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                platform.toast(e.message)
             } catch (e: Exception) {
                 val message = e.message ?: e.javaClass.simpleName
                 tab.state.value = SessionState.Failed(message)
@@ -180,7 +185,7 @@ object OpenSessions {
             } catch (e: HostKeyRejectedException) {
                 // Chiave rifiutata o cambiata: la scheda non serve più, quindi si chiude con un avviso.
                 close(session)
-                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                platform.toast(e.message)
             } catch (e: Exception) {
                 session.state.value = SessionState.Failed(e.message ?: e.javaClass.simpleName)
             }

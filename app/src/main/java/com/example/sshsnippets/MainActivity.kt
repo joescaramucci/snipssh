@@ -38,7 +38,7 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val store = Store(applicationContext)
-        OpenSessions.attach(store, localizedContext(applicationContext, store.appLanguage()))
+        OpenSessions.attach(store, AndroidPlatform(localizedContext(applicationContext, store.appLanguage())))
         setContent {
             var appThemeId by remember { mutableStateOf(store.appThemeId()) }
             val appTheme = appThemeById(appThemeId)

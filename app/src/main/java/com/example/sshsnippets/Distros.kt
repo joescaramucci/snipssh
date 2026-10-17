@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
  * su un cerchio con il colore del marchio. I loghi provengono da Simple Icons (CC0); i marchi restano
  * dei rispettivi titolari, vedi README. Windows non ha un logo libero: usa un'icona di schermo.
  */
-class Distro(val id: String, val label: String, val color: Color, val iconRes: Int, val labelRes: Int? = null)
+class Distro(val id: String, val label: String, val color: Color, val iconRes: ResId, val labelRes: ResId? = null)
 
 val Distros = listOf(
     Distro("debian", "Debian", Color(0xFFA80030), R.drawable.ic_distro_debian),

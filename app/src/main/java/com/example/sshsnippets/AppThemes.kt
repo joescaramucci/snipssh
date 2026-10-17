@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 private val OnDark = Color(0xFF1C1B1F)
 private val OnLight = Color(0xFFE6E1E5)
 
-class AppTheme(val id: String, val labelRes: Int, gradient: List<Color>, val colors: ColorScheme) {
+class AppTheme(val id: String, val labelRes: ResId, gradient: List<Color>, val colors: ColorScheme) {
     val brush: Brush = Brush.verticalGradient(gradient)
 }
 

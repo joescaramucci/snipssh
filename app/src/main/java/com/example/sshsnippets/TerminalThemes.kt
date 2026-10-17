@@ -2,16 +2,14 @@ package com.example.sshsnippets
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 const val MIN_TERMINAL_FONT_SIZE = 8
 const val MAX_TERMINAL_FONT_SIZE = 24
 const val DEFAULT_TERMINAL_FONT_SIZE = 12
 
-class TerminalTheme(val id: String, val labelRes: Int, val fg: Color, val bg: Color)
+class TerminalTheme(val id: String, val labelRes: ResId, val fg: Color, val bg: Color)
 
 val TerminalThemes = listOf(
     TerminalTheme("dark", R.string.theme_dark, Color(0xFFE6E6E6), Color(0xFF121212)),
@@ -21,12 +19,9 @@ val TerminalThemes = listOf(
 
 fun themeById(id: String): TerminalTheme = TerminalThemes.firstOrNull { it.id == id } ?: TerminalThemes[0]
 
-class TerminalFont(val id: String, val label: String, val family: FontFamily, val labelRes: Int? = null)
+class TerminalFont(val id: String, val label: String, val family: FontFamily, val labelRes: ResId? = null)
 
-private val JetBrainsMono = FontFamily(
-    Font(R.font.jetbrains_mono_regular, FontWeight.Normal),
-    Font(R.font.jetbrains_mono_bold, FontWeight.Bold),
-)
+private val JetBrainsMono = jetBrainsMono()
 
 val TerminalFonts = listOf(
     TerminalFont("jetbrains", "JetBrains Mono", JetBrainsMono),
