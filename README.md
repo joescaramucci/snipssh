@@ -115,3 +115,5 @@ app/src/main/res/values*/strings.xml   testi (inglese predefinito, poi it, es, f
 [MIT](LICENSE)
 
 Il font JetBrains Mono (`app/src/main/res/font/`) è distribuito con licenza SIL Open Font License 1.1, il cui testo è in [docs/fonts/JetBrainsMono-OFL.txt](docs/fonts/JetBrainsMono-OFL.txt).
+
+I loghi delle distribuzioni (`app/src/main/res/drawable/ic_distro_*.xml`) provengono da [Simple Icons](https://simpleicons.org) (licenza CC0 1.0). I marchi (Debian, Ubuntu, Linux Mint, Fedora, Red Hat, Arch Linux, Alpine Linux, Apple/macOS, FreeBSD, Tux/Linux) restano di proprietà dei rispettivi titolari e sono usati solo per identificare il sistema operativo. Il logo Microsoft Windows non è disponibile in Simple Icons, quindi viene usata un'icona generica di monitor creata per questo progetto.
