@@ -18,29 +18,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SessionChip(session: OpenSession, onSelect: () -> Unit) {
+fun SessionChip(tab: OpenTab, onSelect: () -> Unit) {
+    val label = if (tab is OpenSftp) "SFTP · ${tab.host.name}" else tab.host.name
     InputChip(
-        selected = session.id == OpenSessions.activeId,
+        selected = tab.id == OpenSessions.activeId,
         onClick = onSelect,
-        label = { Text(session.host.name, maxLines = 1) },
+        label = { Text(label, maxLines = 1) },
         trailingIcon = {
             Icon(
                 Icons.Default.Close,
                 contentDescription = stringResource(R.string.session_close),
-                modifier = Modifier.size(18.dp).clickable { OpenSessions.close(session) },
+                modifier = Modifier.size(18.dp).clickable { OpenSessions.close(tab) },
             )
         },
     )
 }
 
-/** Sessioni aperte in una riga scorrevole orizzontalmente. */
+/** Schede aperte (shell e SFTP) in una riga scorrevole orizzontalmente. */
 @Composable
-fun SessionChipRow(modifier: Modifier = Modifier, onSelect: (OpenSession) -> Unit) {
+fun SessionChipRow(modifier: Modifier = Modifier, onSelect: (OpenTab) -> Unit) {
     Row(
         modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        OpenSessions.list.forEach { s -> SessionChip(s) { onSelect(s) } }
+        OpenSessions.list.forEach { t -> SessionChip(t) { onSelect(t) } }
     }
 }

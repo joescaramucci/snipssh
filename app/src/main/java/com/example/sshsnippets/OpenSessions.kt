@@ -22,17 +22,36 @@ sealed interface SessionState {
     class Failed(val message: String) : SessionState
 }
 
-/** Una connessione SSH aperta con il suo terminale e lo stato della barra di input. */
-class OpenSession(val host: Host, var ssh: SshSession) {
+/** Una scheda aperta su un host: una shell SSH oppure una sessione SFTP. */
+sealed class OpenTab(val host: Host) {
     val id: String = UUID.randomUUID().toString()
+    val state = mutableStateOf<SessionState>(SessionState.Connecting)
+}
+
+/** Una connessione SSH aperta con il suo terminale e lo stato della barra di input. */
+class OpenSession(host: Host, var ssh: SshSession) : OpenTab(host) {
     /** Dimensione del terminale, da usare anche alla riconnessione. */
     var cols = 80
     var rows = 24
     val term = AnsiTerminal(80, 24)
     val version = mutableIntStateOf(0)
-    val state = mutableStateOf<SessionState>(SessionState.Connecting)
     val input = mutableStateOf(TextFieldValue())
     val ctrl = mutableStateOf(false)
+}
+
+/** Sessione SFTP. Il client e la cartella restano qui, così cambiare scheda non li perde. */
+class OpenSftp(host: Host) : OpenTab(host) {
+    var client by mutableStateOf<SftpClient?>(null)
+    var homeDir by mutableStateOf("/")
+    var path by mutableStateOf("")
+    var entries by mutableStateOf<List<RemoteEntry>>(emptyList())
+    var busy by mutableStateOf(true)
+    var error by mutableStateOf<String?>(null)
+
+    suspend fun load(c: SftpClient, target: String) {
+        entries = c.list(target)
+        path = target
+    }
 }
 
 /**
@@ -40,7 +59,7 @@ class OpenSession(val host: Host, var ssh: SshSession) {
  * non le chiude, e così si può saltare da una connessione all'altra.
  */
 object OpenSessions {
-    val list = mutableStateListOf<OpenSession>()
+    val list = mutableStateListOf<OpenTab>()
     var activeId by mutableStateOf<String?>(null)
     var showTerminal by mutableStateOf(false)
     val hostKeys = HostKeyPrompter()
@@ -49,7 +68,7 @@ object OpenSessions {
     private lateinit var context: Context
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    val active: OpenSession?
+    val active: OpenTab?
         get() = list.firstOrNull { it.id == activeId }
 
     /** Va chiamata da MainActivity con il contesto nella lingua scelta dall'utente. */
@@ -71,6 +90,64 @@ object OpenSessions {
         if (session.state.value == SessionState.Connecting) return
         session.ssh = SshSession(context, session.host, store, session.cols, session.rows)
         connect(session)
+    }
+
+    /** Apre una scheda SFTP in parallelo alle altre: non sostituisce la shell già aperta sull'host. */
+    fun openSftp(host: Host) {
+        val tab = OpenSftp(host)
+        list.add(tab)
+        activeId = tab.id
+        showTerminal = true
+        connectSftp(tab)
+    }
+
+    private fun connectSftp(tab: OpenSftp) {
+        tab.state.value = SessionState.Connecting
+        tab.busy = true
+        tab.error = null
+        scope.launch {
+            try {
+                val c = SftpClient.open(context, tab.host, store) { fingerprint ->
+                    hostKeys.confirm(tab.host.hostname, fingerprint)
+                }
+                tab.client = c
+                tab.homeDir = c.home()
+                val landing = tab.host.landingDir.trim()
+                val target = if (landing.isEmpty()) tab.homeDir else c.resolveDir(expandHome(landing, tab.homeDir))
+                if (target != null) {
+                    tab.load(c, target)
+                } else {
+                    tab.load(c, tab.homeDir)
+                    tab.error = context.getString(R.string.sftp_landing_missing, landing)
+                }
+                tab.state.value = SessionState.Connected
+            } catch (e: HostKeyRejectedException) {
+                close(tab)
+                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                val message = e.message ?: e.javaClass.simpleName
+                tab.state.value = SessionState.Failed(message)
+                tab.error = message
+            } finally {
+                tab.busy = false
+            }
+        }
+    }
+
+    /** Esegue un'operazione SFTP sulla scheda; resta attiva anche se si cambia scheda durante l'attesa. */
+    fun runSftp(tab: OpenSftp, block: suspend (SftpClient) -> Unit) {
+        val c = tab.client ?: return
+        scope.launch {
+            tab.busy = true
+            tab.error = null
+            try {
+                block(c)
+            } catch (e: Exception) {
+                tab.error = e.message ?: e.javaClass.simpleName
+            } finally {
+                tab.busy = false
+            }
+        }
     }
 
     private fun connect(session: OpenSession) {
@@ -114,20 +191,25 @@ object OpenSessions {
         }
     }
 
-    fun select(session: OpenSession) {
-        activeId = session.id
+    fun select(tab: OpenTab) {
+        activeId = tab.id
         showTerminal = true
     }
 
-    /** Chiude una sessione. Se era quella mostrata, passa a un'altra aperta o alla lista host. */
-    fun close(session: OpenSession) {
-        val index = list.indexOf(session)
+    /** Chiude una scheda. Se era quella mostrata, passa a un'altra aperta o alla lista host. */
+    fun close(tab: OpenTab) {
+        val index = list.indexOf(tab)
         if (index < 0) return
         list.removeAt(index)
-        if (activeId == session.id) {
+        if (activeId == tab.id) {
             activeId = list.getOrNull(index.coerceAtMost(list.lastIndex))?.id
         }
         if (list.isEmpty()) showTerminal = false
-        scope.launch(Dispatchers.IO) { session.ssh.close() }
+        scope.launch(Dispatchers.IO) {
+            when (tab) {
+                is OpenSession -> tab.ssh.close()
+                is OpenSftp -> tab.client?.close()
+            }
+        }
     }
 }

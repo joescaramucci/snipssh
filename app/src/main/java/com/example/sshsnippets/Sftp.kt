@@ -3,6 +3,7 @@ package com.example.sshsnippets
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -29,13 +30,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +50,6 @@ import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.SftpException
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -265,73 +263,34 @@ private fun displayName(context: Context, uri: Uri): String? =
     }
 
 /** Espande un "~" iniziale nella home remota. */
-private fun expandHome(input: String, homeDir: String): String =
+internal fun expandHome(input: String, homeDir: String): String =
     if (input == "~" || input.startsWith("~/")) homeDir + input.removePrefix("~") else input
 
+/** Schermata di una scheda SFTP. Connessione e cartella corrente stanno in [tab], quindi restano attive cambiando scheda. */
 @Composable
-fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> Unit) {
+fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val prompter = rememberHostKeyPrompter()
-    var client by remember { mutableStateOf<SftpClient?>(null) }
-    var path by remember { mutableStateOf("") }
-    var entries by remember { mutableStateOf<List<RemoteEntry>>(emptyList()) }
-    var busy by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
+    val host = tab.host
+    val client = tab.client
+    val path = tab.path
+    val entries = tab.entries
+    val busy = tab.busy
+    val error = tab.error
+    val homeDir = tab.homeDir
     var toDelete by remember { mutableStateOf<RemoteEntry?>(null) }
     var deleteCount by remember { mutableIntStateOf(0) }
     var toChmod by remember { mutableStateOf<RemoteEntry?>(null) }
     var toRename by remember { mutableStateOf<RemoteEntry?>(null) }
     var renameText by remember { mutableStateOf("") }
     var downloadPath by remember { mutableStateOf<String?>(null) }
-    var homeDir by remember { mutableStateOf("/") }
     var pathInput by remember { mutableStateOf("") }
 
+    BackHandler(onBack = onBack)
     LaunchedEffect(path) { pathInput = path }
 
-    fun withClient(block: suspend (SftpClient) -> Unit) {
-        val c = client ?: return
-        scope.launch {
-            busy = true
-            error = null
-            try {
-                block(c)
-            } catch (e: Exception) {
-                error = e.message ?: e.javaClass.simpleName
-            } finally {
-                busy = false
-            }
-        }
-    }
+    fun withClient(block: suspend (SftpClient) -> Unit) = OpenSessions.runSftp(tab, block)
 
-    suspend fun load(c: SftpClient, target: String) {
-        entries = c.list(target)
-        path = target
-    }
-
-    LaunchedEffect(host) {
-        busy = true
-        try {
-            val c = SftpClient.open(context, host, store) { fingerprint -> prompter.confirm(host.hostname, fingerprint) }
-            client = c
-            homeDir = c.home()
-            val landing = host.landingDir.trim()
-            val target = if (landing.isEmpty()) homeDir else c.resolveDir(expandHome(landing, homeDir))
-            if (target != null) {
-                load(c, target)
-            } else {
-                load(c, homeDir)
-                error = context.getString(R.string.sftp_landing_missing, landing)
-            }
-        } catch (e: Exception) {
-            error = e.message ?: e.javaClass.simpleName
-        } finally {
-            busy = false
-        }
-    }
-    DisposableEffect(host) {
-        onDispose { client?.close() }
-    }
+    suspend fun load(c: SftpClient, target: String) = tab.load(c, target)
 
     fun goTo(input: String) {
         val raw = input.trim()
@@ -377,6 +336,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             TextButton(onClick = onBack) { Text(stringResource(R.string.sftp_back)) }
             Text("SFTP ${host.hostname}", style = MaterialTheme.typography.titleMedium)
         }
+        SessionChipRow(Modifier.padding(vertical = 4.dp)) { OpenSessions.select(it) }
         OutlinedTextField(
             value = pathInput,
             onValueChange = { pathInput = it },
@@ -554,6 +514,4 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             },
         )
     }
-
-    HostKeyDialog(prompter)
 }

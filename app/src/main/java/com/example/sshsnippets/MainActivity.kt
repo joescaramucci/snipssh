@@ -61,19 +61,19 @@ class MainActivity : FragmentActivity() {
 fun App(store: Store, lock: AppLockViewModel, appTheme: AppTheme, onAppThemeChange: (String) -> Unit) {
     var hosts by remember { mutableStateOf(store.loadHosts()) }
     var snippets by remember { mutableStateOf(store.loadSnippets()) }
-    var sftpHost by remember { mutableStateOf<Host?>(null) }
     var tab by rememberSaveable { mutableStateOf(0) }
-    val terminal = OpenSessions.active.takeIf { OpenSessions.showTerminal }
+    val active = OpenSessions.active.takeIf { OpenSessions.showTerminal }
 
     Surface(Modifier.fillMaxSize()) {
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
         Box(Modifier.fillMaxSize().background(appTheme.brush)) {
-            val s = sftpHost
-            when {
-                terminal != null -> key(terminal.id) {
-                    TerminalScreen(terminal, snippets, store) { OpenSessions.showTerminal = false }
+            when (active) {
+                is OpenSession -> key(active.id) {
+                    TerminalScreen(active, snippets, store) { OpenSessions.showTerminal = false }
                 }
-                s != null -> SftpScreen(s, store, lock) { sftpHost = null }
+                is OpenSftp -> key(active.id) {
+                    SftpScreen(active, lock) { OpenSessions.showTerminal = false }
+                }
                 else -> Column(Modifier.fillMaxSize().systemBarsPadding()) {
                     TabRow(tab) {
                         Tab(tab == 0, { tab = 0 }, text = { Text(stringResource(R.string.tab_hosts)) })
@@ -85,7 +85,7 @@ fun App(store: Store, lock: AppLockViewModel, appTheme: AppTheme, onAppThemeChan
                             hosts,
                             { hosts = it; store.saveHosts(it) },
                             { OpenSessions.open(it) },
-                            { sftpHost = it },
+                            { OpenSessions.openSftp(it) },
                             { store.removeHostKey("${it.hostname}:${it.port}") },
                             lock,
                         )
