@@ -6,6 +6,7 @@ import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -419,13 +420,21 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                         .padding(horizontal = 12.dp, vertical = 2.dp),
                 ) {
                     val displayName = if (e.isDir) "${e.name}/" else e.name
-                    Text(
-                        "%s  %s %2d %s %s %7d %s".format(displayName, e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime)),
-                        style = LsLineStyle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    Row {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            displayName,
+                            style = LsLineStyle,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f),
+                        )
+                        Text(
+                            "%s %2d %s %s %7d %s".format(e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime)),
+                            style = LsLineStyle,
+                            maxLines = 1,
+                        )
+                    }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                         val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                         val buttonModifier = Modifier.height(26.dp)
                         if (!e.isDir) {
