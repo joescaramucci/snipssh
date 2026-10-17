@@ -4,7 +4,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,6 +58,8 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
@@ -230,6 +235,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
     var visibleRows by remember { mutableIntStateOf(24) }
     var scrollBack by remember { mutableIntStateOf(0) }
     var selection by remember { mutableStateOf<Pair<Cell, Cell>?>(null) }
+    var snippetsWidth by remember { mutableFloatStateOf(store.snippetsWidthDp().toFloat()) }
     val focus = remember { FocusRequester() }
 
     val theme = remember { themeById(store.terminalThemeId()) }
@@ -424,8 +430,24 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                     }
                 }
             }
+            Box(
+                Modifier
+                    .width(6.dp)
+                    .fillMaxHeight()
+                    .pointerHoverIcon(PointerIcon(java.awt.Cursor(java.awt.Cursor.E_RESIZE_CURSOR)))
+                    .draggable(
+                        orientation = Orientation.Horizontal,
+                        state = rememberDraggableState { delta ->
+                            snippetsWidth = (snippetsWidth - delta / density.density).coerceIn(160f, 480f)
+                        },
+                        onDragStopped = { store.setSnippetsWidthDp(snippetsWidth.roundToInt()) },
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Box(Modifier.width(1.dp).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
+            }
             Column(
-                Modifier.width(240.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
+                Modifier.width(snippetsWidth.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(stringResource(R.string.tab_snippets), style = MaterialTheme.typography.titleSmall)

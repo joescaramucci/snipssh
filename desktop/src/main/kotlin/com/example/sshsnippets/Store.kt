@@ -161,6 +161,11 @@ class Store(private val dir: File = defaultDir()) : HostKeyStore {
 
     fun setAppThemeId(id: String) = put("app_theme", id)
 
+    /** Larghezza della colonna snippet nel terminale, in dp. */
+    fun snippetsWidthDp(): Int = data.optInt("snippets_width", 240).coerceIn(160, 480)
+
+    fun setSnippetsWidthDp(dp: Int) = put("snippets_width", dp.coerceIn(160, 480))
+
     /** Contenuto del backup in chiaro: host, snippet e chiavi host. Va cifrato prima di essere salvato. */
     @Synchronized
     fun exportPayload(): String = JSONObject()
