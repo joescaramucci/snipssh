@@ -41,10 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.Session
 import com.jcraft.jsch.SftpException
@@ -56,13 +58,27 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 import java.util.Vector
+import kotlin.math.abs
 
 /** Bit dei permessi POSIX, incluso setuid/setgid/sticky (07777 in ottale). */
 private const val PERMISSION_MASK = 0xFFF
 
 /** [mode] contiene solo i bit dei permessi (inclusi setuid/setgid/sticky), senza il tipo del file. */
-data class RemoteEntry(val name: String, val isDir: Boolean, val size: Long, val mode: Int, val owner: String)
+data class RemoteEntry(
+    val name: String,
+    val isDir: Boolean,
+    val size: Long,
+    val mode: Int,
+    val owner: String,
+    val group: String,
+    val perms: String,
+    val mtime: Long,
+)
 
 private val WHITESPACE = Regex("\\s+")
 
@@ -80,7 +96,10 @@ class SftpClient private constructor(private val session: Session, private val c
                     it.attrs.isDir,
                     it.attrs.size,
                     it.attrs.permissions and PERMISSION_MASK,
-                    ownerOf(it),
+                    longnameField(it, 2) ?: it.attrs.uId.toString(),
+                    longnameField(it, 3) ?: it.attrs.gId.toString(),
+                    it.attrs.permissionsString,
+                    it.attrs.getMTime().toLong(),
                 )
             }
             .sortedWith(compareBy({ !it.isDir }, { it.name.lowercase() }))
@@ -114,9 +133,9 @@ class SftpClient private constructor(private val session: Session, private val c
         return entries.filter { it.filename != "." && it.filename != ".." }
     }
 
-    /** Il server riporta il nome utente nella longname (es. "-rw-r--r--  1 root  root ..."); ripiego sull'UID. */
-    private fun ownerOf(e: ChannelSftp.LsEntry): String =
-        e.longname.trim().split(WHITESPACE).getOrNull(2) ?: e.attrs.uId.toString()
+    /** Il server riporta utente (2) e gruppo (3) nella longname (es. "-rw-r--r--  1 root  root ..."); altrimenti null. */
+    private fun longnameField(e: ChannelSftp.LsEntry, index: Int): String? =
+        e.longname.trim().split(WHITESPACE).getOrNull(index)
 
     private fun countLocked(ch: ChannelSftp, remote: String): Int =
         childrenOf(ch, remote).sumOf { child ->
@@ -164,10 +183,19 @@ fun parentOf(path: String): String =
 
 fun joinPath(dir: String, name: String): String = if (dir.endsWith("/")) dir + name else "$dir/$name"
 
-private fun formatSize(bytes: Long): String = when {
-    bytes < 1024 -> "$bytes B"
-    bytes < 1024 * 1024 -> "%.1f KB".format(bytes / 1024.0)
-    else -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
+private const val SIX_MONTHS_MS = 182L * 24 * 60 * 60 * 1000
+
+/** Stile delle righe di dettaglio, come l'output di `ls -l` nel terminale. */
+private val LsLineStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 13.sp)
+
+/** Data in stile `ls -l`: "Jan 28 14:05" se recente, altrimenti "Jan 28  2026". */
+private fun lsDate(mtimeSeconds: Long): String {
+    val date = Date(mtimeSeconds * 1000)
+    val cal = Calendar.getInstance().apply { time = date }
+    val month = SimpleDateFormat("MMM", Locale.US).format(date)
+    val recent = abs(System.currentTimeMillis() - date.time) < SIX_MONTHS_MS
+    val timeOrYear = if (recent) SimpleDateFormat("HH:mm", Locale.US).format(date) else cal.get(Calendar.YEAR).toString()
+    return "%s %2d %5s".format(month, cal.get(Calendar.DAY_OF_MONTH), timeOrYear)
 }
 
 private val MODE_GROUP_LABELS = listOf(R.string.sftp_owner, R.string.sftp_group, R.string.sftp_other)
@@ -377,14 +405,13 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
 
         LazyColumn(Modifier.weight(1f)) {
             items(entries, key = { it.name }) { e ->
-                val octal = "%04o".format(e.mode)
                 ListItem(
                     headlineContent = { Text(if (e.isDir) "${e.name}/" else e.name) },
                     supportingContent = {
-                        Text(
-                            if (e.isDir) "$octal · ${e.owner}"
-                            else "$octal · ${e.owner} · ${formatSize(e.size).replace(' ', '\u00A0')}",
-                        )
+                        Column {
+                            Text("${e.perms}  ${e.owner}  ${e.group}", style = LsLineStyle)
+                            Text("%7d  %s".format(e.size, lsDate(e.mtime)), style = LsLineStyle)
+                        }
                     },
                     modifier = Modifier.clickable(enabled = !busy && e.isDir) {
                         withClient { c -> load(c, joinPath(path, e.name)) }
