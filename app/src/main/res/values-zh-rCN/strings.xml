@@ -26,6 +26,8 @@
     <string name="host_user">用户</string>
     <string name="host_private_key">私钥 (PEM)</string>
     <string name="host_passphrase">密钥口令（如有）</string>
+    <string name="host_landing_dir">起始目录（SFTP）</string>
+    <string name="host_landing_dir_hint">SFTP 连接时打开的目录。留空则为主目录。可使用 ~。</string>
     <string name="host_logo">系统标志</string>
     <string name="host_logo_none">无</string>
     <string name="host_import_key">导入密钥文件</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">警告：%1$s 的主机密钥已更改（%2$s）。出于安全考虑已阻止连接。如果服务器已重装，请在主机列表中使用“忘记密钥”。</string>
 
     <string name="sftp_back">返回</string>
+    <string name="sftp_path">路径</string>
+    <string name="sftp_not_a_folder">不是文件夹：%1$s</string>
+    <string name="sftp_landing_missing">未找到起始目录，已改为打开主目录：%1$s</string>
     <string name="sftp_up">上级</string>
     <string name="sftp_refresh">刷新</string>
     <string name="sftp_upload">上传</string>

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
@@ -41,10 +42,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.Session
+import com.jcraft.jsch.SftpException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -59,7 +62,9 @@ import java.util.Vector
 private const val PERMISSION_MASK = 0xFFF
 
 /** [mode] contiene solo i bit dei permessi (inclusi setuid/setgid/sticky), senza il tipo del file. */
-data class RemoteEntry(val name: String, val isDir: Boolean, val size: Long, val mode: Int)
+data class RemoteEntry(val name: String, val isDir: Boolean, val size: Long, val mode: Int, val owner: String)
+
+private val WHITESPACE = Regex("\\s+")
 
 /** Un solo canale SFTP per sessione: le operazioni sono serializzate da [mutex]. */
 class SftpClient private constructor(private val session: Session, private val channel: ChannelSftp) : AutoCloseable {
@@ -69,8 +74,26 @@ class SftpClient private constructor(private val session: Session, private val c
 
     suspend fun list(path: String): List<RemoteEntry> = op { ch ->
         childrenOf(ch, path)
-            .map { RemoteEntry(it.filename, it.attrs.isDir, it.attrs.size, it.attrs.permissions and PERMISSION_MASK) }
+            .map {
+                RemoteEntry(
+                    it.filename,
+                    it.attrs.isDir,
+                    it.attrs.size,
+                    it.attrs.permissions and PERMISSION_MASK,
+                    ownerOf(it),
+                )
+            }
             .sortedWith(compareBy({ !it.isDir }, { it.name.lowercase() }))
+    }
+
+    /** Risolve [path] (anche relativo o con ".."); null se non è una cartella. */
+    suspend fun resolveDir(path: String): String? = op { ch ->
+        try {
+            val real = ch.realpath(path)
+            if (ch.stat(real).isDir) real else null
+        } catch (e: SftpException) {
+            if (e.id == ChannelSftp.SSH_FX_NO_SUCH_FILE) null else throw e
+        }
     }
 
     suspend fun download(remote: String, out: OutputStream) = op { it.get(remote, out) }
@@ -90,6 +113,10 @@ class SftpClient private constructor(private val session: Session, private val c
         val entries = ch.ls(path) as Vector<ChannelSftp.LsEntry>
         return entries.filter { it.filename != "." && it.filename != ".." }
     }
+
+    /** Il server riporta il nome utente nella longname (es. "-rw-r--r--  1 root  root ..."); ripiego sull'UID. */
+    private fun ownerOf(e: ChannelSftp.LsEntry): String =
+        e.longname.trim().split(WHITESPACE).getOrNull(2) ?: e.attrs.uId.toString()
 
     private fun countLocked(ch: ChannelSftp, remote: String): Int =
         childrenOf(ch, remote).sumOf { child ->
@@ -206,6 +233,10 @@ private fun displayName(context: Context, uri: Uri): String? =
         if (c.moveToFirst()) c.getString(0) else null
     }
 
+/** Espande un "~" iniziale nella home remota. */
+private fun expandHome(input: String, homeDir: String): String =
+    if (input == "~" || input.startsWith("~/")) homeDir + input.removePrefix("~") else input
+
 @Composable
 fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> Unit) {
     val context = LocalContext.current
@@ -220,6 +251,10 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     var deleteCount by remember { mutableIntStateOf(0) }
     var toChmod by remember { mutableStateOf<RemoteEntry?>(null) }
     var downloadPath by remember { mutableStateOf<String?>(null) }
+    var homeDir by remember { mutableStateOf("/") }
+    var pathInput by remember { mutableStateOf("") }
+
+    LaunchedEffect(path) { pathInput = path }
 
     fun withClient(block: suspend (SftpClient) -> Unit) {
         val c = client ?: return
@@ -246,7 +281,15 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
         try {
             val c = SftpClient.open(context, host, store) { fingerprint -> prompter.confirm(host.hostname, fingerprint) }
             client = c
-            load(c, c.home())
+            homeDir = c.home()
+            val landing = host.landingDir.trim()
+            val target = if (landing.isEmpty()) homeDir else c.resolveDir(expandHome(landing, homeDir))
+            if (target != null) {
+                load(c, target)
+            } else {
+                load(c, homeDir)
+                error = context.getString(R.string.sftp_landing_missing, landing)
+            }
         } catch (e: Exception) {
             error = e.message ?: e.javaClass.simpleName
         } finally {
@@ -255,6 +298,17 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     }
     DisposableEffect(host) {
         onDispose { client?.close() }
+    }
+
+    fun goTo(input: String) {
+        val raw = input.trim()
+        if (raw.isEmpty()) return
+        val expanded = expandHome(raw, homeDir)
+        withClient { c ->
+            val dir = c.resolveDir(expanded)
+                ?: throw IOException(context.getString(R.string.sftp_not_a_folder, expanded))
+            load(c, dir)
+        }
     }
 
     val uploadLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -290,7 +344,17 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             TextButton(onClick = onBack) { Text(stringResource(R.string.sftp_back)) }
             Text("SFTP ${host.hostname}", style = MaterialTheme.typography.titleMedium)
         }
-        Text(path, fontFamily = FontFamily.Monospace, style = MaterialTheme.typography.bodySmall)
+        OutlinedTextField(
+            value = pathInput,
+            onValueChange = { pathInput = it },
+            label = { Text(stringResource(R.string.sftp_path)) },
+            singleLine = true,
+            enabled = client != null,
+            textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(onGo = { goTo(pathInput) }),
+            modifier = Modifier.fillMaxWidth(),
+        )
         Row {
             TextButton(
                 enabled = client != null && !busy && path.length > 1,
@@ -317,7 +381,10 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                 ListItem(
                     headlineContent = { Text(if (e.isDir) "${e.name}/" else e.name) },
                     supportingContent = {
-                        Text(if (e.isDir) octal else "$octal · ${formatSize(e.size)}")
+                        Text(
+                            if (e.isDir) "$octal · ${e.owner}"
+                            else "$octal · ${e.owner} · ${formatSize(e.size).replace(' ', '\u00A0')}",
+                        )
                     },
                     modifier = Modifier.clickable(enabled = !busy && e.isDir) {
                         withClient { c -> load(c, joinPath(path, e.name)) }

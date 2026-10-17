@@ -26,6 +26,8 @@
     <string name="host_user">Пользователь</string>
     <string name="host_private_key">Приватный ключ (PEM)</string>
     <string name="host_passphrase">Пароль ключа (если есть)</string>
+    <string name="host_landing_dir">Начальная папка (SFTP)</string>
+    <string name="host_landing_dir_hint">Папка, открываемая при подключении по SFTP. Пусто = домашняя. Можно ~.</string>
     <string name="host_logo">Логотип системы</string>
     <string name="host_logo_none">Нет</string>
     <string name="host_import_key">Импорт файла ключа</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">ВНИМАНИЕ: ключ хоста %1$s изменился (%2$s). Подключение заблокировано из соображений безопасности. Если сервер переустанавливали, используйте «Забыть ключ» в списке хостов.</string>
 
     <string name="sftp_back">Назад</string>
+    <string name="sftp_path">Путь</string>
+    <string name="sftp_not_a_folder">Это не папка: %1$s</string>
+    <string name="sftp_landing_missing">Начальная папка не найдена, открыта домашняя: %1$s</string>
     <string name="sftp_up">Вверх</string>
     <string name="sftp_refresh">Обновить</string>
     <string name="sftp_upload">Загрузить</string>

@@ -26,6 +26,8 @@
     <string name="host_user">User</string>
     <string name="host_private_key">Private key (PEM)</string>
     <string name="host_passphrase">Key passphrase (if any)</string>
+    <string name="host_landing_dir">Landing directory (SFTP)</string>
+    <string name="host_landing_dir_hint">Folder opened on SFTP connect. Empty = home. ~ is allowed.</string>
     <string name="host_logo">System logo</string>
     <string name="host_logo_none">None</string>
     <string name="host_import_key">Import key file</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">WARNING: the host key of %1$s has changed (%2$s). Connection blocked for security. If the server was reinstalled, use Forget key in the host list.</string>
 
     <string name="sftp_back">Back</string>
+    <string name="sftp_path">Path</string>
+    <string name="sftp_not_a_folder">Not a folder: %1$s</string>
+    <string name="sftp_landing_missing">Landing directory not found, opened home instead: %1$s</string>
     <string name="sftp_up">Up</string>
     <string name="sftp_refresh">Refresh</string>
     <string name="sftp_upload">Upload</string>

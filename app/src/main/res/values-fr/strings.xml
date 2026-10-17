@@ -26,6 +26,8 @@
     <string name="host_user">Utilisateur</string>
     <string name="host_private_key">Clé privée (PEM)</string>
     <string name="host_passphrase">Phrase de passe de la clé (si besoin)</string>
+    <string name="host_landing_dir">Dossier d\'accueil (SFTP)</string>
+    <string name="host_landing_dir_hint">Dossier ouvert à la connexion SFTP. Vide = accueil. ~ accepté.</string>
     <string name="host_logo">Logo du système</string>
     <string name="host_logo_none">Aucun</string>
     <string name="host_import_key">Importer un fichier de clé</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">ATTENTION : la clé d\'hôte de %1$s a changé (%2$s). Connexion bloquée par sécurité. Si le serveur a été réinstallé, utilisez Oublier la clé dans la liste des hôtes.</string>
 
     <string name="sftp_back">Retour</string>
+    <string name="sftp_path">Chemin</string>
+    <string name="sftp_not_a_folder">Ce n\'est pas un dossier : %1$s</string>
+    <string name="sftp_landing_missing">Dossier d\'accueil introuvable, accueil ouvert à la place : %1$s</string>
     <string name="sftp_up">Remonter</string>
     <string name="sftp_refresh">Actualiser</string>
     <string name="sftp_upload">Envoyer</string>

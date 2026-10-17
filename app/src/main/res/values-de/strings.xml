@@ -26,6 +26,8 @@
     <string name="host_user">Benutzer</string>
     <string name="host_private_key">Privater Schlüssel (PEM)</string>
     <string name="host_passphrase">Passphrase des Schlüssels (falls vorhanden)</string>
+    <string name="host_landing_dir">Startordner (SFTP)</string>
+    <string name="host_landing_dir_hint">Beim SFTP-Verbinden geöffneter Ordner. Leer = Home. ~ ist erlaubt.</string>
     <string name="host_logo">Systemlogo</string>
     <string name="host_logo_none">Keins</string>
     <string name="host_import_key">Schlüsseldatei importieren</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">WARNUNG: der Host-Schlüssel von %1$s hat sich geändert (%2$s). Verbindung aus Sicherheitsgründen blockiert. Wenn der Server neu installiert wurde, verwende in der Host-Liste Schlüssel vergessen.</string>
 
     <string name="sftp_back">Zurück</string>
+    <string name="sftp_path">Pfad</string>
+    <string name="sftp_not_a_folder">Kein Ordner: %1$s</string>
+    <string name="sftp_landing_missing">Startordner nicht gefunden, stattdessen Home geöffnet: %1$s</string>
     <string name="sftp_up">Nach oben</string>
     <string name="sftp_refresh">Aktualisieren</string>
     <string name="sftp_upload">Hochladen</string>

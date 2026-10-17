@@ -26,6 +26,8 @@
     <string name="host_user">Usuario</string>
     <string name="host_private_key">Clave privada (PEM)</string>
     <string name="host_passphrase">Frase de contraseña de la clave (si la tiene)</string>
+    <string name="host_landing_dir">Carpeta inicial (SFTP)</string>
+    <string name="host_landing_dir_hint">Carpeta que se abre al conectar por SFTP. Vacío = home. Se admite ~.</string>
     <string name="host_logo">Logo del sistema</string>
     <string name="host_logo_none">Ninguno</string>
     <string name="host_import_key">Importar archivo de clave</string>
@@ -98,6 +100,9 @@
     <string name="ssh_key_changed">ADVERTENCIA: la clave del host de %1$s ha cambiado (%2$s). Conexión bloqueada por seguridad. Si el servidor se reinstaló, usa Olvidar clave en la lista de hosts.</string>
 
     <string name="sftp_back">Atrás</string>
+    <string name="sftp_path">Ruta</string>
+    <string name="sftp_not_a_folder">No es una carpeta: %1$s</string>
+    <string name="sftp_landing_missing">No se encontró la carpeta inicial; se abrió home: %1$s</string>
     <string name="sftp_up">Arriba</string>
     <string name="sftp_refresh">Actualizar</string>
     <string name="sftp_upload">Subir archivo</string>

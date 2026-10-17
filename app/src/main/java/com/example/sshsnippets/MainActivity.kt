@@ -125,11 +125,12 @@ fun HostsScreen(
     var keyError by remember { mutableStateOf<String?>(null) }
     var editingId by remember { mutableStateOf<String?>(null) }
     var distro by remember { mutableStateOf("") }
+    var landingDir by remember { mutableStateOf("") }
 
     fun resetForm() {
         editingId = null
         name = ""; hostname = ""; port = "22"; user = ""; pass = ""; key = ""; passphrase = ""
-        distro = ""
+        distro = ""; landingDir = ""
         keyError = null
     }
 
@@ -188,6 +189,14 @@ fun HostsScreen(
                 }
                 OutlinedTextField(pass, { pass = it }, label = { Text(stringResource(R.string.common_password)) }, modifier = Modifier.fillMaxWidth())
                 OutlinedTextField(
+                    landingDir,
+                    { landingDir = it },
+                    label = { Text(stringResource(R.string.host_landing_dir)) },
+                    supportingText = { Text(stringResource(R.string.host_landing_dir_hint)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
                     key,
                     { key = it; keyError = null },
                     label = { Text(stringResource(R.string.host_private_key)) },
@@ -220,6 +229,7 @@ fun HostsScreen(
                             name = name.ifBlank { hostname }, hostname = hostname,
                             port = port.toIntOrNull() ?: 22, username = user, password = pass,
                             privateKey = key, keyPassphrase = passphrase, distro = distro,
+                            landingDir = landingDir.trim(),
                         )
                         onChange(
                             if (editingId == null) hosts + saved
@@ -255,6 +265,7 @@ fun HostsScreen(
                                     name = h.name; hostname = h.hostname; port = h.port.toString()
                                     user = h.username; pass = h.password; key = h.privateKey
                                     passphrase = h.keyPassphrase; keyError = null; distro = h.distro
+                                    landingDir = h.landingDir
                                     editing = true
                                 }) { Text(stringResource(R.string.host_edit)) }
                                 TextButton(onClick = { onForgetKey(h) }) { Text(stringResource(R.string.host_forget_key)) }
