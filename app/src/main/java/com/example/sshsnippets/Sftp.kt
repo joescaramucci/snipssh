@@ -288,12 +288,20 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
     var downloadPath by remember { mutableStateOf<String?>(null) }
     var pathInput by remember { mutableStateOf("") }
 
-    BackHandler(onBack = onBack)
     LaunchedEffect(path) { pathInput = path }
 
     fun withClient(block: suspend (SftpClient) -> Unit) = OpenSessions.runSftp(tab, block)
 
     suspend fun load(c: SftpClient, target: String) = tab.load(c, target)
+
+    /** Risale di una cartella; alla radice chiude la vista SFTP. Legge tab.path al momento del click, perché ::goUp viene memorizzato da Compose. */
+    fun goUp() {
+        val current = tab.path
+        val parent = parentOf(current)
+        if (parent == current) onBack() else withClient { c -> load(c, parent) }
+    }
+
+    BackHandler(onBack = ::goUp)
 
     fun goTo(input: String) {
         val raw = input.trim()
@@ -336,7 +344,7 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
 
     Column(Modifier.fillMaxSize().systemBarsPadding().padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text(stringResource(R.string.sftp_back)) }
+            TextButton(onClick = ::goUp) { Text(stringResource(R.string.sftp_back)) }
             Text("SFTP ${host.hostname}", style = MaterialTheme.typography.titleMedium)
         }
         SessionChipRow(Modifier.padding(vertical = 4.dp)) { OpenSessions.select(it) }
