@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
@@ -127,6 +126,7 @@ private fun HostEditorDialog(initial: Host, onSave: (Host) -> Unit, onDismiss: (
     var distro by remember { mutableStateOf(initial.distro) }
     var landingDir by remember { mutableStateOf(initial.landingDir) }
     var keyError by remember { mutableStateOf<String?>(null) }
+    val formScroll = rememberScrollState()
 
     fun importKey() {
         scope.launch {
@@ -151,7 +151,7 @@ private fun HostEditorDialog(initial: Host, onSave: (Host) -> Unit, onDismiss: (
         modifier = Modifier.width(620.dp),
         title = { Text(stringResource(if (isNew) R.string.host_new else R.string.host_edit)) },
         text = {
-            Column(Modifier.heightIn(max = 520.dp).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            ScrollableColumn(formScroll, Modifier.heightIn(max = 600.dp)) {
                 OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.common_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(hostname, { hostname = it }, label = { Text(stringResource(R.string.host_address)) }, singleLine = true, modifier = Modifier.weight(1f))
