@@ -35,7 +35,8 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 - **Snippet** con nome e variabili tipo `{{servizio}}`, lanciabili sul server con un tocco e conferma.
 - **Host** con autenticazione a password oppure chiave privata (PEM), con passphrase opzionale.
 - **Verifica delle chiavi host** alla prima connessione, con avviso se la chiave del server cambia.
-- **SFTP**: sfoglia, scarica, carica, elimina file e cartelle vuote.
+- **Temi dell'app**: 8 palette (Aurora, Ocean, Sunset, Forest, Midnight, Graphite, Cocoa, Moss), scelte in Impostazioni.
+- **SFTP**: elenco in stile `ls -l` (nome, permessi, dimensione, data), con percorso modificabile e una cartella di partenza per ogni host (con `cd` automatico dopo la connessione). I nomi lunghi vanno a capo invece di essere troncati, e i permessi si modificano. Si può sfogliare, scaricare, caricare ed eliminare file e cartelle vuote.
 - **Sicurezza**: blocco biometrico opzionale; dati locali cifrati con `EncryptedSharedPreferences`.
 - **Backup** esportabile in un file cifrato con una password scelta dall'utente.
 
@@ -43,6 +44,22 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 
 - Android 8.0 (API 26) o successivo.
 - Per compilare: JDK 17 e Android SDK con platform 36.
+
+## Specifiche tecniche
+
+| Voce | Valore |
+|---|---|
+| Versione | 0.2.0 (`versionCode` 2) |
+| Android | minSdk 26 (Android 8.0), targetSdk 36, compileSdk 36 |
+| Linguaggio e build | Kotlin 1.9.24, Android Gradle Plugin 8.5.2, JVM target 17 |
+| Interfaccia | Jetpack Compose (BOM 2024.06.00), Material 3 |
+| Client SSH | JSch 2.28.8 (`com.github.mwiede:jsch`) |
+| Chiavi host | RSA, ECDSA e ed25519 (ed25519 tramite BouncyCastle `bcprov-jdk18on` 1.86) |
+| Archiviazione | dati locali cifrati con `EncryptedSharedPreferences` |
+| Backup | file cifrato protetto da password scelta dall'utente |
+| Temi | 8 temi app, 3 temi terminale (Scuro, Chiaro, Solarized) |
+| Font terminale | JetBrains Mono (licenza OFL) o font di sistema |
+| Lingue | 8 (inglese, italiano, spagnolo, francese, tedesco, cinese semplificato, russo, coreano) |
 
 ## Build
 
@@ -79,7 +96,6 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 ## Limiti noti
 
 - Il terminale non supporta applicazioni a schermo intero come `vim` o `htop`.
-- Server che offrono solo chiavi host `ssh-ed25519` non si connettono. RSA ed ECDSA funzionano.
 - Le variabili degli snippet accettano lettere di qualsiasi alfabeto, cifre e `_` (`{{servizio}}`, `{{città}}` o `{{имя}}` sì; spazi e simboli no).
 - Le chiavi sono associate al singolo host, non condivise.
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.

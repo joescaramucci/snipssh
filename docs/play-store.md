@@ -160,13 +160,7 @@ File in [docs/store/](./store/):
 - [feature-graphic-1024x500.png](./store/feature-graphic-1024x500.png): grafica in evidenza, 1024 x 500.
 - [screenshots/](./store/screenshots/): screenshot telefono 1080 x 2160 (rapporto 2:1, il massimo accettato da Play). Ordine consigliato: host (`01`), snippet (`02`), terminale (`03`), SFTP (`04`), impostazioni (`05`), terminale con comandi (`06`), nuovo host (`07`), verifica chiave host (`08`), SFTP con file (`09`).
 
-Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server di prova, ritagliate a 1080 x 2160 (rapporto 2:1). Stato attuale:
-
-- `07` (nuovo host) e `08` (verifica chiave host) sono in inglese, con dati fittizi (host `web-01 production`, indirizzo dell'emulatore `10.0.2.2:2222`). Nessun hostname o IP reale.
-- `03`, `05` e `06` sono stati rifatti con dati fittizi (host `web-01`, Ubuntu 24.04, font JetBrains Mono, tema Scuro), ma l'interfaccia è in italiano.
-- `01`, `02`, `04` e `09` sono ancora in italiano e possono contenere dati del server di prova.
-
-Screenshot in inglese già rifatti con l'app impostata su English e dati fittizi (host `db-01 staging` e `web-01 production`).
+Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server di prova, ritagliate a 1080 x 2160 (rapporto 2:1). Tutte e 9 sono in inglese, con l'app impostata su English, tema app Ocean, tema terminale Solarized e dati fittizi (host `db-01 staging` e `web-01 production`, indirizzo dell'emulatore `10.0.2.2:2222`). Nessun hostname o IP reale.
 
 Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prompt `>_` su sfondo `#1C1B1F`.
 
@@ -191,4 +185,4 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 - SFTP non cancella le cartelle non vuote.
 - Importare un backup sostituisce i dati presenti nell'app.
 - Il messaggio di avviso per una chiave host cambiata arriva dalla libreria SSH ed è in inglese in tutte le lingue.
-- Chiavi host ed25519: la connessione con un server che offre solo `ssh-ed25519` come chiave host fallisce. Con RSA o ECDSA la connessione funziona. Da dichiarare nella descrizione o risolvere prima del rilascio.
+- Chiavi host ed25519 supportate tramite BouncyCastle (anche su Android 8–12). Il supporto ed25519 è stato verificato con un server di prova che offre solo `ssh-ed25519`; resta da verificare su un server Linux reale.
