@@ -42,6 +42,9 @@
     <string name="snippets_command_hint">Comando, variables: {{name}}</string>
     <string name="snippets_add">Añadir snippet</string>
     <string name="terminal_no_snippets">No hay snippets: añádelos desde la pestaña Snippets</string>
+    <string name="session_new">+ Host</string>
+    <string name="sessions_open">Sesiones abiertas</string>
+    <string name="session_close">Cerrar sesión</string>
 
     <string name="settings_language">Idioma</string>
     <string name="settings_biometric">Bloqueo biométrico</string>

@@ -42,6 +42,9 @@
     <string name="snippets_command_hint">命令，变量：{{name}}</string>
     <string name="snippets_add">添加代码片段</string>
     <string name="terminal_no_snippets">没有代码片段：请在“代码片段”选项卡中添加</string>
+    <string name="session_new">+ 主机</string>
+    <string name="sessions_open">已打开的会话</string>
+    <string name="session_close">关闭会话</string>
 
     <string name="settings_language">语言</string>
     <string name="settings_biometric">生物识别锁</string>

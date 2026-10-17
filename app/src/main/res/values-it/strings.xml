@@ -11,7 +11,7 @@
 
     <string name="tab_hosts">Host</string>
     <string name="tab_snippets">Snippet</string>
-    <string name="tab_settings">Impostazioni</string>
+    <string name="tab_settings">Opzioni</string>
 
     <string name="common_cancel">Annulla</string>
     <string name="common_close">Chiudi</string>
@@ -42,6 +42,9 @@
     <string name="snippets_command_hint">Comando, variabili: {{name}}</string>
     <string name="snippets_add">Aggiungi snippet</string>
     <string name="terminal_no_snippets">Nessuno snippet: aggiungili dalla scheda Snippet</string>
+    <string name="session_new">+ Host</string>
+    <string name="sessions_open">Sessioni aperte</string>
+    <string name="session_close">Chiudi sessione</string>
 
     <string name="settings_language">Lingua</string>
     <string name="settings_biometric">Blocco biometrico</string>

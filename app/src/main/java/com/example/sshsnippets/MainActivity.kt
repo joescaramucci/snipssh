@@ -37,6 +37,7 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val store = Store(applicationContext)
+        OpenSessions.attach(store, localizedContext(applicationContext, store.appLanguage()))
         setContent { MaterialTheme(colorScheme = darkColorScheme()) { App(store, lock) } }
     }
 
@@ -50,17 +51,18 @@ class MainActivity : FragmentActivity() {
 fun App(store: Store, lock: AppLockViewModel) {
     var hosts by remember { mutableStateOf(store.loadHosts()) }
     var snippets by remember { mutableStateOf(store.loadSnippets()) }
-    var active by remember { mutableStateOf<Host?>(null) }
     var sftpHost by remember { mutableStateOf<Host?>(null) }
     var tab by rememberSaveable { mutableStateOf(0) }
+    val terminal = OpenSessions.active.takeIf { OpenSessions.showTerminal }
 
     Surface(Modifier.fillMaxSize()) {
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
         Box(Modifier.fillMaxSize()) {
-            val h = active
             val s = sftpHost
             when {
-                h != null -> TerminalScreen(h, snippets, store) { active = null }
+                terminal != null -> key(terminal.id) {
+                    TerminalScreen(terminal, snippets, store) { OpenSessions.showTerminal = false }
+                }
                 s != null -> SftpScreen(s, store, lock) { sftpHost = null }
                 else -> Column(Modifier.fillMaxSize().systemBarsPadding()) {
                     TabRow(tab) {
@@ -72,7 +74,7 @@ fun App(store: Store, lock: AppLockViewModel) {
                         0 -> HostsScreen(
                             hosts,
                             { hosts = it; store.saveHosts(it) },
-                            { active = it },
+                            { OpenSessions.open(it) },
                             { sftpHost = it },
                             { store.removeHostKey("${it.hostname}:${it.port}") },
                             lock,
@@ -85,6 +87,7 @@ fun App(store: Store, lock: AppLockViewModel) {
                     }
                 }
             }
+            HostKeyDialog(OpenSessions.hostKeys)
             if (lock.locked) LockScreen(lock)
         }
     }
@@ -142,6 +145,10 @@ fun HostsScreen(
     }
 
     Column(Modifier.fillMaxSize().padding(12.dp)) {
+        if (OpenSessions.list.isNotEmpty()) {
+            Text(stringResource(R.string.sessions_open), style = MaterialTheme.typography.labelLarge)
+            SessionChipRow(Modifier.padding(vertical = 4.dp)) { OpenSessions.select(it) }
+        }
         Button(onClick = {
             if (editing) {
                 resetForm(); editing = false

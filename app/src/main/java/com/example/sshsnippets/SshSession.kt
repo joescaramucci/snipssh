@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStream
 
@@ -101,9 +102,11 @@ class SshSession(private val context: Context, private val host: Host, private v
                     if (n < 0) break
                     onOutput(String(buf, 0, n))
                 }
-            } catch (_: Exception) {
+            } catch (e: IOException) {
+                // Il server ha chiuso il canale: lo gestisce onClosed.
+            } finally {
+                onClosed()
             }
-            onClosed()
         }
     }
 

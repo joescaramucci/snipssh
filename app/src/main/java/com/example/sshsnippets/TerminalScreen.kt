@@ -1,6 +1,5 @@
 package com.example.sshsnippets
 
-import android.app.Activity
 import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -35,8 +34,6 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -110,21 +107,25 @@ private fun Modifier.pinchToZoom(onZoom: (Float) -> Unit): Modifier = pointerInp
 }
 
 @Composable
-fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: () -> Unit) {
+fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, onNew: () -> Unit) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val ssh = remember { SshSession(context, host, store) }
-    val term = remember { AnsiTerminal(80, 24) }
-    var version by remember { mutableIntStateOf(0) }
-    var status by remember { mutableStateOf(context.getString(R.string.terminal_connecting, host.hostname)) }
-    var input by remember { mutableStateOf(TextFieldValue()) }
+    val host = session.host
+    val ssh = session.ssh
+    val term = session.term
+    var version by session.version
+    val state = session.state.value
+    val status = when (state) {
+        SessionState.Connecting -> context.getString(R.string.terminal_connecting, host.hostname)
+        SessionState.Connected -> context.getString(R.string.terminal_connected, host.hostname)
+        is SessionState.Failed -> context.getString(R.string.terminal_error, state.message)
+    }
+    var input by session.input
     var pending by remember { mutableStateOf<Snippet?>(null) }
     val values = remember { mutableStateMapOf<String, String>() }
-    var ctrl by remember { mutableStateOf(false) }
+    var ctrl by session.ctrl
     var history by remember(host.id) { mutableStateOf(store.loadHistory(host.id)) }
     var areaSize by remember { mutableStateOf(IntSize.Zero) }
-    val hostKeys = rememberHostKeyPrompter()
-    val activity = context as? Activity
 
     val theme = remember { themeById(store.terminalThemeId()) }
     var fontSp by remember { mutableFloatStateOf(store.terminalFontSize().toFloat()) }
@@ -143,24 +144,6 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     val listState = rememberLazyListState()
     val snap = remember(version) { synchronized(term) { term.snapshot() } }
 
-    LaunchedEffect(Unit) {
-        try {
-            ssh.connect(
-                confirmHostKey = { fingerprint -> hostKeys.confirm(host.hostname, fingerprint) },
-                onOutput = { chunk ->
-                    synchronized(term) { term.feed(chunk) }
-                    scope.launch(Dispatchers.Main) { version++ }
-                },
-                onClosed = {
-                    scope.launch(Dispatchers.Main) { activity?.finishAndRemoveTask() }
-                },
-            )
-            status = context.getString(R.string.terminal_connected, host.hostname)
-        } catch (e: Exception) {
-            status = context.getString(R.string.terminal_error, e.message ?: e.javaClass.simpleName)
-        }
-    }
-
     LaunchedEffect(areaSize, cellW, cellH) {
         if (areaSize.width <= padPx || areaSize.height <= padPx) return@LaunchedEffect
         val c = ((areaSize.width - padPx) / cellW).coerceAtLeast(20)
@@ -172,10 +155,6 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
 
     LaunchedEffect(version) { listState.scrollToItem(0) }
 
-    DisposableEffect(Unit) {
-        onDispose { CoroutineScope(Dispatchers.IO).launch { ssh.close() } }
-    }
-
     fun send(s: String) {
         scope.launch { ssh.send(s) }
     }
@@ -183,15 +162,18 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
     @Composable
     fun Header(stacked: Boolean) {
         if (stacked) {
-            Column(Modifier.fillMaxWidth()) {
-                TextButton(onExit) { Text("< ${host.name}") }
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                OpenSessions.list.forEach { s -> SessionChip(s) { OpenSessions.select(s) } }
+                TextButton(onNew) { Text(stringResource(R.string.session_new)) }
                 Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 12.dp))
             }
         } else {
-            Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onExit) { Text("< ${host.name}") }
-                Spacer(Modifier.weight(1f))
-                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(end = 8.dp))
+            Column(Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    SessionChipRow(Modifier.weight(1f)) { OpenSessions.select(it) }
+                    TextButton(onNew) { Text(stringResource(R.string.session_new)) }
+                }
+                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 12.dp))
             }
         }
     }
@@ -370,5 +352,4 @@ fun TerminalScreen(host: Host, snippets: List<Snippet>, store: Store, onExit: ()
         )
     }
 
-    HostKeyDialog(hostKeys)
 }

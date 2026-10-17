@@ -42,6 +42,9 @@
     <string name="snippets_command_hint">Команда, переменные: {{name}}</string>
     <string name="snippets_add">Добавить сниппет</string>
     <string name="terminal_no_snippets">Нет сниппетов: добавьте их на вкладке «Сниппеты»</string>
+    <string name="session_new">+ Хост</string>
+    <string name="sessions_open">Открытые сеансы</string>
+    <string name="session_close">Закрыть сеанс</string>
 
     <string name="settings_language">Язык</string>
     <string name="settings_biometric">Биометрическая блокировка</string>

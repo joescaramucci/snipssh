@@ -42,6 +42,9 @@
     <string name="snippets_command_hint">명령, 변수: {{name}}</string>
     <string name="snippets_add">스니펫 추가</string>
     <string name="terminal_no_snippets">스니펫이 없습니다: 스니펫 탭에서 추가하세요</string>
+    <string name="session_new">+ 호스트</string>
+    <string name="sessions_open">열린 세션</string>
+    <string name="session_close">세션 닫기</string>
 
     <string name="settings_language">언어</string>
     <string name="settings_biometric">생체 인증 잠금</string>

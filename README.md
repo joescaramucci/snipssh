@@ -27,7 +27,8 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
 - **Lingue**: inglese (predefinito), italiano, spagnolo, francese, tedesco, cinese semplificato, russo e coreano. Si scelgono in Impostazioni e l'app si aggiorna subito.
 - **Aspetto del terminale** in Impostazioni: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized. Con due dita sul terminale si ingrandisce o riduce il testo, e la dimensione viene salvata.
-- **Uscita dalla sessione**: digitando `exit` la connessione si chiude e l'app si chiude.
+- **Sessioni multiple**: puoi tenere aperte più connessioni contemporaneamente. Ogni sessione è un chip in alto nel terminale: tocca il nome per passare da una all'altra senza disconnettere le altre. `+ Host` apre un'altra connessione, la × chiude la sessione.
+- **Uscita dalla sessione**: digitando `exit` si chiude solo la sessione corrente. Le altre restano aperte, e chiudendo l'ultima si torna alla lista host.
 - **Orizzontale**: con il telefono in orizzontale la colonna destra mostra host, snippet e tasti rapidi, scorrevole; il terminale occupa la parte sinistra, con la riga di input compatta.
 - **Logo della distribuzione** accanto al nome dell'host (Debian, Ubuntu, Linux Mint, Fedora, Red Hat, Arch, Alpine, Windows, macOS, FreeBSD o generico), scelto nel form dell'host.
 - **Cronologia dei comandi** per host: mentre digiti (es. `cd`) compaiono i comandi già usati che iniziano così, dal più usato al meno usato.
@@ -79,7 +80,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 
 - Il terminale non supporta applicazioni a schermo intero come `vim` o `htop`.
 - Server che offrono solo chiavi host `ssh-ed25519` non si connettono. RSA ed ECDSA funzionano.
-- Le variabili degli snippet accettano solo lettere ASCII, cifre e `_` (`{{servizio}}` sì, `{{è}}` o `{{nome città}}` no).
+- Le variabili degli snippet accettano lettere di qualsiasi alfabeto, cifre e `_` (`{{servizio}}`, `{{città}}` o `{{имя}}` sì; spazi e simboli no).
 - Le chiavi sono associate al singolo host, non condivise.
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.
 - SFTP non cancella le cartelle non vuote.

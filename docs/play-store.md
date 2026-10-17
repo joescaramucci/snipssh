@@ -24,11 +24,12 @@ Terminale
 - Impostazioni del terminale: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized.
 - Lingue: inglese (predefinito), italiano, spagnolo, francese, tedesco, cinese semplificato, russo e coreano. Si cambiano in Impostazioni.
 - Zoom a due dita sul terminale per ingrandire o ridurre il testo.
-- Digitando `exit` la sessione si chiude e l'app si chiude.
+- Più sessioni SSH aperte contemporaneamente, con passaggio da un chip all'altro senza disconnettere.
+- Digitando `exit` si chiude solo la sessione corrente.
 - In orizzontale snippet e tasti rapidi sono in una colonna laterale scorrevole, e il terminale resta visibile anche con la tastiera aperta.
 
 Snippet
-- Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}} (lettere senza accenti, cifre e underscore).
+- Salva i comandi che usi più spesso, con nome e variabili tipo {{nome}} (lettere di qualsiasi alfabeto, cifre e underscore).
 - Lancia uno snippet sul server con un tocco e conferma.
 
 Host
@@ -113,7 +114,7 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 - [ ] Questionario contenuti e classificazione età compilati.
 - [ ] Dichiarazione di sicurezza per le app con crittografia (export compliance): l'app usa crittografia standard (SSH, AES-GCM).
 - [ ] Test chiuso: se l'account personale è stato creato di recente, Google richiede un test chiuso con almeno 12 tester per 14 giorni prima della produzione. Verifica nella Console la regola corrente.
-- [ ] Screenshot rifatti in inglese, con dati fittizi (vedi sopra).
+- [x] Screenshot rifatti in inglese, con dati fittizi (vedi sopra).
 - [ ] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino, cambio lingua.
 
 ## Limiti da dichiarare agli utenti
@@ -123,6 +124,5 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 - Nessuna sincronizzazione cloud: il backup è un file cifrato che l'utente gestisce.
 - SFTP non cancella le cartelle non vuote.
 - Importare un backup sostituisce i dati presenti nell'app.
-- Le variabili `{{...}}` degli snippet accettano solo lettere ASCII, cifre e underscore. Nomi con accenti o alfabeti non latini non vengono riconosciuti.
 - Il messaggio di avviso per una chiave host cambiata arriva dalla libreria SSH ed è in inglese in tutte le lingue.
 - Chiavi host ed25519: la connessione con un server che offre solo `ssh-ed25519` come chiave host fallisce. Con RSA o ECDSA la connessione funziona. Da dichiarare nella descrizione o risolvere prima del rilascio.
