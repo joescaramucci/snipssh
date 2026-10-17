@@ -2,7 +2,7 @@
 
 **SnipSSH = PuTTY + FileZilla per Android, con snippet di comandi.** Terminale SSH e SFTP in un'unica app, senza abbonamento.
 
-Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal telefono direttamente al tuo server.
+Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal telefono direttamente al tuo server. Esiste anche la [versione per Windows](#versione-windows), con le stesse funzioni.
 
 ## Screenshot
 
@@ -43,9 +43,31 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 - **Sicurezza**: blocco biometrico opzionale; dati locali cifrati con `EncryptedSharedPreferences`.
 - **Backup** esportabile in un file cifrato con una password scelta dall'utente.
 
+## Versione Windows
+
+App per Windows 10/11 (64 bit) con le stesse funzioni di quella Android: host, shell SSH, SFTP, snippet, temi, 8 lingue e backup cifrato. È scritta in Compose Desktop e condivide il codice con l'app Android: la logica SSH/SFTP, l'emulatore ANSI e i modelli stanno nel modulo `core`.
+
+- **Schede**: shell e SFTP si aprono in schede affiancate. `+ Host` torna alla lista, la × chiude la scheda.
+- **Terminale**: tastiera completa (frecce, F1–F12, Ctrl+lettera, AltGr), selezione col mouse e rotella per scorrere. Copia con `Ctrl+Maiusc+C` (o `Ctrl+C` se c'è una selezione, o `Ctrl+Ins`), incolla con `Ctrl+Maiusc+V` o `Maiusc+Ins`. `Maiusc+PagSu/PagGiù` scorre lo storico. `Ctrl+rotella`, `Ctrl++`, `Ctrl+-` e `Ctrl+0` cambiano la dimensione del testo. Gli snippet sono nella colonna a destra.
+- **SFTP**: doppio click per entrare in una cartella, caricamento di più file insieme, download con la finestra "Salva con nome".
+- **Dati**: in `%APPDATA%\SnipSSH`, cifrati con AES-256-GCM. La chiave è protetta da DPAPI di Windows, quindi solo lo stesso utente Windows sullo stesso PC può leggerli. Il blocco biometrico resta solo su Android. I file di backup `.ssb` sono interscambiabili con l'app Android.
+
+### Build per Windows
+
+```powershell
+.\gradlew.bat :desktop:run                              # avvia l'app
+.\gradlew.bat :desktop:createDistributable              # cartella portabile con SnipSSH.exe
+.\gradlew.bat :desktop:packageMsi :desktop:packageExe   # installer MSI e setup EXE
+```
+
+Per gli installer servono JDK 17 (include `jpackage`) e [WiX Toolset 3.14](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm), con `candle.exe` e `light.exe` nel `PATH`; basta estrarre l'archivio dei binari, senza installarlo. I risultati sono in `desktop/build/compose/binaries/main/` (`app/`, `msi/`, `exe/`). L'installer lavora per utente in `%LOCALAPPDATA%\SnipSSH` e non richiede privilegi di amministratore. L'eseguibile non è firmato: alla prima esecuzione SmartScreen può mostrare un avviso.
+
+Traduzioni, icone dei loghi e font vengono copiate dalle risorse Android a ogni build, e l'icona è `docs/store/icon-512.png`: non vanno duplicate nel modulo desktop.
+
 ## Requisiti
 
 - Android 8.0 (API 26) o successivo.
+- Windows 10 o 11 a 64 bit per la versione desktop.
 - Per compilare: JDK 17 e Android SDK con platform 36.
 
 ## Specifiche tecniche
@@ -114,18 +136,29 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 ## Struttura
 
 ```
-app/src/main/java/com/example/sshsnippets/
+core/src/main/kotlin/com/example/sshsnippets/     logica condivisa Android + Windows (JVM puro)
+  SshSession.kt        connessione SSH, verifica chiave host
+  SftpClient.kt        client SFTP e helper di percorso
+  AnsiTerminal.kt      emulatore ANSI
+  HostKeys.kt          chiavi host note (TOFU)
+  Models.kt            host, snippet, cronologia
+  Backup.kt            export / import cifrato
+
+app/src/main/java/com/example/sshsnippets/        app Android
   MainActivity.kt      schede Host / Snippet / Impostazioni
   Locales.kt           lingue disponibili e lingua predefinita
-  SshSession.kt        connessione SSH, verifica chiave host
   TerminalScreen.kt    terminale e tasti rapidi
-  TerminalThemes.kt    temi, font e dimensione del terminale
-  AnsiTerminal.kt      emulatore ANSI
-  Sftp.kt              client e schermata SFTP
-  Store.kt, Models.kt  archiviazione cifrata e modelli
-  HostKeys.kt          chiavi host note (TOFU)
+  Sftp.kt              schermata SFTP
+  Store.kt             archiviazione cifrata (EncryptedSharedPreferences)
   AppLock.kt           blocco biometrico
-  Backup.kt            export / import cifrato
+  OpenSessions.kt, SessionBar.kt, HostKeyDialog.kt, ChmodDialog.kt,
+  AppThemes.kt, TerminalThemes.kt, Distros.kt   file Compose condivisi con il desktop
+
+desktop/src/main/kotlin/com/example/sshsnippets/  app Windows (Compose Desktop)
+  DesktopMain.kt, App.kt        finestra e schede
+  HostsScreen.kt, SettingsScreen.kt, TerminalScreen.kt, SftpScreen.kt
+  Store.kt             archiviazione cifrata con DPAPI
+  Platform.kt          traduzioni (le stesse di Android) e servizi di piattaforma
 
 app/src/main/res/values*/strings.xml   testi (inglese predefinito, poi it, es, fr, de, zh-rCN, ru, ko)
 ```
