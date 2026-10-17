@@ -6,6 +6,7 @@ app/build/
 
 # Android Studio / IntelliJ
 .idea/
+.vscode/
 *.hprof
 
 # Locale, con percorso SDK
