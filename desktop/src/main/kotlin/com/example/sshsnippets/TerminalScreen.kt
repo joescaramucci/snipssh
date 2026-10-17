@@ -210,9 +210,11 @@ private fun controlKey(e: KeyEvent): String? {
     }
 }
 
+private const val COMPACT_SNIPPETS_DP = 160f
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, autoFocus: Boolean = true) {
+fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, autoFocus: Boolean = true, compact: Boolean = false) {
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
     val host = session.host
@@ -236,6 +238,8 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
     var scrollBack by remember { mutableIntStateOf(0) }
     var selection by remember { mutableStateOf<Pair<Cell, Cell>?>(null) }
     var snippetsWidth by remember { mutableFloatStateOf(store.snippetsWidthDp().toFloat()) }
+    // In vista affiancata la colonna resta stretta e fissa: la larghezza salvata non cambia.
+    val snippetsColumnWidth = if (compact) COMPACT_SNIPPETS_DP else snippetsWidth
     val focus = remember { FocusRequester() }
 
     val theme = remember { themeById(store.terminalThemeId()) }
@@ -430,7 +434,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                     }
                 }
             }
-            Box(
+            if (!compact) Box(
                 Modifier
                     .width(6.dp)
                     .fillMaxHeight()
@@ -447,7 +451,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                 Box(Modifier.width(1.dp).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
             }
             Column(
-                Modifier.width(snippetsWidth.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
+                Modifier.width(snippetsColumnWidth.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(stringResource(R.string.tab_snippets), style = MaterialTheme.typography.titleSmall)

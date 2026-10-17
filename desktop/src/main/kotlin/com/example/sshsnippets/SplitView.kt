@@ -103,7 +103,7 @@ fun SplitView(
                         },
                 ) {
                     when (tab) {
-                        is OpenSession -> TerminalScreen(tab, snippets, store, autoFocus = tab.id == activeId)
+                        is OpenSession -> TerminalScreen(tab, snippets, store, autoFocus = tab.id == activeId, compact = true)
                         is OpenSftp -> SftpScreen(tab)
                     }
                 }

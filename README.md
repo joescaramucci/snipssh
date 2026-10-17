@@ -6,14 +6,14 @@ Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riuti
 
 ## Download
 
-Ultima versione: **0.3.0**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.0).
+Ultima versione: **0.3.1**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.1).
 
 | File | Per |
 |---|---|
-| `SnipSSH-0.3.0-android.apk` | Android 8.0 o successivo (installazione da file, consentire l'origine sconosciuta) |
-| `SnipSSH-0.3.0-windows-setup.exe` | Windows 10/11 64 bit, installazione per utente |
-| `SnipSSH-0.3.0-windows.msi` | Windows 10/11 64 bit, pacchetto MSI per utente |
-| `SnipSSH-0.3.0-windows-portable.zip` | Windows 10/11 64 bit, nessuna installazione: estrai e avvia `SnipSSH.exe` |
+| `SnipSSH-0.3.1-android.apk` | Android 8.0 o successivo (installazione da file, consentire l'origine sconosciuta) |
+| `SnipSSH-0.3.1-windows-setup.exe` | Windows 10/11 64 bit, installazione per utente |
+| `SnipSSH-0.3.1-windows.msi` | Windows 10/11 64 bit, pacchetto MSI per utente |
+| `SnipSSH-0.3.1-windows-portable.zip` | Windows 10/11 64 bit, nessuna installazione: estrai e avvia `SnipSSH.exe` |
 
 Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non sono firmati, quindi SmartScreen può mostrare un avviso alla prima esecuzione.
 
@@ -90,7 +90,7 @@ Traduzioni, icone dei loghi e font vengono copiate dalle risorse Android a ogni 
 
 | Voce | Valore |
 |---|---|
-| Versione | 0.3.0 (`versionCode` 3) |
+| Versione | 0.3.1 (`versionCode` 4) |
 | Android | minSdk 26 (Android 8.0), targetSdk 36, compileSdk 36 |
 | Windows | Windows 10/11 a 64 bit, Compose Desktop 1.6.11, JDK 17; exe portabile, MSI e setup EXE (non firmati, per utente) |
 | Moduli Gradle | `:core` (Kotlin/JVM, logica condivisa), `:app` (Android), `:desktop` (Windows) |
@@ -145,7 +145,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.
 - SFTP non cancella le cartelle non vuote.
 - Importare un backup sostituisce i dati presenti nell'app.
-- Nella vista affiancata ogni pannello mostra la propria colonna di snippet: con 4 pannelli su uno schermo normale può risultare stretta.
+- Nella vista affiancata la colonna snippet di ogni pannello è fissa e stretta (160 dp) e il suo divisore è nascosto, per lasciare spazio al terminale. La larghezza scelta in vista singola non cambia.
 
 ## Sostieni il progetto
 
