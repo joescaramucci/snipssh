@@ -102,7 +102,14 @@
     <string name="sftp_upload">Upload</string>
     <string name="sftp_download">Download</string>
     <string name="sftp_delete_title">Delete %1$s?</string>
-    <string name="sftp_delete_folder">The folder must be empty.</string>
+    <string name="sftp_delete_folder">%1$d items inside will be deleted permanently.</string>
+    <string name="sftp_delete_folder_empty">The folder is empty.</string>
+    <string name="sftp_chmod">Permissions</string>
+    <string name="sftp_chmod_title">Permissions: %1$s</string>
+    <string name="sftp_mode_octal">Octal mode (e.g. 0755)</string>
+    <string name="sftp_owner">Owner</string>
+    <string name="sftp_group">Group</string>
+    <string name="sftp_other">Other</string>
     <string name="sftp_delete_file">The file will be deleted from the server.</string>
 
     <string name="distro_generic">Generic Linux</string>

@@ -102,7 +102,14 @@
     <string name="sftp_upload">Hochladen</string>
     <string name="sftp_download">Herunterladen</string>
     <string name="sftp_delete_title">%1$s löschen?</string>
-    <string name="sftp_delete_folder">Der Ordner muss leer sein.</string>
+    <string name="sftp_delete_folder">%1$d Elemente darin werden dauerhaft gelöscht.</string>
+    <string name="sftp_delete_folder_empty">Der Ordner ist leer.</string>
+    <string name="sftp_chmod">Rechte</string>
+    <string name="sftp_chmod_title">Rechte: %1$s</string>
+    <string name="sftp_mode_octal">Oktalmodus (z. B. 0755)</string>
+    <string name="sftp_owner">Besitzer</string>
+    <string name="sftp_group">Gruppe</string>
+    <string name="sftp_other">Andere</string>
     <string name="sftp_delete_file">Die Datei wird vom Server gelöscht.</string>
 
     <string name="distro_generic">Generisches Linux</string>

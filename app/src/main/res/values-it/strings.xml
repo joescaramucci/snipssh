@@ -102,7 +102,14 @@
     <string name="sftp_upload">Carica</string>
     <string name="sftp_download">Scarica</string>
     <string name="sftp_delete_title">Eliminare %1$s?</string>
-    <string name="sftp_delete_folder">La cartella deve essere vuota.</string>
+    <string name="sftp_delete_folder">Verranno eliminati definitivamente %1$d elementi al suo interno.</string>
+    <string name="sftp_delete_folder_empty">La cartella è vuota.</string>
+    <string name="sftp_chmod">Permessi</string>
+    <string name="sftp_chmod_title">Permessi: %1$s</string>
+    <string name="sftp_mode_octal">Modalità ottale (es. 0755)</string>
+    <string name="sftp_owner">Proprietario</string>
+    <string name="sftp_group">Gruppo</string>
+    <string name="sftp_other">Altri</string>
     <string name="sftp_delete_file">Il file verrà eliminato dal server.</string>
 
     <string name="distro_generic">Linux generico</string>

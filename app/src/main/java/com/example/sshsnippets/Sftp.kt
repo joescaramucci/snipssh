@@ -8,23 +8,30 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.jcraft.jsch.ChannelSftp
 import com.jcraft.jsch.Session
@@ -47,7 +55,11 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Vector
 
-data class RemoteEntry(val name: String, val isDir: Boolean, val size: Long)
+/** Bit dei permessi POSIX, incluso setuid/setgid/sticky (07777 in ottale). */
+private const val PERMISSION_MASK = 0xFFF
+
+/** [mode] contiene solo i bit dei permessi (inclusi setuid/setgid/sticky), senza il tipo del file. */
+data class RemoteEntry(val name: String, val isDir: Boolean, val size: Long, val mode: Int)
 
 /** Un solo canale SFTP per sessione: le operazioni sono serializzate da [mutex]. */
 class SftpClient private constructor(private val session: Session, private val channel: ChannelSftp) : AutoCloseable {
@@ -56,11 +68,8 @@ class SftpClient private constructor(private val session: Session, private val c
     suspend fun home(): String = op { it.pwd() }
 
     suspend fun list(path: String): List<RemoteEntry> = op { ch ->
-        @Suppress("UNCHECKED_CAST")
-        val entries = ch.ls(path) as Vector<ChannelSftp.LsEntry>
-        entries
-            .filter { it.filename != "." && it.filename != ".." }
-            .map { RemoteEntry(it.filename, it.attrs.isDir, it.attrs.size) }
+        childrenOf(ch, path)
+            .map { RemoteEntry(it.filename, it.attrs.isDir, it.attrs.size, it.attrs.permissions and PERMISSION_MASK) }
             .sortedWith(compareBy({ !it.isDir }, { it.name.lowercase() }))
     }
 
@@ -68,8 +77,35 @@ class SftpClient private constructor(private val session: Session, private val c
 
     suspend fun upload(remote: String, input: InputStream) = op { it.put(input, remote) }
 
-    /** Le cartelle devono essere vuote: JSch non cancella ricorsivamente. */
-    suspend fun delete(remote: String, isDir: Boolean) = op { if (isDir) it.rmdir(remote) else it.rm(remote) }
+    /** Numero di elementi contenuti in [remote] (ricorsivo); 0 per file o cartelle vuote. */
+    suspend fun countTree(remote: String): Int = op { countLocked(it, remote) }
+
+    /** Cancella file, o cartelle con tutto il contenuto. I link simbolici vengono rimossi senza seguirli. */
+    suspend fun deleteTree(remote: String, isDir: Boolean) = op { deleteLocked(it, remote, isDir) }
+
+    suspend fun chmod(remote: String, mode: Int) = op { it.chmod(mode and PERMISSION_MASK, remote) }
+
+    private fun childrenOf(ch: ChannelSftp, path: String): List<ChannelSftp.LsEntry> {
+        @Suppress("UNCHECKED_CAST")
+        val entries = ch.ls(path) as Vector<ChannelSftp.LsEntry>
+        return entries.filter { it.filename != "." && it.filename != ".." }
+    }
+
+    private fun countLocked(ch: ChannelSftp, remote: String): Int =
+        childrenOf(ch, remote).sumOf { child ->
+            1 + if (child.attrs.isDir) countLocked(ch, joinPath(remote, child.filename)) else 0
+        }
+
+    private fun deleteLocked(ch: ChannelSftp, remote: String, isDir: Boolean) {
+        if (isDir) {
+            childrenOf(ch, remote).forEach { child ->
+                deleteLocked(ch, joinPath(remote, child.filename), child.attrs.isDir)
+            }
+            ch.rmdir(remote)
+        } else {
+            ch.rm(remote)
+        }
+    }
 
     private suspend fun <T> op(block: (ChannelSftp) -> T): T = mutex.withLock {
         withContext(Dispatchers.IO) { block(channel) }
@@ -107,6 +143,64 @@ private fun formatSize(bytes: Long): String = when {
     else -> "%.1f MB".format(bytes / (1024.0 * 1024.0))
 }
 
+private val MODE_GROUP_LABELS = listOf(R.string.sftp_owner, R.string.sftp_group, R.string.sftp_other)
+private val MODE_FLAGS = listOf("r", "w", "x")
+
+/** Bit per (gruppo, flag): proprietario = 0o400/0o200/0o100, gruppo = 0o40/0o20/0o10, altri = 0o4/0o2/0o1. */
+private fun modeBit(group: Int, flag: Int): Int = 1 shl (8 - (group * 3 + flag))
+
+@Composable
+private fun ChmodDialog(name: String, initialMode: Int, onDismiss: () -> Unit, onConfirm: (Int) -> Unit) {
+    var mode by remember { mutableIntStateOf(initialMode) }
+    var octal by remember { mutableStateOf("%04o".format(initialMode)) }
+    val valid = octal.length == 4
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.sftp_chmod_title, name)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = octal,
+                    onValueChange = { input ->
+                        val digits = input.filter { it in '0'..'7' }.take(4)
+                        octal = digits
+                        if (digits.length == 4) mode = digits.toInt(8)
+                    },
+                    label = { Text(stringResource(R.string.sftp_mode_octal)) },
+                    singleLine = true,
+                    isError = !valid,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(12.dp))
+                MODE_GROUP_LABELS.forEachIndexed { group, labelRes ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(labelRes), Modifier.width(80.dp))
+                        MODE_FLAGS.forEachIndexed { flag, letter ->
+                            val bit = modeBit(group, flag)
+                            Row(Modifier.width(64.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(
+                                    checked = (mode and bit) != 0,
+                                    onCheckedChange = { on ->
+                                        mode = if (on) mode or bit else mode and bit.inv()
+                                        octal = "%04o".format(mode)
+                                    },
+                                )
+                                Text(letter)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(enabled = valid, onClick = { onConfirm(mode) }) { Text(stringResource(R.string.common_save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.common_cancel)) } },
+    )
+}
+
 private fun displayName(context: Context, uri: Uri): String? =
     context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
         if (c.moveToFirst()) c.getString(0) else null
@@ -123,6 +217,8 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
     var busy by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var toDelete by remember { mutableStateOf<RemoteEntry?>(null) }
+    var deleteCount by remember { mutableIntStateOf(0) }
+    var toChmod by remember { mutableStateOf<RemoteEntry?>(null) }
     var downloadPath by remember { mutableStateOf<String?>(null) }
 
     fun withClient(block: suspend (SftpClient) -> Unit) {
@@ -217,9 +313,12 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
 
         LazyColumn(Modifier.weight(1f)) {
             items(entries, key = { it.name }) { e ->
+                val octal = "%04o".format(e.mode)
                 ListItem(
                     headlineContent = { Text(if (e.isDir) "${e.name}/" else e.name) },
-                    supportingContent = { if (!e.isDir) Text(formatSize(e.size)) },
+                    supportingContent = {
+                        Text(if (e.isDir) octal else "$octal · ${formatSize(e.size)}")
+                    },
                     modifier = Modifier.clickable(enabled = !busy && e.isDir) {
                         withClient { c -> load(c, joinPath(path, e.name)) }
                     },
@@ -235,7 +334,20 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                                     },
                                 ) { Text(stringResource(R.string.sftp_download)) }
                             }
-                            TextButton(enabled = !busy, onClick = { toDelete = e }) { Text(stringResource(R.string.common_delete)) }
+                            TextButton(enabled = !busy, onClick = { toChmod = e }) { Text(stringResource(R.string.sftp_chmod)) }
+                            TextButton(
+                                enabled = !busy,
+                                onClick = {
+                                    if (e.isDir) {
+                                        withClient { c ->
+                                            deleteCount = c.countTree(joinPath(path, e.name))
+                                            toDelete = e
+                                        }
+                                    } else {
+                                        toDelete = e
+                                    }
+                                },
+                            ) { Text(stringResource(R.string.common_delete)) }
                         }
                     },
                 )
@@ -250,9 +362,13 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
             title = { Text(stringResource(R.string.sftp_delete_title, d.name)) },
             text = {
                 Text(
-                    stringResource(
-                        if (d.isDir) R.string.sftp_delete_folder else R.string.sftp_delete_file,
-                    ),
+                    if (d.isDir && deleteCount == 0) {
+                        stringResource(R.string.sftp_delete_folder_empty)
+                    } else if (d.isDir) {
+                        stringResource(R.string.sftp_delete_folder, deleteCount)
+                    } else {
+                        stringResource(R.string.sftp_delete_file)
+                    },
                 )
             },
             confirmButton = {
@@ -260,12 +376,28 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                     val target = joinPath(path, d.name)
                     toDelete = null
                     withClient { c ->
-                        c.delete(target, d.isDir)
+                        c.deleteTree(target, d.isDir)
                         load(c, path)
                     }
                 }) { Text(stringResource(R.string.common_delete)) }
             },
             dismissButton = { TextButton(onClick = { toDelete = null }) { Text(stringResource(R.string.common_cancel)) } },
+        )
+    }
+
+    toChmod?.let { e ->
+        ChmodDialog(
+            name = e.name,
+            initialMode = e.mode,
+            onDismiss = { toChmod = null },
+            onConfirm = { mode ->
+                val target = joinPath(path, e.name)
+                toChmod = null
+                withClient { c ->
+                    c.chmod(target, mode)
+                    load(c, path)
+                }
+            },
         )
     }
 

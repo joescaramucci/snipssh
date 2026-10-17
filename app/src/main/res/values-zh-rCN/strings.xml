@@ -102,7 +102,14 @@
     <string name="sftp_upload">上传</string>
     <string name="sftp_download">下载</string>
     <string name="sftp_delete_title">删除 %1$s？</string>
-    <string name="sftp_delete_folder">文件夹必须为空。</string>
+    <string name="sftp_delete_folder">其中的 %1$d 个项目将被永久删除。</string>
+    <string name="sftp_delete_folder_empty">该文件夹为空。</string>
+    <string name="sftp_chmod">权限</string>
+    <string name="sftp_chmod_title">权限：%1$s</string>
+    <string name="sftp_mode_octal">八进制模式（如 0755）</string>
+    <string name="sftp_owner">所有者</string>
+    <string name="sftp_group">组</string>
+    <string name="sftp_other">其他</string>
     <string name="sftp_delete_file">该文件将从服务器删除。</string>
 
     <string name="distro_generic">通用 Linux</string>

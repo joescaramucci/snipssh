@@ -102,7 +102,14 @@
     <string name="sftp_upload">Загрузить</string>
     <string name="sftp_download">Скачать</string>
     <string name="sftp_delete_title">Удалить %1$s?</string>
-    <string name="sftp_delete_folder">Папка должна быть пустой.</string>
+    <string name="sftp_delete_folder">Элементов внутри (%1$d) будут безвозвратно удалены.</string>
+    <string name="sftp_delete_folder_empty">Папка пуста.</string>
+    <string name="sftp_chmod">Права</string>
+    <string name="sftp_chmod_title">Права: %1$s</string>
+    <string name="sftp_mode_octal">Восьмеричный режим (напр. 0755)</string>
+    <string name="sftp_owner">Владелец</string>
+    <string name="sftp_group">Группа</string>
+    <string name="sftp_other">Остальные</string>
     <string name="sftp_delete_file">Файл будет удалён с сервера.</string>
 
     <string name="distro_generic">Generic Linux</string>
