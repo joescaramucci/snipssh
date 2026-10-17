@@ -19,6 +19,8 @@ import kotlin.math.abs
 /** Bit dei permessi POSIX, incluso setuid/setgid/sticky (07777 in ottale). */
 private const val PERMISSION_MASK = 0xFFF
 
+private val WHITESPACE = Regex("\\s+")
+
 /** [mode] contiene solo i bit dei permessi (inclusi setuid/setgid/sticky), senza il tipo del file. */
 data class RemoteEntry(
     val name: String,
@@ -26,8 +28,20 @@ data class RemoteEntry(
     val size: Long,
     val mode: Int,
     val perms: String,
+    val owner: String,
+    val group: String,
     val mtime: Long,
 )
+
+/**
+ * Proprietario e gruppo: si leggono i nomi dalla riga "longname" solo se ha il layout completo di `ls -l`
+ * (permessi, link, proprietario, gruppo, dimensione numerica, data, nome); altrimenti si usano gli id numerici.
+ */
+internal fun ownerAndGroup(longname: String, uid: Int, gid: Int): Pair<String, String> {
+    val fields = longname.trim().split(WHITESPACE, limit = 9)
+    val lsLayout = fields.size == 9 && fields[1].all { it.isDigit() } && fields[4].all { it.isDigit() }
+    return if (lsLayout) fields[2] to fields[3] else uid.toString() to gid.toString()
+}
 
 /** Un solo canale SFTP per sessione: le operazioni sono serializzate da [mutex]. */
 class SftpClient private constructor(private val session: Session, private val channel: ChannelSftp) : AutoCloseable {
@@ -38,12 +52,15 @@ class SftpClient private constructor(private val session: Session, private val c
     suspend fun list(path: String): List<RemoteEntry> = op { ch ->
         childrenOf(ch, path)
             .map {
+                val (owner, group) = ownerAndGroup(it.longname, it.attrs.uId, it.attrs.gId)
                 RemoteEntry(
                     it.filename,
                     it.attrs.isDir,
                     it.attrs.size,
                     it.attrs.permissions and PERMISSION_MASK,
                     it.attrs.permissionsString,
+                    owner,
+                    group,
                     it.attrs.getMTime().toLong(),
                 )
             }

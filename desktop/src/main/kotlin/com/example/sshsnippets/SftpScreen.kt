@@ -157,7 +157,7 @@ fun SftpScreen(tab: OpenSftp) {
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "%s %9d %s".format(e.perms, e.size, lsDate(e.mtime)),
+                            "%s %-12s %-12s %9d %s".format(e.perms, e.owner, e.group, e.size, lsDate(e.mtime)),
                             style = LsLineStyle,
                             maxLines = 1,
                             modifier = Modifier.weight(1f),
@@ -265,6 +265,8 @@ fun SftpScreen(tab: OpenSftp) {
     toChmod?.let { e ->
         ChmodDialog(
             name = e.name,
+            owner = e.owner,
+            group = e.group,
             initialMode = e.mode,
             onDismiss = { toChmod = null },
             onConfirm = { mode ->

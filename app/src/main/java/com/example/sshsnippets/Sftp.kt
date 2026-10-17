@@ -309,6 +309,8 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
     toChmod?.let { e ->
         ChmodDialog(
             name = e.name,
+            owner = e.owner,
+            group = e.group,
             initialMode = e.mode,
             onDismiss = { toChmod = null },
             onConfirm = { mode ->

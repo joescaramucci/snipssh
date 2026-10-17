@@ -36,7 +36,7 @@ private val MODE_FLAGS = listOf("r", "w", "x")
 private fun modeBit(group: Int, flag: Int): Int = 1 shl (8 - (group * 3 + flag))
 
 @Composable
-fun ChmodDialog(name: String, initialMode: Int, onDismiss: () -> Unit, onConfirm: (Int) -> Unit) {
+fun ChmodDialog(name: String, owner: String, group: String, initialMode: Int, onDismiss: () -> Unit, onConfirm: (Int) -> Unit) {
     var mode by remember { mutableIntStateOf(initialMode) }
     var octal by remember { mutableStateOf("%04o".format(initialMode)) }
     val valid = octal.length == 4
@@ -46,6 +46,9 @@ fun ChmodDialog(name: String, initialMode: Int, onDismiss: () -> Unit, onConfirm
         title = { Text(stringResource(R.string.sftp_chmod_title, name)) },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text("${stringResource(R.string.sftp_owner)}: $owner")
+                Text("${stringResource(R.string.sftp_group)}: $group")
+                Spacer(Modifier.height(12.dp))
                 OutlinedTextField(
                     value = octal,
                     onValueChange = { input ->
