@@ -89,6 +89,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 ## Documentazione
 
 - [docs/play-store.md](docs/play-store.md): scheda Google Play, privacy policy, modulo Data Safety, checklist di pubblicazione.
+- [Privacy policy](https://joescaramucci.github.io/snipssh/privacy.html) (EN e IT).
 - [docs/store/](docs/store/): icona, feature graphic e screenshot per lo store.
 
 ## Struttura

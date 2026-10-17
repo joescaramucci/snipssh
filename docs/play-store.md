@@ -52,6 +52,10 @@ Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va
 
 ## Privacy policy (testo da pubblicare su una pagina web)
 
+URL pubblico (EN e IT): https://joescaramucci.github.io/snipssh/privacy.html
+
+Pubblicata con GitHub Pages dal branch `gh-pages`, che contiene solo la pagina della privacy. Il resto di `docs/` non viene pubblicato. Per aggiornare il testo, modifica `privacy.html` nel branch `gh-pages`.
+
 ```
 SnipSSH non raccoglie, non trasmette e non condivide dati personali.
 
@@ -162,7 +166,7 @@ Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server 
 - `03`, `05` e `06` sono stati rifatti con dati fittizi (host `web-01`, Ubuntu 24.04, font JetBrains Mono, tema Scuro), ma l'interfaccia è in italiano.
 - `01`, `02`, `04` e `09` sono ancora in italiano e possono contenere dati del server di prova.
 
-Prima del caricamento sulla scheda in inglese, rifai gli screenshot in inglese con l'app impostata su English, usando solo dati fittizi.
+Screenshot in inglese già rifatti con l'app impostata su English e dati fittizi (host `db-01 staging` e `web-01 production`).
 
 Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prompt `>_` su sfondo `#1C1B1F`.
 
@@ -170,11 +174,12 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 
 - [x] Account sviluppatore verificato e quota una tantum pagata (già fatto con l'app beep; nome sviluppatore: flipall srl, da verificare nella Console).
 - [ ] Icona, feature graphic e screenshot caricati.
-- [ ] Scheda store e privacy policy pubblicate (URL richiesto).
+- [x] Privacy policy pubblicata: https://joescaramucci.github.io/snipssh/privacy.html
+- [ ] Scheda store compilata nella Console con il testo in inglese sopra.
 - [ ] Modulo Data Safety compilato come sopra.
 - [ ] Questionario contenuti e classificazione età compilati.
 - [ ] Dichiarazione di sicurezza per le app con crittografia (export compliance): l'app usa crittografia standard (SSH, AES-GCM).
-- [ ] Test chiuso: se l'account personale è stato creato di recente, Google richiede un test chiuso con almeno 12 tester per 14 giorni prima della produzione. Verifica nella Console la regola corrente.
+- [x] Test chiuso con 12 tester non richiesto: l'account Play è aziendale (flipall srl), non personale.
 - [x] Screenshot rifatti in inglese, con dati fittizi (vedi sopra).
 - [ ] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino, cambio lingua.
 
