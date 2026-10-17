@@ -24,7 +24,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -411,55 +410,59 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
 
         LazyColumn(Modifier.weight(1f)) {
             items(entries, key = { it.name }) { e ->
-                ListItem(
-                    headlineContent = {
-                        val displayName = if (e.isDir) "${e.name}/" else e.name
-                        Text(
-                            "%s %2d %s %s %7d %s  %s".format(e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime), displayName),
-                            style = LsLineStyle,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    },
-                    supportingContent = {
-                        Row {
-                            val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
-                            if (!e.isDir) {
-                                TextButton(
-                                    enabled = !busy,
-                                    contentPadding = small,
-                                    onClick = {
-                                        downloadPath = joinPath(path, e.name)
-                                        lock.expectExternalActivity()
-                                        saveLauncher.launch(e.name)
-                                    },
-                                ) { Text(stringResource(R.string.sftp_download), style = SmallActionStyle) }
-                            }
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = !busy && e.isDir) {
+                            withClient { c -> load(c, joinPath(path, e.name)) }
+                        }
+                        .padding(horizontal = 12.dp, vertical = 2.dp),
+                ) {
+                    val displayName = if (e.isDir) "${e.name}/" else e.name
+                    Text(
+                        "%s  %s %2d %s %s %7d %s".format(displayName, e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime)),
+                        style = LsLineStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Row {
+                        val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+                        val buttonModifier = Modifier.height(26.dp)
+                        if (!e.isDir) {
                             TextButton(
                                 enabled = !busy,
-                                contentPadding = small,
-                                onClick = { toChmod = e },
-                            ) { Text(stringResource(R.string.sftp_chmod), style = SmallActionStyle) }
-                            TextButton(
-                                enabled = !busy,
+                                modifier = buttonModifier,
                                 contentPadding = small,
                                 onClick = {
-                                    if (e.isDir) {
-                                        withClient { c ->
-                                            deleteCount = c.countTree(joinPath(path, e.name))
-                                            toDelete = e
-                                        }
-                                    } else {
+                                    downloadPath = joinPath(path, e.name)
+                                    lock.expectExternalActivity()
+                                    saveLauncher.launch(e.name)
+                                },
+                            ) { Text(stringResource(R.string.sftp_download), style = SmallActionStyle) }
+                        }
+                        TextButton(
+                            enabled = !busy,
+                            modifier = buttonModifier,
+                            contentPadding = small,
+                            onClick = { toChmod = e },
+                        ) { Text(stringResource(R.string.sftp_chmod), style = SmallActionStyle) }
+                        TextButton(
+                            enabled = !busy,
+                            modifier = buttonModifier,
+                            contentPadding = small,
+                            onClick = {
+                                if (e.isDir) {
+                                    withClient { c ->
+                                        deleteCount = c.countTree(joinPath(path, e.name))
                                         toDelete = e
                                     }
-                                },
-                            ) { Text(stringResource(R.string.common_delete), style = SmallActionStyle) }
-                        }
-                    },
-                    modifier = Modifier.clickable(enabled = !busy && e.isDir) {
-                        withClient { c -> load(c, joinPath(path, e.name)) }
-                    },
-                )
+                                } else {
+                                    toDelete = e
+                                }
+                            },
+                        ) { Text(stringResource(R.string.common_delete), style = SmallActionStyle) }
+                    }
+                }
                 HorizontalDivider()
             }
         }
