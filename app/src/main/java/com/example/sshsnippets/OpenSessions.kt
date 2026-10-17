@@ -66,6 +66,7 @@ object OpenSessions {
 
     private lateinit var store: Store
     private lateinit var context: Context
+    private val messages get() = AndroidSshMessages(context)
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     val active: OpenTab?
@@ -78,7 +79,7 @@ object OpenSessions {
     }
 
     fun open(host: Host) {
-        val session = OpenSession(host, SshSession(context, host, store))
+        val session = OpenSession(host, SshSession(messages, host, store))
         list.add(session)
         activeId = session.id
         showTerminal = true
@@ -88,7 +89,7 @@ object OpenSessions {
     /** Riapre la connessione di una sessione caduta o fallita, nella stessa scheda. */
     fun reconnect(session: OpenSession) {
         if (session.state.value == SessionState.Connecting) return
-        session.ssh = SshSession(context, session.host, store, session.cols, session.rows)
+        session.ssh = SshSession(messages, session.host, store, session.cols, session.rows)
         connect(session)
     }
 
@@ -116,7 +117,7 @@ object OpenSessions {
         tab.error = null
         scope.launch {
             try {
-                val c = SftpClient.open(context, tab.host, store) { fingerprint ->
+                val c = SftpClient.open(messages, tab.host, store) { fingerprint ->
                     hostKeys.confirm(tab.host.hostname, fingerprint)
                 }
                 tab.client = c

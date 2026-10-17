@@ -55,6 +55,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
     val bom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(bom)
     implementation("androidx.compose.material3:material3")

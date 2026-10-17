@@ -13,3 +13,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "SnipSSH"
 include(":app")
+include(":core")

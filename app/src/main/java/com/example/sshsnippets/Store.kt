@@ -11,7 +11,7 @@ import java.util.Base64
 private const val MAX_HISTORY_PER_HOST = 200
 
 // Hosts hold credentials, so everything lives in encrypted preferences.
-class Store(context: Context) {
+class Store(context: Context) : HostKeyStore {
     private val prefs: SharedPreferences = EncryptedSharedPreferences.create(
         context,
         "secure_store",
@@ -56,12 +56,12 @@ class Store(context: Context) {
     }
 
     /** Chiave host salvata per "host:porta", oppure null se non ancora vista. */
-    fun loadHostKey(hostId: String): ByteArray? {
+    override fun loadHostKey(hostId: String): ByteArray? {
         val all = JSONObject(prefs.getString("hostkeys", "{}")!!)
         return if (all.has(hostId)) Base64.getDecoder().decode(all.getString(hostId)) else null
     }
 
-    fun saveHostKey(hostId: String, key: ByteArray) {
+    override fun saveHostKey(hostId: String, key: ByteArray) {
         val all = JSONObject(prefs.getString("hostkeys", "{}")!!)
         all.put(hostId, Base64.getEncoder().encodeToString(key))
         prefs.edit().putString("hostkeys", all.toString()).apply()
@@ -85,7 +85,7 @@ class Store(context: Context) {
         prefs.edit().putInt("terminal_font_size", sp.coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)).apply()
 
     /** Intervallo keepalive SSH in secondi; 0 = disattivato. */
-    fun keepAliveSeconds(): Int = prefs.getInt("keepalive_seconds", DEFAULT_KEEPALIVE_SECONDS)
+    override fun keepAliveSeconds(): Int = prefs.getInt("keepalive_seconds", DEFAULT_KEEPALIVE_SECONDS)
         .coerceIn(0, MAX_KEEPALIVE_SECONDS)
 
     fun setKeepAliveSeconds(sec: Int) =

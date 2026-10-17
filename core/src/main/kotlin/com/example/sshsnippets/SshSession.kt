@@ -1,6 +1,5 @@
 package com.example.sshsnippets
 
-import android.content.Context
 import com.jcraft.jsch.ChannelShell
 import com.jcraft.jsch.JSch
 import com.jcraft.jsch.JSchException
@@ -15,6 +14,20 @@ import java.io.OutputStream
 
 /** Chiave host rifiutata dall'utente o cambiata: la connessione è bloccata e la sessione va chiusa. */
 class HostKeyRejectedException(message: String) : Exception(message)
+
+/** Messaggi di errore localizzati: ogni piattaforma li legge dalle proprie risorse. */
+interface SshMessages {
+    fun connectFailed(hostname: String, detail: String): String
+    fun keyRejected(): String
+    fun keyChanged(hostname: String, fingerprint: String): String
+}
+
+/** Archivio delle chiavi host e delle impostazioni di connessione, implementato da ogni piattaforma. */
+interface HostKeyStore {
+    fun loadHostKey(hostId: String): ByteArray?
+    fun saveHostKey(hostId: String, key: ByteArray)
+    fun keepAliveSeconds(): Int
+}
 
 const val DEFAULT_KEEPALIVE_SECONDS = 30
 const val MAX_KEEPALIVE_SECONDS = 120
@@ -50,9 +63,9 @@ private fun cdCommand(dir: String): String {
  * [confirmHostKey] riceve l'impronta di una chiave mai vista e restituisce true se l'utente la accetta.
  */
 suspend fun openVerifiedSession(
-    context: Context,
+    messages: SshMessages,
     host: Host,
-    store: Store,
+    store: HostKeyStore,
     confirmHostKey: suspend (fingerprint: String) -> Boolean,
 ): Session = withContext(Dispatchers.IO) {
     useBouncyCastleEd25519()
@@ -73,19 +86,17 @@ suspend fun openVerifiedSession(
         probe.disconnect()
     }
     val seen = probeRepo.lastSeen
-        ?: throw IOException(
-            context.getString(R.string.ssh_connect_failed, host.hostname, probeError?.message.orEmpty()),
-        )
+        ?: throw IOException(messages.connectFailed(host.hostname, probeError?.message.orEmpty()))
 
     when {
         known == null -> {
             if (!confirmHostKey(hostKeyFingerprint(seen))) {
-                throw HostKeyRejectedException(context.getString(R.string.ssh_key_rejected))
+                throw HostKeyRejectedException(messages.keyRejected())
             }
             store.saveHostKey(hostId, seen)
         }
         !known.contentEquals(seen) -> throw HostKeyRejectedException(
-            context.getString(R.string.ssh_key_changed, host.hostname, hostKeyFingerprint(seen)),
+            messages.keyChanged(host.hostname, hostKeyFingerprint(seen)),
         )
     }
 
@@ -107,9 +118,9 @@ suspend fun openVerifiedSession(
 }
 
 class SshSession(
-    private val context: Context,
+    private val messages: SshMessages,
     private val host: Host,
-    private val store: Store,
+    private val store: HostKeyStore,
     initialCols: Int = 80,
     initialRows: Int = 24,
 ) {
@@ -129,7 +140,7 @@ class SshSession(
         onOutput: (String) -> Unit,
         onClosed: (clean: Boolean) -> Unit,
     ) = withContext(Dispatchers.IO) {
-        val s = openVerifiedSession(context, host, store, confirmHostKey)
+        val s = openVerifiedSession(messages, host, store, confirmHostKey)
         val ch = s.openChannel("shell") as ChannelShell
         ch.setPtyType("xterm-256color", cols, rows, 0, 0)
         val input = InputStreamReader(ch.inputStream, Charsets.UTF_8)
