@@ -75,11 +75,8 @@ data class RemoteEntry(
     val size: Long,
     val mode: Int,
     val perms: String,
-    val links: Int,
     val mtime: Long,
 )
-
-private val WHITESPACE = Regex("\\s+")
 
 /** Un solo canale SFTP per sessione: le operazioni sono serializzate da [mutex]. */
 class SftpClient private constructor(private val session: Session, private val channel: ChannelSftp) : AutoCloseable {
@@ -96,7 +93,6 @@ class SftpClient private constructor(private val session: Session, private val c
                     it.attrs.size,
                     it.attrs.permissions and PERMISSION_MASK,
                     it.attrs.permissionsString,
-                    longnameField(it, 1)?.toIntOrNull() ?: 1,
                     it.attrs.getMTime().toLong(),
                 )
             }
@@ -130,10 +126,6 @@ class SftpClient private constructor(private val session: Session, private val c
         val entries = ch.ls(path) as Vector<ChannelSftp.LsEntry>
         return entries.filter { it.filename != "." && it.filename != ".." }
     }
-
-    /** Il server riporta utente (2) e gruppo (3) nella longname (es. "-rw-r--r--  1 root  root ..."); altrimenti null. */
-    private fun longnameField(e: ChannelSftp.LsEntry, index: Int): String? =
-        e.longname.trim().split(WHITESPACE).getOrNull(index)
 
     private fun countLocked(ch: ChannelSftp, remote: String): Int =
         childrenOf(ch, remote).sumOf { child ->
@@ -421,7 +413,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            "%s %2d %7d %s".format(e.perms, e.links, e.size, lsDate(e.mtime)),
+                            "%s %7d %s".format(e.perms, e.size, lsDate(e.mtime)),
                             style = LsLineStyle,
                             maxLines = 1,
                             modifier = Modifier.padding(start = 8.dp),
