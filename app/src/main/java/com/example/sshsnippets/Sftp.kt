@@ -425,7 +425,7 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            "%s %2d %s %s %7d %s".format(e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime)),
+                            "%s %2d %s %7d %s".format(e.perms, e.links, e.owner, e.size, lsDate(e.mtime)),
                             style = LsLineStyle,
                             maxLines = 1,
                         )
