@@ -20,11 +20,11 @@
 <h1>SnipSSH - Privacy policy</h1>
 <p>SnipSSH does not collect, transmit or share personal data.</p>
 <ul>
-  <li>Hosts, credentials, private keys, snippets, command history, terminal preferences and SSH host keys stay on the device, encrypted with EncryptedSharedPreferences (key kept in the Android Keystore).</li>
+  <li>Hosts, credentials, private keys, snippets, command history, terminal preferences and SSH host keys stay on the device. On Android they are encrypted with EncryptedSharedPreferences (key kept in the Android Keystore). On Windows they are stored in the %APPDATA%\SnipSSH folder, encrypted with AES-256-GCM, with the key protected by Windows DPAPI.</li>
   <li>SSH and SFTP connections go directly from the device to the server chosen by the user. The developer does not receive or store any data from these connections.</li>
   <li>A backup is saved only if the user exports it, as a file encrypted with the password the user chooses. The developer does not receive the file.</li>
   <li>The app uses no analytics, advertising or tracking SDKs.</li>
-  <li>To delete all data: uninstall the app, or clear its data from Android settings.</li>
+  <li>To delete all data: uninstall the app, or clear its data from Android settings. On Windows, also delete the %APPDATA%\SnipSSH folder.</li>
 </ul>
 <p class="meta">Controller: flipall srl<br>Contact: <a href="mailto:info@flipall.it">info@flipall.it</a><br>Last updated: 17 October 2026</p>
 </section>
@@ -33,11 +33,11 @@
 <h2>Informativa sulla privacy (italiano)</h2>
 <p>SnipSSH non raccoglie, non trasmette e non condivide dati personali.</p>
 <ul>
-  <li>Host, credenziali, chiavi private, snippet, cronologia dei comandi, preferenze del terminale e chiavi host SSH restano sul dispositivo, cifrati con EncryptedSharedPreferences (chiave nel Android Keystore).</li>
+  <li>Host, credenziali, chiavi private, snippet, cronologia dei comandi, preferenze del terminale e chiavi host SSH restano sul dispositivo. Su Android sono cifrati con EncryptedSharedPreferences (chiave nel Android Keystore). Su Windows sono salvati nella cartella %APPDATA%\SnipSSH, cifrati con AES-256-GCM, con la chiave protetta da DPAPI di Windows.</li>
   <li>Le connessioni SSH e SFTP vanno direttamente dal dispositivo al server scelto dall'utente. Lo sviluppatore non riceve né conserva alcun dato di queste connessioni.</li>
   <li>Il backup viene salvato solo se l'utente lo esporta, in un file cifrato con la password scelta dall'utente. Lo sviluppatore non riceve il file.</li>
   <li>L'app non usa analytics, pubblicità o SDK di tracciamento.</li>
-  <li>Per eliminare tutti i dati: disinstalla l'app oppure cancella i dati dalle impostazioni Android.</li>
+  <li>Per eliminare tutti i dati: disinstalla l'app oppure cancella i dati dalle impostazioni Android. Su Windows, elimina anche la cartella %APPDATA%\SnipSSH.</li>
 </ul>
 <p class="meta">Titolare: flipall srl<br>Contatto: <a href="mailto:info@flipall.it">info@flipall.it</a><br>Data di ultimo aggiornamento: 17 ottobre 2026</p>
 </section>
