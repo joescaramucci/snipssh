@@ -63,7 +63,7 @@ Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non 
 App per Windows 10/11 (64 bit) con le stesse funzioni di quella Android: host, shell SSH, SFTP, snippet, temi, 8 lingue e backup cifrato. È scritta in Compose Desktop e condivide il codice con l'app Android: la logica SSH/SFTP, l'emulatore ANSI e i modelli stanno nel modulo `core`.
 
 - **Schede**: shell e SFTP si aprono in schede. `+ Host` torna alla lista, la × chiude la scheda.
-- **Vista affiancata**: il pulsante *Affianca* nella barra in alto mostra due schede insieme, una a sinistra e una a destra, per vedere subito una shell SSH e una connessione SFTP. Un click sul pannello di destra lo scambia con quello di sinistra.
+- **Vista affiancata**: il pulsante *Affianca* nella barra in alto mostra fino a 4 schede una accanto all'altra, per vedere insieme una shell SSH e una connessione SFTP. Si aprono subito 2 pannelli; le altre schede restano nella barra e, quando le selezioni, prendono il posto del pannello con il fuoco. Trascina i divisori per cambiare la larghezza dei pannelli. Un click su un pannello gli dà il fuoco, e *Vista singola* torna a una scheda sola.
 - **Terminale**: tastiera completa (frecce, F1–F12, Ctrl+lettera, AltGr), selezione col mouse e rotella per scorrere. Copia con `Ctrl+Maiusc+C` (o `Ctrl+C` se c'è una selezione, o `Ctrl+Ins`), incolla con `Ctrl+Maiusc+V` o `Maiusc+Ins`. `Maiusc+PagSu/PagGiù` scorre lo storico. `Ctrl+rotella`, `Ctrl++`, `Ctrl+-` e `Ctrl+0` cambiano la dimensione del testo. Gli snippet sono nella colonna a destra.
 - **SFTP**: doppio click per entrare in una cartella, caricamento di più file insieme, download con la finestra "Salva con nome".
 - **Dati**: in `%APPDATA%\SnipSSH`, cifrati con AES-256-GCM. La chiave è protetta da DPAPI di Windows, quindi solo lo stesso utente Windows sullo stesso PC può leggerli. Il blocco biometrico resta solo su Android. I file di backup `.ssb` sono interscambiabili con l'app Android.
@@ -145,6 +145,11 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.
 - SFTP non cancella le cartelle non vuote.
 - Importare un backup sostituisce i dati presenti nell'app.
+- Nella vista affiancata ogni pannello mostra la propria colonna di snippet: con 4 pannelli su uno schermo normale può risultare stretta.
+
+## Sostieni il progetto
+
+SnipSSH è gratuito e senza pubblicità. Se ti è utile, puoi fare una donazione su PayPal a joe.scaramucci@gmail.com oppure con il pulsante *Sponsor* in alto nella pagina del repository.
 
 ## Documentazione
 

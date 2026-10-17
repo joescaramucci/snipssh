@@ -53,7 +53,6 @@
     <string name="host_color_default">Standard</string>
     <string name="split_toggle">Nebeneinander</string>
     <string name="split_off">Einzelansicht</string>
-    <string name="split_empty">Öffne einen weiteren Tab, um ihn nebenan anzuzeigen</string>
 
     <string name="settings_language">Sprache</string>
     <string name="settings_app_theme">App-Design</string>

@@ -53,7 +53,6 @@
     <string name="host_color_default">Par défaut</string>
     <string name="split_toggle">Côte à côte</string>
     <string name="split_off">Vue simple</string>
-    <string name="split_empty">Ouvrez un autre onglet à afficher à côté</string>
 
     <string name="settings_language">Langue</string>
     <string name="settings_app_theme">Thème de l\'application</string>

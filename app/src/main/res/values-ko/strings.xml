@@ -53,7 +53,6 @@
     <string name="host_color_default">기본값</string>
     <string name="split_toggle">나란히</string>
     <string name="split_off">단일 보기</string>
-    <string name="split_empty">나란히 표시할 다른 탭을 여세요</string>
 
     <string name="settings_language">언어</string>
     <string name="settings_app_theme">앱 테마</string>

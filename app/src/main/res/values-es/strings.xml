@@ -53,7 +53,6 @@
     <string name="host_color_default">Predeterminado</string>
     <string name="split_toggle">Lado a lado</string>
     <string name="split_off">Vista única</string>
-    <string name="split_empty">Abre otra pestaña para mostrarla al lado</string>
 
     <string name="settings_language">Idioma</string>
     <string name="settings_app_theme">Tema de la app</string>
