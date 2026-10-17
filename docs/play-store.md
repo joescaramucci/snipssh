@@ -168,7 +168,7 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 
 ## Checklist prima del caricamento
 
-- [ ] Account sviluppatore verificato (quota una tantum da 25 USD).
+- [x] Account sviluppatore verificato e quota una tantum pagata (già fatto con l'app beep; nome sviluppatore: flipall srl, da verificare nella Console).
 - [ ] Icona, feature graphic e screenshot caricati.
 - [ ] Scheda store e privacy policy pubblicate (URL richiesto).
 - [ ] Modulo Data Safety compilato come sopra.
