@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jcraft.jsch.ChannelSftp
@@ -77,6 +79,7 @@ data class RemoteEntry(
     val owner: String,
     val group: String,
     val perms: String,
+    val links: Int,
     val mtime: Long,
 )
 
@@ -99,6 +102,7 @@ class SftpClient private constructor(private val session: Session, private val c
                     longnameField(it, 2) ?: it.attrs.uId.toString(),
                     longnameField(it, 3) ?: it.attrs.gId.toString(),
                     it.attrs.permissionsString,
+                    longnameField(it, 1)?.toIntOrNull() ?: 1,
                     it.attrs.getMTime().toLong(),
                 )
             }
@@ -187,6 +191,8 @@ private const val SIX_MONTHS_MS = 182L * 24 * 60 * 60 * 1000
 
 /** Stile delle righe di dettaglio, come l'output di `ls -l` nel terminale. */
 private val LsLineStyle = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 13.sp)
+
+private val SmallActionStyle = TextStyle(fontSize = 11.sp)
 
 /** Data in stile `ls -l`: "Jan 28 14:05" se recente, altrimenti "Jan 28  2026". */
 private fun lsDate(mtimeSeconds: Long): String {
@@ -406,31 +412,37 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
         LazyColumn(Modifier.weight(1f)) {
             items(entries, key = { it.name }) { e ->
                 ListItem(
-                    headlineContent = { Text(if (e.isDir) "${e.name}/" else e.name) },
+                    headlineContent = {
+                        val displayName = if (e.isDir) "${e.name}/" else e.name
+                        Text(
+                            "%s %2d %s %s %7d %s  %s".format(e.perms, e.links, e.owner, e.group, e.size, lsDate(e.mtime), displayName),
+                            style = LsLineStyle,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
                     supportingContent = {
-                        Column {
-                            Text("${e.perms}  ${e.owner}  ${e.group}", style = LsLineStyle)
-                            Text("%7d  %s".format(e.size, lsDate(e.mtime)), style = LsLineStyle)
-                        }
-                    },
-                    modifier = Modifier.clickable(enabled = !busy && e.isDir) {
-                        withClient { c -> load(c, joinPath(path, e.name)) }
-                    },
-                    trailingContent = {
                         Row {
+                            val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
                             if (!e.isDir) {
                                 TextButton(
                                     enabled = !busy,
+                                    contentPadding = small,
                                     onClick = {
                                         downloadPath = joinPath(path, e.name)
                                         lock.expectExternalActivity()
                                         saveLauncher.launch(e.name)
                                     },
-                                ) { Text(stringResource(R.string.sftp_download)) }
+                                ) { Text(stringResource(R.string.sftp_download), style = SmallActionStyle) }
                             }
-                            TextButton(enabled = !busy, onClick = { toChmod = e }) { Text(stringResource(R.string.sftp_chmod)) }
                             TextButton(
                                 enabled = !busy,
+                                contentPadding = small,
+                                onClick = { toChmod = e },
+                            ) { Text(stringResource(R.string.sftp_chmod), style = SmallActionStyle) }
+                            TextButton(
+                                enabled = !busy,
+                                contentPadding = small,
                                 onClick = {
                                     if (e.isDir) {
                                         withClient { c ->
@@ -441,8 +453,11 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                                         toDelete = e
                                     }
                                 },
-                            ) { Text(stringResource(R.string.common_delete)) }
+                            ) { Text(stringResource(R.string.common_delete), style = SmallActionStyle) }
                         }
+                    },
+                    modifier = Modifier.clickable(enabled = !busy && e.isDir) {
+                        withClient { c -> load(c, joinPath(path, e.name)) }
                     },
                 )
                 HorizontalDivider()
