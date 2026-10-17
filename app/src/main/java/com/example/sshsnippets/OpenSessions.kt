@@ -1,6 +1,7 @@
 package com.example.sshsnippets
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -86,6 +87,10 @@ object OpenSessions {
                     onClosed = { clean -> onSessionClosed(session, ssh, clean) },
                 )
                 session.state.value = SessionState.Connected
+            } catch (e: HostKeyRejectedException) {
+                // Chiave rifiutata o cambiata: la scheda non serve più, quindi si chiude con un avviso.
+                close(session)
+                Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 session.state.value = SessionState.Failed(e.message ?: e.javaClass.simpleName)
             }

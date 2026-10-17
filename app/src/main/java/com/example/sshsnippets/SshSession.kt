@@ -13,6 +13,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.io.OutputStream
 
+/** Chiave host rifiutata dall'utente o cambiata: la connessione è bloccata e la sessione va chiusa. */
 class HostKeyRejectedException(message: String) : Exception(message)
 
 const val DEFAULT_KEEPALIVE_SECONDS = 30
@@ -20,6 +21,15 @@ const val MAX_KEEPALIVE_SECONDS = 120
 
 /** Dopo questo numero di keepalive senza risposta la connessione viene considerata caduta. */
 private const val KEEPALIVE_COUNT_MAX = 3
+
+/**
+ * L'implementazione Ed25519 predefinita di JSch usa l'EdDSA del JDK (Java 15+), assente su Android sotto API 33.
+ * Il provider BouncyCastle incluso nell'app funziona su tutte le versioni. La configurazione JSch è globale.
+ */
+private fun useBouncyCastleEd25519() {
+    JSch.setConfig("ssh-ed25519", "com.jcraft.jsch.bc.SignatureEd25519")
+    JSch.setConfig("keypairgen.eddsa", "com.jcraft.jsch.bc.KeyPairGenEdDSA")
+}
 
 /**
  * Apre una sessione SSH verificando la chiave host (trust-on-first-use) prima di inviare credenziali.
@@ -31,6 +41,7 @@ suspend fun openVerifiedSession(
     store: Store,
     confirmHostKey: suspend (fingerprint: String) -> Boolean,
 ): Session = withContext(Dispatchers.IO) {
+    useBouncyCastleEd25519()
     val hostId = "${host.hostname}:${host.port}"
     val known = store.loadHostKey(hostId)
 
@@ -48,7 +59,7 @@ suspend fun openVerifiedSession(
         probe.disconnect()
     }
     val seen = probeRepo.lastSeen
-        ?: throw HostKeyRejectedException(
+        ?: throw IOException(
             context.getString(R.string.ssh_connect_failed, host.hostname, probeError?.message.orEmpty()),
         )
 
