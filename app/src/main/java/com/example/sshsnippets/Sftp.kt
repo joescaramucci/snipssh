@@ -74,8 +74,6 @@ data class RemoteEntry(
     val isDir: Boolean,
     val size: Long,
     val mode: Int,
-    val owner: String,
-    val group: String,
     val perms: String,
     val links: Int,
     val mtime: Long,
@@ -97,8 +95,6 @@ class SftpClient private constructor(private val session: Session, private val c
                     it.attrs.isDir,
                     it.attrs.size,
                     it.attrs.permissions and PERMISSION_MASK,
-                    longnameField(it, 2) ?: it.attrs.uId.toString(),
-                    longnameField(it, 3) ?: it.attrs.gId.toString(),
                     it.attrs.permissionsString,
                     longnameField(it, 1)?.toIntOrNull() ?: 1,
                     it.attrs.getMTime().toLong(),
@@ -425,9 +421,10 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            "%s %2d %s %7d %s".format(e.perms, e.links, e.owner, e.size, lsDate(e.mtime)),
+                            "%s %2d %7d %s".format(e.perms, e.links, e.size, lsDate(e.mtime)),
                             style = LsLineStyle,
                             maxLines = 1,
+                            modifier = Modifier.padding(start = 8.dp),
                         )
                     }
                     Row {
