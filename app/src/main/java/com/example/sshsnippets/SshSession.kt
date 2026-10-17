@@ -31,7 +31,10 @@ private fun useBouncyCastleEd25519() {
     JSch.setConfig("keypairgen.eddsa", "com.jcraft.jsch.bc.KeyPairGenEdDSA")
 }
 
-/** Comando che porta la shell nella cartella iniziale. "~/..." viene espanso dalla shell, il resto è tra apici. */
+/**
+ * Comando che porta la shell nella cartella iniziale. "~/..." viene espanso dalla shell, il resto è tra apici.
+ * Se la cartella non esiste, `cd` stampa l'errore e il secondo `cd` riporta alla home.
+ */
 private fun cdCommand(dir: String): String {
     fun quote(s: String) = "'" + s.replace("'", "'\\''") + "'"
     val target = when {
@@ -39,7 +42,7 @@ private fun cdCommand(dir: String): String {
         dir.startsWith("~/") -> "~/" + quote(dir.substring(2))
         else -> quote(dir)
     }
-    return "cd -- $target\n"
+    return "cd -- $target || cd\n"
 }
 
 /**
