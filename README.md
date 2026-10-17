@@ -1,5 +1,7 @@
 # SnipSSH
 
+**SnipSSH = PuTTY + FileZilla per Android, con snippet di comandi.** Terminale SSH e SFTP in un'unica app, senza abbonamento.
+
 Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal telefono direttamente al tuo server.
 
 ## Screenshot
@@ -33,7 +35,8 @@ Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun
 - **Logo della distribuzione** accanto al nome dell'host (Debian, Ubuntu, Linux Mint, Fedora, Red Hat, Arch, Alpine, Windows, macOS, FreeBSD o generico), scelto nel form dell'host.
 - **Cronologia dei comandi** per host: mentre digiti (es. `cd`) compaiono i comandi già usati che iniziano così, dal più usato al meno usato.
 - **Snippet** con nome e variabili tipo `{{servizio}}`, lanciabili sul server con un tocco e conferma.
-- **Host** con autenticazione a password oppure chiave privata (PEM), con passphrase opzionale.
+- **Host** con autenticazione a password oppure chiave privata, con passphrase opzionale.
+- **Chiavi**: accetta chiavi private in formato OpenSSH o PEM, di tipo RSA, ECDSA ed Ed25519. Le chiavi PuTTY `.ppk` non sono supportate: esportale in formato OpenSSH.
 - **Verifica delle chiavi host** alla prima connessione, con avviso se la chiave del server cambia.
 - **Temi dell'app**: 8 palette (Aurora, Ocean, Sunset, Forest, Midnight, Graphite, Cocoa, Moss), scelte in Impostazioni.
 - **SFTP**: elenco in stile `ls -l` (nome, permessi, dimensione, data), con percorso modificabile e una cartella di partenza per ogni host (con `cd` automatico dopo la connessione). I nomi lunghi vanno a capo invece di essere troncati, e i permessi si modificano. Si può sfogliare, scaricare, caricare ed eliminare file e cartelle vuote.
