@@ -47,6 +47,13 @@
     <string name="session_new">+ Host</string>
     <string name="sessions_open">Offene Sitzungen</string>
     <string name="session_close">Sitzung schließen</string>
+    <string name="host_color_title">Host-Farbe</string>
+    <string name="host_color_hex">Hex-Farbe</string>
+    <string name="host_color_invalid">Format #RRGGBB verwenden</string>
+    <string name="host_color_default">Standard</string>
+    <string name="split_toggle">Nebeneinander</string>
+    <string name="split_off">Einzelansicht</string>
+    <string name="split_empty">Öffne einen weiteren Tab, um ihn nebenan anzuzeigen</string>
 
     <string name="settings_language">Sprache</string>
     <string name="settings_app_theme">App-Design</string>

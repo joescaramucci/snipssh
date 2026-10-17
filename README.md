@@ -4,6 +4,19 @@
 
 Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal dispositivo direttamente al tuo server. La [versione per Windows](#versione-windows) ha le stesse funzioni di quella Android.
 
+## Download
+
+Ultima versione: **0.3.0**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.0).
+
+| File | Per |
+|---|---|
+| `SnipSSH-0.3.0-android.apk` | Android 8.0 o successivo (installazione da file, consentire l'origine sconosciuta) |
+| `SnipSSH-0.3.0-windows-setup.exe` | Windows 10/11 64 bit, installazione per utente |
+| `SnipSSH-0.3.0-windows.msi` | Windows 10/11 64 bit, pacchetto MSI per utente |
+| `SnipSSH-0.3.0-windows-portable.zip` | Windows 10/11 64 bit, nessuna installazione: estrai e avvia `SnipSSH.exe` |
+
+Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non sono firmati, quindi SmartScreen può mostrare un avviso alla prima esecuzione.
+
 ## Screenshot
 
 <table>
@@ -42,12 +55,15 @@ Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riuti
 - **SFTP**: elenco in stile `ls -l` (nome, permessi, dimensione, data), con percorso modificabile e una cartella di partenza per ogni host (con `cd` automatico dopo la connessione). I nomi lunghi vanno a capo invece di essere troncati, e i permessi si modificano. Si può sfogliare, scaricare, caricare ed eliminare file e cartelle vuote.
 - **Sicurezza**: blocco biometrico opzionale; dati locali cifrati con `EncryptedSharedPreferences`.
 - **Backup** esportabile in un file cifrato con una password scelta dall'utente.
+- **Colore per host**: ogni host può avere un colore che evidenzia la sua riga nell'elenco. Su Android si apre con un tocco lungo sulla riga, su Windows con il tasto destro. Il colore si salva nel backup.
+- **Crediti** in alto in ogni schermata.
 
 ## Versione Windows
 
 App per Windows 10/11 (64 bit) con le stesse funzioni di quella Android: host, shell SSH, SFTP, snippet, temi, 8 lingue e backup cifrato. È scritta in Compose Desktop e condivide il codice con l'app Android: la logica SSH/SFTP, l'emulatore ANSI e i modelli stanno nel modulo `core`.
 
-- **Schede**: shell e SFTP si aprono in schede affiancate. `+ Host` torna alla lista, la × chiude la scheda.
+- **Schede**: shell e SFTP si aprono in schede. `+ Host` torna alla lista, la × chiude la scheda.
+- **Vista affiancata**: il pulsante *Affianca* nella barra in alto mostra due schede insieme, una a sinistra e una a destra, per vedere subito una shell SSH e una connessione SFTP. Un click sul pannello di destra lo scambia con quello di sinistra.
 - **Terminale**: tastiera completa (frecce, F1–F12, Ctrl+lettera, AltGr), selezione col mouse e rotella per scorrere. Copia con `Ctrl+Maiusc+C` (o `Ctrl+C` se c'è una selezione, o `Ctrl+Ins`), incolla con `Ctrl+Maiusc+V` o `Maiusc+Ins`. `Maiusc+PagSu/PagGiù` scorre lo storico. `Ctrl+rotella`, `Ctrl++`, `Ctrl+-` e `Ctrl+0` cambiano la dimensione del testo. Gli snippet sono nella colonna a destra.
 - **SFTP**: doppio click per entrare in una cartella, caricamento di più file insieme, download con la finestra "Salva con nome".
 - **Dati**: in `%APPDATA%\SnipSSH`, cifrati con AES-256-GCM. La chiave è protetta da DPAPI di Windows, quindi solo lo stesso utente Windows sullo stesso PC può leggerli. Il blocco biometrico resta solo su Android. I file di backup `.ssb` sono interscambiabili con l'app Android.
@@ -74,7 +90,7 @@ Traduzioni, icone dei loghi e font vengono copiate dalle risorse Android a ogni 
 
 | Voce | Valore |
 |---|---|
-| Versione | 0.2.0 (`versionCode` 2) |
+| Versione | 0.3.0 (`versionCode` 3) |
 | Android | minSdk 26 (Android 8.0), targetSdk 36, compileSdk 36 |
 | Windows | Windows 10/11 a 64 bit, Compose Desktop 1.6.11, JDK 17; exe portabile, MSI e setup EXE (non firmati, per utente) |
 | Moduli Gradle | `:core` (Kotlin/JVM, logica condivisa), `:app` (Android), `:desktop` (Windows) |

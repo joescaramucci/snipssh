@@ -47,6 +47,13 @@
     <string name="session_new">+ Хост</string>
     <string name="sessions_open">Открытые сеансы</string>
     <string name="session_close">Закрыть сеанс</string>
+    <string name="host_color_title">Цвет хоста</string>
+    <string name="host_color_hex">HEX-цвет</string>
+    <string name="host_color_invalid">Используйте формат #RRGGBB</string>
+    <string name="host_color_default">По умолчанию</string>
+    <string name="split_toggle">Рядом</string>
+    <string name="split_off">Один экран</string>
+    <string name="split_empty">Откройте другую вкладку, чтобы показать её рядом</string>
 
     <string name="settings_language">Язык</string>
     <string name="settings_app_theme">Тема приложения</string>

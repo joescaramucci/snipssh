@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -34,6 +35,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -54,6 +58,8 @@ fun HostsScreen(
 ) {
     // null = editor chiuso; un Host con id vuoto = nuovo host.
     var editing by remember { mutableStateOf<Host?>(null) }
+    // Host di cui si sta cambiando il colore (tasto destro sulla riga).
+    var colorHost by remember { mutableStateOf<Host?>(null) }
     val listState = rememberLazyListState()
 
     Column(Modifier.fillMaxSize().padding(12.dp)) {
@@ -65,7 +71,22 @@ fun HostsScreen(
                 items(hosts, key = { it.id }) { h ->
                     val logo = distroById(h.distro)
                     ListItem(
-                        modifier = Modifier.combinedClickable(onDoubleClick = { onConnect(h) }, onClick = {}),
+                        modifier = Modifier
+                            .combinedClickable(onDoubleClick = { onConnect(h) }, onClick = {})
+                            .pointerInput(h.id) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        val event = awaitPointerEvent()
+                                        if (event.type == PointerEventType.Press && event.buttons.isSecondaryPressed) {
+                                            colorHost = h
+                                            event.changes.forEach { it.consume() }
+                                        }
+                                    }
+                                }
+                            },
+                        colors = ListItemDefaults.colors(
+                            containerColor = hostRowColor(h.color, MaterialTheme.colorScheme.surface),
+                        ),
                         headlineContent = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 if (logo != null) {
@@ -107,6 +128,16 @@ fun HostsScreen(
                 editing = null
             },
             onDismiss = { editing = null },
+        )
+    }
+    colorHost?.let { target ->
+        HostColorDialog(
+            current = target.color,
+            onDismiss = { colorHost = null },
+            onSave = { c ->
+                onChange(hosts.map { if (it.id == target.id) it.copy(color = c) else it })
+                colorHost = null
+            },
         )
     }
 }
@@ -223,6 +254,7 @@ private fun HostEditorDialog(initial: Host, onSave: (Host) -> Unit, onDismiss: (
                             keyPassphrase = passphrase,
                             distro = distro,
                             landingDir = landingDir.trim(),
+                            color = initial.color,
                         ),
                     )
                 },

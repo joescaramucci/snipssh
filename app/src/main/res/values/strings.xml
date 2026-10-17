@@ -47,6 +47,13 @@
     <string name="session_new">+ Host</string>
     <string name="sessions_open">Open sessions</string>
     <string name="session_close">Close session</string>
+    <string name="host_color_title">Host color</string>
+    <string name="host_color_hex">Hex color</string>
+    <string name="host_color_invalid">Use the format #RRGGBB</string>
+    <string name="host_color_default">Default</string>
+    <string name="split_toggle">Side by side</string>
+    <string name="split_off">Single view</string>
+    <string name="split_empty">Open another tab to show it side by side</string>
 
     <string name="settings_language">Language</string>
     <string name="settings_app_theme">App theme</string>

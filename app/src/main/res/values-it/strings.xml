@@ -47,6 +47,13 @@
     <string name="session_new">+ Host</string>
     <string name="sessions_open">Sessioni aperte</string>
     <string name="session_close">Chiudi sessione</string>
+    <string name="host_color_title">Colore host</string>
+    <string name="host_color_hex">Colore esadecimale</string>
+    <string name="host_color_invalid">Usa il formato #RRGGBB</string>
+    <string name="host_color_default">Predefinito</string>
+    <string name="split_toggle">Affianca</string>
+    <string name="split_off">Vista singola</string>
+    <string name="split_empty">Apri un\'altra scheda da affiancare</string>
 
     <string name="settings_language">Lingua</string>
     <string name="settings_app_theme">Tema app</string>

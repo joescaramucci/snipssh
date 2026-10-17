@@ -7,6 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -67,32 +69,37 @@ fun App(store: Store, lock: AppLockViewModel, appTheme: AppTheme, onAppThemeChan
     Surface(Modifier.fillMaxSize()) {
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
         Box(Modifier.fillMaxSize().background(appTheme.brush)) {
-            when (active) {
-                is OpenSession -> key(active.id) {
-                    TerminalScreen(active, snippets, store) { OpenSessions.showTerminal = false }
-                }
-                is OpenSftp -> key(active.id) {
-                    SftpScreen(active, lock) { OpenSessions.showTerminal = false }
-                }
-                else -> Column(Modifier.fillMaxSize().systemBarsPadding()) {
-                    TabRow(tab) {
-                        Tab(tab == 0, { tab = 0 }, text = { Text(stringResource(R.string.tab_hosts)) })
-                        Tab(tab == 1, { tab = 1 }, text = { Text(stringResource(R.string.tab_snippets)) })
-                        Tab(tab == 2, { tab = 2 }, text = { Text(stringResource(R.string.tab_settings)) })
-                    }
-                    when (tab) {
-                        0 -> HostsScreen(
-                            hosts,
-                            { hosts = it; store.saveHosts(it) },
-                            { OpenSessions.open(it) },
-                            { OpenSessions.openSftp(it) },
-                            { store.removeHostKey("${it.hostname}:${it.port}") },
-                            lock,
-                        )
-                        1 -> SnippetsScreen(snippets) { snippets = it; store.saveSnippets(it) }
-                        else -> SettingsScreen(store, lock, appTheme.id, onAppThemeChange) {
-                            hosts = store.loadHosts()
-                            snippets = store.loadSnippets()
+            Column(Modifier.fillMaxSize()) {
+                CreditsBar(Modifier.statusBarsPadding())
+                Box(Modifier.weight(1f).fillMaxWidth()) {
+                    when (active) {
+                        is OpenSession -> key(active.id) {
+                            TerminalScreen(active, snippets, store) { OpenSessions.showTerminal = false }
+                        }
+                        is OpenSftp -> key(active.id) {
+                            SftpScreen(active, lock) { OpenSessions.showTerminal = false }
+                        }
+                        else -> Column(Modifier.fillMaxSize().systemBarsPadding()) {
+                            TabRow(tab) {
+                                Tab(tab == 0, { tab = 0 }, text = { Text(stringResource(R.string.tab_hosts)) })
+                                Tab(tab == 1, { tab = 1 }, text = { Text(stringResource(R.string.tab_snippets)) })
+                                Tab(tab == 2, { tab = 2 }, text = { Text(stringResource(R.string.tab_settings)) })
+                            }
+                            when (tab) {
+                                0 -> HostsScreen(
+                                    hosts,
+                                    { hosts = it; store.saveHosts(it) },
+                                    { OpenSessions.open(it) },
+                                    { OpenSessions.openSftp(it) },
+                                    { store.removeHostKey("${it.hostname}:${it.port}") },
+                                    lock,
+                                )
+                                1 -> SnippetsScreen(snippets) { snippets = it; store.saveSnippets(it) }
+                                else -> SettingsScreen(store, lock, appTheme.id, onAppThemeChange) {
+                                    hosts = store.loadHosts()
+                                    snippets = store.loadSnippets()
+                                }
+                            }
                         }
                     }
                 }
@@ -126,6 +133,7 @@ fun HostsScreen(
     var editingId by remember { mutableStateOf<String?>(null) }
     var distro by remember { mutableStateOf("") }
     var landingDir by remember { mutableStateOf("") }
+    var colorHost by remember { mutableStateOf<Host?>(null) }
 
     fun resetForm() {
         editingId = null
@@ -230,6 +238,7 @@ fun HostsScreen(
                             port = port.toIntOrNull() ?: 22, username = user, password = pass,
                             privateKey = key, keyPassphrase = passphrase, distro = distro,
                             landingDir = landingDir.trim(),
+                            color = hosts.firstOrNull { it.id == editingId }?.color ?: "",
                         )
                         onChange(
                             if (editingId == null) hosts + saved
@@ -245,6 +254,12 @@ fun HostsScreen(
             items(hosts, key = { it.id }) { h ->
                 val logo = distroById(h.distro)
                 ListItem(
+                    modifier = Modifier.pointerInput(h.id) {
+                        detectTapGestures(onLongPress = { colorHost = h })
+                    },
+                    colors = ListItemDefaults.colors(
+                        containerColor = hostRowColor(h.color, MaterialTheme.colorScheme.surface),
+                    ),
                     headlineContent = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (logo != null) {
@@ -282,6 +297,16 @@ fun HostsScreen(
                 HorizontalDivider()
             }
         }
+    }
+    colorHost?.let { target ->
+        HostColorDialog(
+            current = target.color,
+            onDismiss = { colorHost = null },
+            onSave = { c ->
+                onChange(hosts.map { if (it.id == target.id) it.copy(color = c) else it })
+                colorHost = null
+            },
+        )
     }
 }
 

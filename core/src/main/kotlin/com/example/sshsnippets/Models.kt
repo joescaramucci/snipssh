@@ -17,6 +17,8 @@ data class Host(
     val distro: String = "",
     // Cartella in cui SFTP si apre alla connessione; vuota = home.
     val landingDir: String = "",
+    // Colore esadecimale "#RRGGBB" della riga nell'elenco; vuoto = colore predefinito.
+    val color: String = "",
 )
 
 data class Snippet(
@@ -40,11 +42,12 @@ fun Host.toJson() = JSONObject()
     .put("id", id).put("name", name).put("hostname", hostname).put("port", port)
     .put("username", username).put("password", password).put("privateKey", privateKey)
     .put("keyPassphrase", keyPassphrase).put("distro", distro).put("landingDir", landingDir)
+    .put("color", color)
 
 fun JSONObject.toHost() = Host(
     getString("id"), getString("name"), getString("hostname"), getInt("port"),
     getString("username"), optString("password"), optString("privateKey"), optString("keyPassphrase"),
-    optString("distro"), optString("landingDir"),
+    optString("distro"), optString("landingDir"), optString("color"),
 )
 
 fun Snippet.toJson() = JSONObject()

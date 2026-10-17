@@ -207,7 +207,7 @@ private fun controlKey(e: KeyEvent): String? {
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store) {
+fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, autoFocus: Boolean = true) {
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
     val host = session.host
@@ -254,7 +254,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store) 
     val snapNow by rememberUpdatedState(snap)
     val maxScrollBackNow by rememberUpdatedState(maxScrollBack)
 
-    LaunchedEffect(Unit) { focus.requestFocus() }
+    LaunchedEffect(autoFocus) { if (autoFocus) focus.requestFocus() }
 
     LaunchedEffect(areaSize, cellW, cellH) {
         if (areaSize.width <= padPx || areaSize.height <= padPx) return@LaunchedEffect

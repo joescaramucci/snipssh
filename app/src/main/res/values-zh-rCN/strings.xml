@@ -47,6 +47,13 @@
     <string name="session_new">+ 主机</string>
     <string name="sessions_open">已打开的会话</string>
     <string name="session_close">关闭会话</string>
+    <string name="host_color_title">主机颜色</string>
+    <string name="host_color_hex">十六进制颜色</string>
+    <string name="host_color_invalid">请使用 #RRGGBB 格式</string>
+    <string name="host_color_default">默认</string>
+    <string name="split_toggle">并排</string>
+    <string name="split_off">单视图</string>
+    <string name="split_empty">打开另一个标签页以并排显示</string>
 
     <string name="settings_language">语言</string>
     <string name="settings_app_theme">应用主题</string>

@@ -76,7 +76,7 @@ val generateAndroidResources by tasks.registering {
 
 // File Compose senza dipendenze Android, condivisi con l'app: si copiano qui così restano identici sulle due piattaforme.
 val sharedFromApp = listOf(
-    "AppThemes.kt", "TerminalThemes.kt", "Distros.kt", "OpenSessions.kt", "SessionBar.kt", "HostKeyDialog.kt", "ChmodDialog.kt",
+    "AppThemes.kt", "TerminalThemes.kt", "Distros.kt", "OpenSessions.kt", "SessionBar.kt", "HostKeyDialog.kt", "ChmodDialog.kt", "HostColor.kt", "Credits.kt",
 )
 val sharedSrc = layout.buildDirectory.dir("generated/sharedFromApp/kotlin")
 
@@ -150,7 +150,7 @@ compose.desktop {
             // jdk.crypto.ec fornisce le curve ellittiche usate da SSH: jlink non lo include da solo.
             modules("java.instrument", "jdk.unsupported", "jdk.crypto.ec", "java.naming")
             packageName = "SnipSSH"
-            packageVersion = "0.2.0"
+            packageVersion = "0.3.0"
             description = "SSH client with SFTP and command snippets"
             vendor = "flipall srl"
             windows {
