@@ -17,16 +17,16 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
@@ -38,18 +38,38 @@ fun DesktopApp(store: Store) {
     var appThemeId by remember { mutableStateOf(store.appThemeId()) }
     val appTheme = appThemeById(appThemeId)
     val active = OpenSessions.active.takeIf { OpenSessions.showTerminal }
-    // Vista affiancata: la scheda attiva sta a sinistra, `other` a destra.
+    // Vista affiancata: `panes` sono gli id delle schede a vista, da sinistra a destra.
     var split by remember { mutableStateOf(false) }
-    var rightId by remember { mutableStateOf<String?>(null) }
-    val other = active?.let { a ->
-        OpenSessions.list.firstOrNull { it.id == rightId && it.id != a.id }
-            ?: OpenSessions.list.lastOrNull { it.id != a.id }
+    val panes = remember { mutableStateListOf<String>() }
+    val paneWeights = remember { mutableStateMapOf<String, Float>() }
+    var focusedPane by remember { mutableStateOf<String?>(null) }
+    val tabIds = OpenSessions.list.map { it.id }
+    LaunchedEffect(split, OpenSessions.activeId, tabIds) {
+        if (!split) return@LaunchedEffect
+        panes.removeAll { it !in tabIds }
+        val current = OpenSessions.activeId ?: return@LaunchedEffect
+        if (current in panes) {
+            focusedPane = current
+            return@LaunchedEffect
+        }
+        // Una scheda non ancora a vista entra se c'è spazio, altrimenti prende il posto di quella con il fuoco.
+        val slot = panes.indexOf(focusedPane)
+        if (panes.size < SPLIT_MAX_PANES) panes.add(current)
+        else panes[if (slot >= 0) slot else panes.lastIndex] = current
+        focusedPane = current
     }
-    fun focusTab(target: OpenTab) {
-        // Scegliere la scheda di destra la scambia con quella attiva.
-        if (target.id == other?.id) rightId = active?.id
-        OpenSessions.select(target)
+    fun toggleSplit() {
+        if (split) {
+            split = false
+            return
+        }
+        panes.clear()
+        OpenSessions.active?.let { panes.add(it.id) }
+        OpenSessions.list.filter { it.id !in panes }.take(SPLIT_OPEN_PANES - panes.size).forEach { panes.add(it.id) }
+        focusedPane = OpenSessions.activeId
+        split = true
     }
+    val paneTabs = panes.mapNotNull { id -> OpenSessions.list.firstOrNull { it.id == id } }
 
     MaterialTheme(colorScheme = appTheme.colors) {
         Surface(Modifier.fillMaxSize()) {
@@ -59,33 +79,12 @@ fun DesktopApp(store: Store) {
                     SessionBar(
                         split = split,
                         canSplit = OpenSessions.list.size >= 2,
-                        onToggleSplit = { split = !split },
-                        onSelect = { focusTab(it) },
+                        onToggleSplit = { toggleSplit() },
+                        onSelect = { OpenSessions.select(it) },
                     )
                     Box(Modifier.weight(1f).fillMaxWidth()) {
-                        if (split && active != null) {
-                            Row(Modifier.fillMaxSize()) {
-                                Box(Modifier.weight(1f).fillMaxHeight()) {
-                                    TabPane(active, snippets, store, autoFocus = true)
-                                }
-                                Box(Modifier.width(1.dp).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
-                                Box(
-                                    Modifier.weight(1f).fillMaxHeight().pointerInput(active.id, other?.id) {
-                                        awaitPointerEventScope {
-                                            while (true) {
-                                                val event = awaitPointerEvent(PointerEventPass.Initial)
-                                                if (other != null && event.changes.any { it.changedToDown() }) focusTab(other)
-                                            }
-                                        }
-                                    },
-                                ) {
-                                    if (other != null) TabPane(other, snippets, store, autoFocus = false)
-                                    else Text(
-                                        stringResource(R.string.split_empty),
-                                        Modifier.align(Alignment.Center).padding(16.dp),
-                                    )
-                                }
-                            }
+                        if (split && active != null && paneTabs.isNotEmpty()) {
+                            SplitView(paneTabs, OpenSessions.activeId, snippets, store, paneWeights) { OpenSessions.select(it) }
                         } else when (active) {
                             is OpenSession -> key(active.id) { TerminalScreen(active, snippets, store) }
                             is OpenSftp -> key(active.id) { SftpScreen(active) }
@@ -150,10 +149,3 @@ private fun SessionBar(split: Boolean, canSplit: Boolean, onToggleSplit: () -> U
     }
 }
 
-@Composable
-private fun TabPane(tab: OpenTab, snippets: List<Snippet>, store: Store, autoFocus: Boolean) {
-    when (tab) {
-        is OpenSession -> key(tab.id) { TerminalScreen(tab, snippets, store, autoFocus) }
-        is OpenSftp -> key(tab.id) { SftpScreen(tab) }
-    }
-}
