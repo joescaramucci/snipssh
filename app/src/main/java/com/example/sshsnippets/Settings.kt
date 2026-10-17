@@ -45,6 +45,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 private const val MIN_BACKUP_PASSWORD = 8
+private const val KEEPALIVE_STEP = 15
 private const val BACKUP_FILE_NAME = "snipssh-backup.ssb"
 
 @Composable
@@ -57,6 +58,7 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
     var importBytes by remember { mutableStateOf<ByteArray?>(null) }
     var askExportPassword by remember { mutableStateOf(false) }
     var fontSize by remember { mutableStateOf(store.terminalFontSize()) }
+    var keepAlive by remember { mutableStateOf(store.keepAliveSeconds()) }
     var fontId by remember { mutableStateOf(store.terminalFontId()) }
     var themeId by remember { mutableStateOf(store.terminalThemeId()) }
     var appLang by remember { mutableStateOf(store.appLanguage()) }
@@ -146,6 +148,21 @@ fun SettingsScreen(store: Store, lock: AppLockViewModel, onRestored: () -> Unit)
                 },
             )
         }
+
+        Spacer(Modifier.height(24.dp))
+        Text(stringResource(R.string.settings_connection), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        Text(
+            if (keepAlive == 0) stringResource(R.string.settings_keepalive_off)
+            else stringResource(R.string.settings_keepalive, keepAlive),
+        )
+        Slider(
+            value = keepAlive.toFloat(),
+            onValueChange = { keepAlive = (it / KEEPALIVE_STEP).roundToInt() * KEEPALIVE_STEP },
+            onValueChangeFinished = { store.setKeepAliveSeconds(keepAlive) },
+            valueRange = 0f..MAX_KEEPALIVE_SECONDS.toFloat(),
+            steps = MAX_KEEPALIVE_SECONDS / KEEPALIVE_STEP - 1,
+        )
 
         Spacer(Modifier.height(24.dp))
         Text(stringResource(R.string.settings_terminal), style = MaterialTheme.typography.titleMedium)

@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Android 설정에서 지문 또는 화면 잠금을 설정하세요.</string>
     <string name="settings_terminal">터미널</string>
     <string name="settings_font_size">글꼴 크기: %1$d sp</string>
+    <string name="settings_connection">연결</string>
+    <string name="settings_keepalive">킵얼라이브: %1$d초마다</string>
+    <string name="settings_keepalive_off">킵얼라이브: 끔</string>
     <string name="settings_font">글꼴</string>
     <string name="settings_theme">색상 테마</string>
     <string name="settings_backup">백업</string>

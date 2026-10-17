@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Configura una huella o un bloqueo de pantalla en los ajustes de Android.</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_font_size">Tamaño de fuente: %1$d sp</string>
+    <string name="settings_connection">Conexión</string>
+    <string name="settings_keepalive">Keepalive: cada %1$d s</string>
+    <string name="settings_keepalive_off">Keepalive: desactivado</string>
     <string name="settings_font">Fuente</string>
     <string name="settings_theme">Tema de color</string>
     <string name="settings_backup">Copia de seguridad</string>

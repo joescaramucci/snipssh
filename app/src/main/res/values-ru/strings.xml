@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Настройте отпечаток или блокировку экрана в настройках Android.</string>
     <string name="settings_terminal">Терминал</string>
     <string name="settings_font_size">Размер шрифта: %1$d sp</string>
+    <string name="settings_connection">Подключение</string>
+    <string name="settings_keepalive">Keepalive: каждые %1$d с</string>
+    <string name="settings_keepalive_off">Keepalive: выкл.</string>
     <string name="settings_font">Шрифт</string>
     <string name="settings_theme">Цветовая тема</string>
     <string name="settings_backup">Резервная копия</string>

@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Set up a fingerprint or screen lock in Android settings.</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_font_size">Font size: %1$d sp</string>
+    <string name="settings_connection">Connection</string>
+    <string name="settings_keepalive">Keepalive: every %1$d s</string>
+    <string name="settings_keepalive_off">Keepalive: off</string>
     <string name="settings_font">Font</string>
     <string name="settings_theme">Color theme</string>
     <string name="settings_backup">Backup</string>

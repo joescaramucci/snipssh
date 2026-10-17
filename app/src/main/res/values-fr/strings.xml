@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Configurez une empreinte ou un verrouillage d\'écran dans les réglages Android.</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_font_size">Taille de police : %1$d sp</string>
+    <string name="settings_connection">Connexion</string>
+    <string name="settings_keepalive">Keepalive : toutes les %1$d s</string>
+    <string name="settings_keepalive_off">Keepalive : désactivé</string>
     <string name="settings_font">Police</string>
     <string name="settings_theme">Thème de couleurs</string>
     <string name="settings_backup">Sauvegarde</string>

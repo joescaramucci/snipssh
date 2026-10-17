@@ -61,8 +61,69 @@ SnipSSH non raccoglie, non trasmette e non condivide dati personali.
 - L'app non usa analytics, pubblicità o SDK di tracciamento.
 - Per eliminare tutti i dati: disinstalla l'app oppure cancella i dati dalle impostazioni Android.
 
-Contatto: scaramucci@yahoo.com
-Data di ultimo aggiornamento: 16 ottobre 2026
+Titolare: flipall srl
+Contatto: info@flipall.it
+Data di ultimo aggiornamento: 17 ottobre 2026
+```
+
+## Scheda store in inglese (en-US, lingua predefinita)
+
+**Title:** `SnipSSH`
+
+**Short description** (max 80 characters):
+`Free SSH client with reusable command snippets. No account needed.`
+
+**Full description** (max 4000 characters):
+
+```
+SnipSSH is an Android SSH client for people who work on servers every day.
+
+Terminal
+- SSH sessions with ANSI terminal emulation (colours, cursor, scrollback).
+- Extra keys (Esc, Tab, Ctrl, arrows) so you can use the shell without a hardware keyboard.
+- Per-host command history: as you type, previously used commands that start the same way appear, most used first.
+- Host key verification on first connection, with a warning if the server key changes.
+- Terminal settings: font size (8–24 sp), system font or JetBrains Mono, colour theme Dark, Light or Solarized.
+- Languages: English (default), Italian, Spanish, French, German, Simplified Chinese, Russian and Korean. Change them in Settings.
+- Pinch to zoom on the terminal to enlarge or shrink the text.
+- Several SSH sessions open at once, switching between them with a tap, without disconnecting.
+- Typing `exit` closes only the current session.
+- In landscape, snippets and quick keys are in a scrollable side column, and the terminal stays visible with the keyboard open.
+
+Snippets
+- Save the commands you use most, with a name and variables such as {{name}} (letters of any alphabet, digits and underscores).
+- Run a snippet on the server with one tap and a confirmation.
+
+Hosts
+- Password or private key (PEM), with an optional passphrase.
+- Import a key file from the device.
+- Distribution logo next to the host name (Debian, Ubuntu and others), chosen in the form.
+
+SFTP
+- Browse the server filesystem, download and upload files, delete files and empty folders.
+
+Security
+- Optional biometric lock when the app opens.
+- Hosts, snippets and keys are stored on the device in encrypted form.
+- Backup you can export to an encrypted file protected by a password you choose.
+
+No account, no ads, no middle server: the connection goes from your phone directly to your server.
+```
+
+## Privacy policy in inglese (per la scheda en-US)
+
+```
+SnipSSH does not collect, transmit or share personal data.
+
+- Hosts, credentials, private keys, snippets, command history, terminal preferences and SSH host keys stay on the device, encrypted with EncryptedSharedPreferences (key kept in the Android Keystore).
+- SSH and SFTP connections go directly from the device to the server chosen by the user. The developer does not receive or store any data from these connections.
+- A backup is saved only if the user exports it, as a file encrypted with the password the user chooses. The developer does not receive the file.
+- The app uses no analytics, advertising or tracking SDKs.
+- To delete all data: uninstall the app, or clear its data from Android settings.
+
+Controller: flipall srl
+Contact: info@flipall.it
+Last updated: 17 October 2026
 ```
 
 ## Modulo Data Safety (Play Console)

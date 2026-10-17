@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">请在 Android 设置中设置指纹或屏幕锁。</string>
     <string name="settings_terminal">终端</string>
     <string name="settings_font_size">字号：%1$d sp</string>
+    <string name="settings_connection">连接</string>
+    <string name="settings_keepalive">保活：每 %1$d 秒</string>
+    <string name="settings_keepalive_off">保活：已关闭</string>
     <string name="settings_font">字体</string>
     <string name="settings_theme">配色主题</string>
     <string name="settings_backup">备份</string>

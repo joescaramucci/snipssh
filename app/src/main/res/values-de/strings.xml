@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Richte einen Fingerabdruck oder eine Displaysperre in den Android-Einstellungen ein.</string>
     <string name="settings_terminal">Terminal</string>
     <string name="settings_font_size">Schriftgröße: %1$d sp</string>
+    <string name="settings_connection">Verbindung</string>
+    <string name="settings_keepalive">Keepalive: alle %1$d s</string>
+    <string name="settings_keepalive_off">Keepalive: aus</string>
     <string name="settings_font">Schriftart</string>
     <string name="settings_theme">Farbdesign</string>
     <string name="settings_backup">Sicherung</string>

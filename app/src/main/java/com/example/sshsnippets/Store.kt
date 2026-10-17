@@ -84,6 +84,13 @@ class Store(context: Context) {
     fun setTerminalFontSize(sp: Int) =
         prefs.edit().putInt("terminal_font_size", sp.coerceIn(MIN_TERMINAL_FONT_SIZE, MAX_TERMINAL_FONT_SIZE)).apply()
 
+    /** Intervallo keepalive SSH in secondi; 0 = disattivato. */
+    fun keepAliveSeconds(): Int = prefs.getInt("keepalive_seconds", DEFAULT_KEEPALIVE_SECONDS)
+        .coerceIn(0, MAX_KEEPALIVE_SECONDS)
+
+    fun setKeepAliveSeconds(sec: Int) =
+        prefs.edit().putInt("keepalive_seconds", sec.coerceIn(0, MAX_KEEPALIVE_SECONDS)).apply()
+
     fun terminalFontId(): String = prefs.getString("terminal_font", TerminalFonts[0].id)!!
 
     fun setTerminalFontId(id: String) = prefs.edit().putString("terminal_font", id).apply()

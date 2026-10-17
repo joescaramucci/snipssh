@@ -52,6 +52,9 @@
     <string name="settings_biometric_setup">Imposta un\'impronta o un blocco schermo nelle impostazioni Android.</string>
     <string name="settings_terminal">Terminale</string>
     <string name="settings_font_size">Dimensione testo: %1$d sp</string>
+    <string name="settings_connection">Connessione</string>
+    <string name="settings_keepalive">Keepalive: ogni %1$d s</string>
+    <string name="settings_keepalive_off">Keepalive: disattivato</string>
     <string name="settings_font">Carattere</string>
     <string name="settings_theme">Tema colori</string>
     <string name="settings_backup">Backup</string>

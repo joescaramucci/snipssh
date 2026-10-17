@@ -15,6 +15,12 @@ import java.io.OutputStream
 
 class HostKeyRejectedException(message: String) : Exception(message)
 
+const val DEFAULT_KEEPALIVE_SECONDS = 30
+const val MAX_KEEPALIVE_SECONDS = 120
+
+/** Dopo questo numero di keepalive senza risposta la connessione viene considerata caduta. */
+private const val KEEPALIVE_COUNT_MAX = 3
+
 /**
  * Apre una sessione SSH verificando la chiave host (trust-on-first-use) prima di inviare credenziali.
  * [confirmHostKey] riceve l'impronta di una chiave mai vista e restituisce true se l'utente la accetta.
@@ -66,6 +72,11 @@ suspend fun openVerifiedSession(
     val s = jsch.getSession(host.username, host.hostname, host.port)
     if (host.password.isNotBlank()) s.setPassword(host.password)
     s.setConfig("StrictHostKeyChecking", "yes")
+    val keepAlive = store.keepAliveSeconds()
+    if (keepAlive > 0) {
+        s.setServerAliveInterval(keepAlive * 1000)
+        s.setServerAliveCountMax(KEEPALIVE_COUNT_MAX)
+    }
     s.connect(15_000)
     s
 }
