@@ -31,6 +31,17 @@ private fun useBouncyCastleEd25519() {
     JSch.setConfig("keypairgen.eddsa", "com.jcraft.jsch.bc.KeyPairGenEdDSA")
 }
 
+/** Comando che porta la shell nella cartella iniziale. "~/..." viene espanso dalla shell, il resto è tra apici. */
+private fun cdCommand(dir: String): String {
+    fun quote(s: String) = "'" + s.replace("'", "'\\''") + "'"
+    val target = when {
+        dir == "~" -> "~"
+        dir.startsWith("~/") -> "~/" + quote(dir.substring(2))
+        else -> quote(dir)
+    }
+    return "cd -- $target\n"
+}
+
 /**
  * Apre una sessione SSH verificando la chiave host (trust-on-first-use) prima di inviare credenziali.
  * [confirmHostKey] riceve l'impronta di una chiave mai vista e restituisce true se l'utente la accetta.
@@ -123,6 +134,9 @@ class SshSession(
         ch.connect(10_000)
         session = s
         channel = ch
+        host.landingDir.trim().takeIf { it.isNotEmpty() }?.let { dir ->
+            out?.apply { write(cdCommand(dir).toByteArray(Charsets.UTF_8)); flush() }
+        }
         CoroutineScope(Dispatchers.IO).launch {
             val buf = CharArray(4096)
             try {

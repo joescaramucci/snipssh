@@ -27,7 +27,7 @@
     <string name="host_private_key">私钥 (PEM)</string>
     <string name="host_passphrase">密钥口令（如有）</string>
     <string name="host_landing_dir">起始目录（SFTP）</string>
-    <string name="host_landing_dir_hint">SFTP 连接时打开的目录。留空则为主目录。可使用 ~。</string>
+    <string name="host_landing_dir_hint">SFTP 和 SSH 连接时打开的目录。留空则为主目录。可使用 ~。</string>
     <string name="host_logo">系统标志</string>
     <string name="host_logo_none">无</string>
     <string name="host_import_key">导入密钥文件</string>
@@ -124,6 +124,10 @@
     <string name="theme_ocean">海洋</string>
     <string name="theme_sunset">日落</string>
     <string name="theme_forest">森林</string>
+    <string name="theme_midnight">午夜</string>
+    <string name="theme_graphite">石墨</string>
+    <string name="theme_cocoa">可可</string>
+    <string name="theme_moss">苔藓</string>
     <string name="theme_light">浅色</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">系统</string>

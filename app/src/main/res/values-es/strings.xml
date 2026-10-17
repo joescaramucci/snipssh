@@ -27,7 +27,7 @@
     <string name="host_private_key">Clave privada (PEM)</string>
     <string name="host_passphrase">Frase de contraseña de la clave (si la tiene)</string>
     <string name="host_landing_dir">Carpeta inicial (SFTP)</string>
-    <string name="host_landing_dir_hint">Carpeta que se abre al conectar por SFTP. Vacío = home. Se admite ~.</string>
+    <string name="host_landing_dir_hint">Carpeta que se abre al conectar por SFTP y SSH. Vacío = home. Se admite ~.</string>
     <string name="host_logo">Logo del sistema</string>
     <string name="host_logo_none">Ninguno</string>
     <string name="host_import_key">Importar archivo de clave</string>
@@ -124,6 +124,10 @@
     <string name="theme_ocean">Océano</string>
     <string name="theme_sunset">Atardecer</string>
     <string name="theme_forest">Bosque</string>
+    <string name="theme_midnight">Medianoche</string>
+    <string name="theme_graphite">Grafito</string>
+    <string name="theme_cocoa">Cacao</string>
+    <string name="theme_moss">Musgo</string>
     <string name="theme_light">Claro</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Sistema</string>

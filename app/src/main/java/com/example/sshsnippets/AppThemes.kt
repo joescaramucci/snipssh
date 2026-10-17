@@ -88,6 +88,58 @@ val AppThemes = listOf(
             surfaceVariant = Color(0xFF2A4A36),
         ),
     ),
+    AppTheme(
+        id = "midnight",
+        labelRes = R.string.theme_midnight,
+        gradient = listOf(Color(0xFF070B1F), Color(0xFF101C4A), Color(0xFF1A2C5E)),
+        colors = appScheme(
+            primary = Color(0xFFA9B8FF),
+            primaryContainer = Color(0xFF2B3F86),
+            secondary = Color(0xFFC2CCEB),
+            secondaryContainer = Color(0xFF2E3A5E),
+            surface = Color(0xFF0F1A3D),
+            surfaceVariant = Color(0xFF26365E),
+        ),
+    ),
+    AppTheme(
+        id = "graphite",
+        labelRes = R.string.theme_graphite,
+        gradient = listOf(Color(0xFF0C0F13), Color(0xFF1A212B), Color(0xFF2B3646)),
+        colors = appScheme(
+            primary = Color(0xFFB7C7DD),
+            primaryContainer = Color(0xFF34465C),
+            secondary = Color(0xFFC5CED9),
+            secondaryContainer = Color(0xFF3A4454),
+            surface = Color(0xFF171D26),
+            surfaceVariant = Color(0xFF2E3846),
+        ),
+    ),
+    AppTheme(
+        id = "cocoa",
+        labelRes = R.string.theme_cocoa,
+        gradient = listOf(Color(0xFF1A110B), Color(0xFF35221A), Color(0xFF553726)),
+        colors = appScheme(
+            primary = Color(0xFFE8C49A),
+            primaryContainer = Color(0xFF5E4128),
+            secondary = Color(0xFFD9C3AE),
+            secondaryContainer = Color(0xFF4B3A2E),
+            surface = Color(0xFF2A1D15),
+            surfaceVariant = Color(0xFF4A3628),
+        ),
+    ),
+    AppTheme(
+        id = "moss",
+        labelRes = R.string.theme_moss,
+        gradient = listOf(Color(0xFF0D1208), Color(0xFF23301A), Color(0xFF3A4D26)),
+        colors = appScheme(
+            primary = Color(0xFFC6DC8E),
+            primaryContainer = Color(0xFF3F5226),
+            secondary = Color(0xFFD0DDB8),
+            secondaryContainer = Color(0xFF46563A),
+            surface = Color(0xFF1E2A15),
+            surfaceVariant = Color(0xFF3A4A2C),
+        ),
+    ),
 )
 
 fun appThemeById(id: String): AppTheme = AppThemes.firstOrNull { it.id == id } ?: AppThemes[0]

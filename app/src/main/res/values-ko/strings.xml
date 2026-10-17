@@ -27,7 +27,7 @@
     <string name="host_private_key">개인 키 (PEM)</string>
     <string name="host_passphrase">키 암호 (있는 경우)</string>
     <string name="host_landing_dir">시작 폴더 (SFTP)</string>
-    <string name="host_landing_dir_hint">SFTP 연결 시 열리는 폴더. 비워 두면 홈. ~ 사용 가능.</string>
+    <string name="host_landing_dir_hint">SFTP 및 SSH 연결 시 열리는 폴더. 비워 두면 홈. ~ 사용 가능.</string>
     <string name="host_logo">시스템 로고</string>
     <string name="host_logo_none">없음</string>
     <string name="host_import_key">키 파일 가져오기</string>
@@ -124,6 +124,10 @@
     <string name="theme_ocean">바다</string>
     <string name="theme_sunset">노을</string>
     <string name="theme_forest">숲</string>
+    <string name="theme_midnight">미드나이트</string>
+    <string name="theme_graphite">그래파이트</string>
+    <string name="theme_cocoa">코코아</string>
+    <string name="theme_moss">이끼</string>
     <string name="theme_light">라이트</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">시스템</string>

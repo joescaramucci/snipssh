@@ -27,7 +27,7 @@
     <string name="host_private_key">Приватный ключ (PEM)</string>
     <string name="host_passphrase">Пароль ключа (если есть)</string>
     <string name="host_landing_dir">Начальная папка (SFTP)</string>
-    <string name="host_landing_dir_hint">Папка, открываемая при подключении по SFTP. Пусто = домашняя. Можно ~.</string>
+    <string name="host_landing_dir_hint">Папка, открываемая при подключении по SFTP и SSH. Пусто = домашняя. Можно ~.</string>
     <string name="host_logo">Логотип системы</string>
     <string name="host_logo_none">Нет</string>
     <string name="host_import_key">Импорт файла ключа</string>
@@ -124,6 +124,10 @@
     <string name="theme_ocean">Океан</string>
     <string name="theme_sunset">Закат</string>
     <string name="theme_forest">Лес</string>
+    <string name="theme_midnight">Полночь</string>
+    <string name="theme_graphite">Графит</string>
+    <string name="theme_cocoa">Какао</string>
+    <string name="theme_moss">Мох</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Системный</string>

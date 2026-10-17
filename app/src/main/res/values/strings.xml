@@ -27,7 +27,7 @@
     <string name="host_private_key">Private key (PEM)</string>
     <string name="host_passphrase">Key passphrase (if any)</string>
     <string name="host_landing_dir">Landing directory (SFTP)</string>
-    <string name="host_landing_dir_hint">Folder opened on SFTP connect. Empty = home. ~ is allowed.</string>
+    <string name="host_landing_dir_hint">Folder opened on SFTP and SSH connect. Empty = home. ~ is allowed.</string>
     <string name="host_logo">System logo</string>
     <string name="host_logo_none">None</string>
     <string name="host_import_key">Import key file</string>
@@ -124,6 +124,10 @@
     <string name="theme_ocean">Ocean</string>
     <string name="theme_sunset">Sunset</string>
     <string name="theme_forest">Forest</string>
+    <string name="theme_midnight">Midnight</string>
+    <string name="theme_graphite">Graphite</string>
+    <string name="theme_cocoa">Cocoa</string>
+    <string name="theme_moss">Moss</string>
     <string name="theme_light">Light</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">System</string>
