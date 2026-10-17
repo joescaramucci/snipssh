@@ -130,6 +130,12 @@ app/src/main/java/com/example/sshsnippets/
 app/src/main/res/values*/strings.xml   testi (inglese predefinito, poi it, es, fr, de, zh-rCN, ru, ko)
 ```
 
+## Crediti
+
+© 2026 flipall srl, Italy. Copyright ® Registered.
+
+Joe Scaramucci · [info@flipall.it](mailto:info@flipall.it)
+
 ## Licenza
 
 [MIT](LICENSE)

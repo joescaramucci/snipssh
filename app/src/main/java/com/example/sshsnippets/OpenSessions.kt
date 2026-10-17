@@ -101,6 +101,15 @@ object OpenSessions {
         connectSftp(tab)
     }
 
+    /** Riapre la connessione SFTP nella stessa scheda, ripartendo dalla cartella di default dell'host. */
+    fun reconnectSftp(tab: OpenSftp) {
+        if (tab.state.value == SessionState.Connecting) return
+        val old = tab.client
+        tab.client = null
+        if (old != null) scope.launch(Dispatchers.IO) { old.close() }
+        connectSftp(tab)
+    }
+
     private fun connectSftp(tab: OpenSftp) {
         tab.state.value = SessionState.Connecting
         tab.busy = true
@@ -143,7 +152,10 @@ object OpenSessions {
             try {
                 block(c)
             } catch (e: Exception) {
-                tab.error = e.message ?: e.javaClass.simpleName
+                val message = e.message ?: e.javaClass.simpleName
+                tab.error = message
+                // Connessione caduta durante l'operazione: la scheda passa a Failed e mostra Riconnetti.
+                if (!c.isConnected) tab.state.value = SessionState.Failed(message)
             } finally {
                 tab.busy = false
             }

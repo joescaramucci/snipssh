@@ -147,6 +147,9 @@ class SftpClient private constructor(private val session: Session, private val c
         withContext(Dispatchers.IO) { block(channel) }
     }
 
+    val isConnected: Boolean
+        get() = channel.isConnected && session.isConnected
+
     override fun close() {
         runCatching { channel.disconnect() }
         runCatching { session.disconnect() }
@@ -367,6 +370,11 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
         }
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+        if (tab.state.value is SessionState.Failed) {
+            TextButton(onClick = { OpenSessions.reconnectSftp(tab) }) {
+                Text(stringResource(R.string.terminal_reconnect), maxLines = 1, softWrap = false)
+            }
+        }
 
         LazyColumn(Modifier.weight(1f)) {
             items(entries, key = { it.name }) { e ->
