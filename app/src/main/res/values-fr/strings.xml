@@ -80,6 +80,8 @@
     <string name="terminal_connecting">Connexion à %1$s...</string>
     <string name="terminal_connected">Connecté à %1$s</string>
     <string name="terminal_error">Erreur : %1$s</string>
+    <string name="terminal_disconnected">Déconnecté de %1$s</string>
+    <string name="terminal_reconnect">Reconnecter</string>
     <string name="terminal_run">Exécuter</string>
     <string name="terminal_send">Envoyer</string>
     <string name="terminal_ctrl">Ctrl</string>

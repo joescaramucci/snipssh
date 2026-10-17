@@ -70,21 +70,28 @@ suspend fun openVerifiedSession(
     s
 }
 
-class SshSession(private val context: Context, private val host: Host, private val store: Store) {
+class SshSession(
+    private val context: Context,
+    private val host: Host,
+    private val store: Store,
+    initialCols: Int = 80,
+    initialRows: Int = 24,
+) {
     private var session: Session? = null
     private var channel: ChannelShell? = null
     private var out: OutputStream? = null
-    @Volatile private var cols = 80
-    @Volatile private var rows = 24
+    @Volatile private var cols = initialCols
+    @Volatile private var rows = initialRows
 
     /**
      * Verifica la chiave host prima di inviare credenziali. [confirmHostKey] riceve l'impronta
      * di una chiave mai vista e restituisce true se l'utente la accetta.
+     * [onClosed] riceve true se la shell è terminata normalmente, false se la connessione è caduta.
      */
     suspend fun connect(
         confirmHostKey: suspend (fingerprint: String) -> Boolean,
         onOutput: (String) -> Unit,
-        onClosed: () -> Unit,
+        onClosed: (clean: Boolean) -> Unit,
     ) = withContext(Dispatchers.IO) {
         val s = openVerifiedSession(context, host, store, confirmHostKey)
         val ch = s.openChannel("shell") as ChannelShell
@@ -105,10 +112,12 @@ class SshSession(private val context: Context, private val host: Host, private v
             } catch (e: IOException) {
                 // Il server ha chiuso il canale: lo gestisce onClosed.
             } finally {
-                onClosed()
+                // Il server invia exit-status prima di chiudere una shell terminata con exit. In una caduta di rete non arriva.
+                onClosed(ch.exitStatus >= 0)
             }
         }
     }
+
 
     suspend fun send(text: String) = withContext(Dispatchers.IO) {
         out?.apply { write(text.toByteArray(Charsets.UTF_8)); flush() }

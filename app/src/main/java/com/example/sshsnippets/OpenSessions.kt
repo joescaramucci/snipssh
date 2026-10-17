@@ -11,17 +11,22 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.UUID
 
 sealed interface SessionState {
     data object Connecting : SessionState
     data object Connected : SessionState
+    data object Disconnected : SessionState
     class Failed(val message: String) : SessionState
 }
 
 /** Una connessione SSH aperta con il suo terminale e lo stato della barra di input. */
-class OpenSession(val host: Host, val ssh: SshSession) {
+class OpenSession(val host: Host, var ssh: SshSession) {
     val id: String = UUID.randomUUID().toString()
+    /** Dimensione del terminale, da usare anche alla riconnessione. */
+    var cols = 80
+    var rows = 24
     val term = AnsiTerminal(80, 24)
     val version = mutableIntStateOf(0)
     val state = mutableStateOf<SessionState>(SessionState.Connecting)
@@ -57,19 +62,49 @@ object OpenSessions {
         list.add(session)
         activeId = session.id
         showTerminal = true
+        connect(session)
+    }
+
+    /** Riapre la connessione di una sessione caduta o fallita, nella stessa scheda. */
+    fun reconnect(session: OpenSession) {
+        if (session.state.value == SessionState.Connecting) return
+        session.ssh = SshSession(context, session.host, store, session.cols, session.rows)
+        connect(session)
+    }
+
+    private fun connect(session: OpenSession) {
+        session.state.value = SessionState.Connecting
+        val ssh = session.ssh
         scope.launch {
             try {
-                session.ssh.connect(
-                    confirmHostKey = { fingerprint -> hostKeys.confirm(host.hostname, fingerprint) },
+                ssh.connect(
+                    confirmHostKey = { fingerprint -> hostKeys.confirm(session.host.hostname, fingerprint) },
                     onOutput = { chunk ->
                         synchronized(session.term) { session.term.feed(chunk) }
                         scope.launch { session.version.intValue++ }
                     },
-                    onClosed = { scope.launch { close(session) } },
+                    onClosed = { clean -> onSessionClosed(session, ssh, clean) },
                 )
                 session.state.value = SessionState.Connected
             } catch (e: Exception) {
                 session.state.value = SessionState.Failed(e.message ?: e.javaClass.simpleName)
+            }
+        }
+    }
+
+    /**
+     * [clean] è true quando la shell è terminata da sola (exit): la sessione si chiude.
+     * Altrimenti la connessione è caduta e la sessione resta aperta, con il pulsante Riconnetti.
+     */
+    private fun onSessionClosed(session: OpenSession, ssh: SshSession, clean: Boolean) {
+        // Una riconnessione ha già sostituito questa connessione: ignorare.
+        if (session.ssh !== ssh) return
+        scope.launch {
+            if (clean) {
+                close(session)
+            } else {
+                session.state.value = SessionState.Disconnected
+                withContext(Dispatchers.IO) { ssh.close() }
             }
         }
     }

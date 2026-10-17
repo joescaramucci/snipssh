@@ -1,6 +1,7 @@
 package com.example.sshsnippets
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -107,17 +108,17 @@ private fun Modifier.pinchToZoom(onZoom: (Float) -> Unit): Modifier = pointerInp
 }
 
 @Composable
-fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, onNew: () -> Unit) {
+fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, onHosts: () -> Unit) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val host = session.host
-    val ssh = session.ssh
     val term = session.term
     var version by session.version
     val state = session.state.value
     val status = when (state) {
         SessionState.Connecting -> context.getString(R.string.terminal_connecting, host.hostname)
         SessionState.Connected -> context.getString(R.string.terminal_connected, host.hostname)
+        SessionState.Disconnected -> context.getString(R.string.terminal_disconnected, host.hostname)
         is SessionState.Failed -> context.getString(R.string.terminal_error, state.message)
     }
     var input by session.input
@@ -150,13 +151,30 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
         val r = ((areaSize.height - padPx) / cellH).coerceAtLeast(5)
         synchronized(term) { term.resize(c, r) }
         version++
-        ssh.resize(c, r)
+        session.cols = c
+        session.rows = r
+        session.ssh.resize(c, r)
     }
 
     LaunchedEffect(version) { listState.scrollToItem(0) }
 
+    // Back torna alla lista host: la sessione resta aperta nella barra delle sessioni.
+    BackHandler(onBack = onHosts)
+
     fun send(s: String) {
-        scope.launch { ssh.send(s) }
+        scope.launch { session.ssh.send(s) }
+    }
+
+    @Composable
+    fun StatusLine() {
+        Row(Modifier.fillMaxWidth().padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(status, Modifier.weight(1f), style = MaterialTheme.typography.labelSmall)
+            if (state == SessionState.Disconnected || state is SessionState.Failed) {
+                TextButton({ OpenSessions.reconnect(session) }) {
+                    Text(stringResource(R.string.terminal_reconnect), maxLines = 1, softWrap = false)
+                }
+            }
+        }
     }
 
     @Composable
@@ -164,19 +182,20 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
         if (stacked) {
             Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 OpenSessions.list.forEach { s -> SessionChip(s) { OpenSessions.select(s) } }
-                TextButton(onNew) { Text(stringResource(R.string.session_new)) }
-                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 12.dp))
+                TextButton(onHosts) { Text(stringResource(R.string.session_new)) }
+                StatusLine()
             }
         } else {
             Column(Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth().padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
                     SessionChipRow(Modifier.weight(1f)) { OpenSessions.select(it) }
-                    TextButton(onNew) { Text(stringResource(R.string.session_new)) }
+                    TextButton(onHosts) { Text(stringResource(R.string.session_new)) }
                 }
-                Text(status, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(start = 12.dp))
+                StatusLine()
             }
         }
     }
+
 
     @Composable
     fun TerminalArea(modifier: Modifier) {

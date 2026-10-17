@@ -80,6 +80,8 @@
     <string name="terminal_connecting">Подключение к %1$s...</string>
     <string name="terminal_connected">Подключено к %1$s</string>
     <string name="terminal_error">Ошибка: %1$s</string>
+    <string name="terminal_disconnected">Соединение с %1$s разорвано</string>
+    <string name="terminal_reconnect">Переподключиться</string>
     <string name="terminal_run">Выполнить</string>
     <string name="terminal_send">Отправить</string>
     <string name="terminal_ctrl">Ctrl</string>
