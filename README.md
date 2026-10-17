@@ -1,8 +1,8 @@
 # SnipSSH
 
-**SnipSSH = PuTTY + FileZilla per Android, con snippet di comandi.** Terminale SSH e SFTP in un'unica app, senza abbonamento.
+**SnipSSH = PuTTY + FileZilla per Android e Windows, con snippet di comandi.** Terminale SSH e SFTP in un'unica app, senza abbonamento.
 
-Client SSH per Android con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal telefono direttamente al tuo server. Esiste anche la [versione per Windows](#versione-windows), con le stesse funzioni.
+Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riutilizzabili. Nessun account, nessuna pubblicità, nessun server intermedio: la connessione va dal dispositivo direttamente al tuo server. La [versione per Windows](#versione-windows) ha le stesse funzioni di quella Android.
 
 ## Screenshot
 
