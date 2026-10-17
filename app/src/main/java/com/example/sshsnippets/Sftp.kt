@@ -45,7 +45,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jcraft.jsch.ChannelSftp
@@ -419,12 +418,10 @@ fun SftpScreen(host: Host, store: Store, lock: AppLockViewModel, onBack: () -> U
                         .padding(horizontal = 12.dp, vertical = 2.dp),
                 ) {
                     val displayName = if (e.isDir) "${e.name}/" else e.name
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                    Row {
                         Text(
                             displayName,
                             style = LsLineStyle,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f),
                         )
                         Text(
