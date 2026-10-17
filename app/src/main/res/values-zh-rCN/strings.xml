@@ -47,6 +47,7 @@
     <string name="session_close">关闭会话</string>
 
     <string name="settings_language">语言</string>
+    <string name="settings_app_theme">应用主题</string>
     <string name="settings_biometric">生物识别锁</string>
     <string name="settings_biometric_desc">返回应用时需要指纹或屏幕锁。</string>
     <string name="settings_biometric_setup">请在 Android 设置中设置指纹或屏幕锁。</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">通用 Linux</string>
     <string name="theme_dark">深色</string>
+    <string name="theme_aurora">极光</string>
+    <string name="theme_ocean">海洋</string>
+    <string name="theme_sunset">日落</string>
+    <string name="theme_forest">森林</string>
     <string name="theme_light">浅色</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">系统</string>

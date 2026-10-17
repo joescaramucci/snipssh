@@ -47,6 +47,7 @@
     <string name="session_close">세션 닫기</string>
 
     <string name="settings_language">언어</string>
+    <string name="settings_app_theme">앱 테마</string>
     <string name="settings_biometric">생체 인증 잠금</string>
     <string name="settings_biometric_desc">앱으로 돌아올 때 지문 또는 화면 잠금을 요구합니다.</string>
     <string name="settings_biometric_setup">Android 설정에서 지문 또는 화면 잠금을 설정하세요.</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">일반 Linux</string>
     <string name="theme_dark">다크</string>
+    <string name="theme_aurora">오로라</string>
+    <string name="theme_ocean">바다</string>
+    <string name="theme_sunset">노을</string>
+    <string name="theme_forest">숲</string>
     <string name="theme_light">라이트</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">시스템</string>

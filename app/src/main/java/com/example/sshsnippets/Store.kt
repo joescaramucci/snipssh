@@ -103,6 +103,10 @@ class Store(context: Context) {
 
     fun setAppLanguage(tag: String) = prefs.edit().putString("app_language", tag).apply()
 
+    fun appThemeId(): String = prefs.getString("app_theme", AppThemes[0].id)!!
+
+    fun setAppThemeId(id: String) = prefs.edit().putString("app_theme", id).apply()
+
     /** Contenuto del backup in chiaro: host, snippet e chiavi host. Va cifrato prima di essere salvato. */
     fun exportPayload(): String = JSONObject()
         .put("version", 1)

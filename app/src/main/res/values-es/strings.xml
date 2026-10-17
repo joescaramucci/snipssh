@@ -47,6 +47,7 @@
     <string name="session_close">Cerrar sesión</string>
 
     <string name="settings_language">Idioma</string>
+    <string name="settings_app_theme">Tema de la app</string>
     <string name="settings_biometric">Bloqueo biométrico</string>
     <string name="settings_biometric_desc">Pide huella o bloqueo de pantalla al volver a la app.</string>
     <string name="settings_biometric_setup">Configura una huella o un bloqueo de pantalla en los ajustes de Android.</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">Linux genérico</string>
     <string name="theme_dark">Oscuro</string>
+    <string name="theme_aurora">Aurora</string>
+    <string name="theme_ocean">Océano</string>
+    <string name="theme_sunset">Atardecer</string>
+    <string name="theme_forest">Bosque</string>
     <string name="theme_light">Claro</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Sistema</string>

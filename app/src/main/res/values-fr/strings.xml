@@ -47,6 +47,7 @@
     <string name="session_close">Fermer la session</string>
 
     <string name="settings_language">Langue</string>
+    <string name="settings_app_theme">Thème de l\'application</string>
     <string name="settings_biometric">Verrouillage biométrique</string>
     <string name="settings_biometric_desc">Demande l\'empreinte ou le verrouillage de l\'écran au retour dans l\'app.</string>
     <string name="settings_biometric_setup">Configurez une empreinte ou un verrouillage d\'écran dans les réglages Android.</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">Linux générique</string>
     <string name="theme_dark">Sombre</string>
+    <string name="theme_aurora">Aurore</string>
+    <string name="theme_ocean">Océan</string>
+    <string name="theme_sunset">Coucher de soleil</string>
+    <string name="theme_forest">Forêt</string>
     <string name="theme_light">Clair</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Système</string>

@@ -47,6 +47,7 @@
     <string name="session_close">Sitzung schließen</string>
 
     <string name="settings_language">Sprache</string>
+    <string name="settings_app_theme">App-Design</string>
     <string name="settings_biometric">Biometrische Sperre</string>
     <string name="settings_biometric_desc">Verlangt Fingerabdruck oder Displaysperre, wenn du zur App zurückkehrst.</string>
     <string name="settings_biometric_setup">Richte einen Fingerabdruck oder eine Displaysperre in den Android-Einstellungen ein.</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">Generisches Linux</string>
     <string name="theme_dark">Dunkel</string>
+    <string name="theme_aurora">Aurora</string>
+    <string name="theme_ocean">Ozean</string>
+    <string name="theme_sunset">Abendrot</string>
+    <string name="theme_forest">Wald</string>
     <string name="theme_light">Hell</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">System</string>

@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,7 +39,16 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         val store = Store(applicationContext)
         OpenSessions.attach(store, localizedContext(applicationContext, store.appLanguage()))
-        setContent { MaterialTheme(colorScheme = darkColorScheme()) { App(store, lock) } }
+        setContent {
+            var appThemeId by remember { mutableStateOf(store.appThemeId()) }
+            val appTheme = appThemeById(appThemeId)
+            MaterialTheme(colorScheme = appTheme.colors) {
+                App(store, lock, appTheme) { id ->
+                    appThemeId = id
+                    store.setAppThemeId(id)
+                }
+            }
+        }
     }
 
     override fun onStop() {
@@ -48,7 +58,7 @@ class MainActivity : FragmentActivity() {
 }
 
 @Composable
-fun App(store: Store, lock: AppLockViewModel) {
+fun App(store: Store, lock: AppLockViewModel, appTheme: AppTheme, onAppThemeChange: (String) -> Unit) {
     var hosts by remember { mutableStateOf(store.loadHosts()) }
     var snippets by remember { mutableStateOf(store.loadSnippets()) }
     var sftpHost by remember { mutableStateOf<Host?>(null) }
@@ -57,7 +67,7 @@ fun App(store: Store, lock: AppLockViewModel) {
 
     Surface(Modifier.fillMaxSize()) {
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize().background(appTheme.brush)) {
             val s = sftpHost
             when {
                 terminal != null -> key(terminal.id) {
@@ -80,7 +90,7 @@ fun App(store: Store, lock: AppLockViewModel) {
                             lock,
                         )
                         1 -> SnippetsScreen(snippets) { snippets = it; store.saveSnippets(it) }
-                        else -> SettingsScreen(store, lock) {
+                        else -> SettingsScreen(store, lock, appTheme.id, onAppThemeChange) {
                             hosts = store.loadHosts()
                             snippets = store.loadSnippets()
                         }

@@ -47,6 +47,7 @@
     <string name="session_close">Закрыть сеанс</string>
 
     <string name="settings_language">Язык</string>
+    <string name="settings_app_theme">Тема приложения</string>
     <string name="settings_biometric">Биометрическая блокировка</string>
     <string name="settings_biometric_desc">При возврате в приложение потребуется отпечаток или блокировка экрана.</string>
     <string name="settings_biometric_setup">Настройте отпечаток или блокировку экрана в настройках Android.</string>
@@ -114,6 +115,10 @@
 
     <string name="distro_generic">Generic Linux</string>
     <string name="theme_dark">Тёмная</string>
+    <string name="theme_aurora">Аврора</string>
+    <string name="theme_ocean">Океан</string>
+    <string name="theme_sunset">Закат</string>
+    <string name="theme_forest">Лес</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Системный</string>
