@@ -142,6 +142,42 @@ tasks.matching {
         it.name.startsWith("createRuntime") || it.name.startsWith("prepareApp")
 }.configureEach { dependsOn(generateWindowsIcon) }
 
+// Compose clears jpackage's --resource-dir during packageMsi/packageExe, so the custom WiX templates
+// in packaging/wix never reach jpackage that way. Instead, jpackage is run again on Compose's app image
+// with our own resource folder, and the result overwrites Compose's installer in the same output folder.
+val appPackageVersion = "0.3.3"
+val wixUpgradeUuid = "6f1d5a52-3c1e-4c3e-9b9a-6d3b8f4a7e21"
+val wixResourcesDir = layout.buildDirectory.dir("wix-resources")
+val stageWixResources by tasks.registering(Copy::class) {
+    from(layout.projectDirectory.dir("packaging/wix"))
+    include("main.wxs")
+    into(wixResourcesDir)
+}
+
+fun registerJpackageTask(taskName: String, type: String) = tasks.register<Exec>(taskName) {
+    dependsOn("createDistributable", stageWixResources)
+    commandLine(
+        File(System.getProperty("java.home"), "bin/jpackage.exe").absolutePath,
+        "--type", type,
+        "--app-image", layout.buildDirectory.dir("compose/binaries/main/app/SnipSSH").get().asFile.absolutePath,
+        "--dest", layout.buildDirectory.dir("compose/binaries/main/$type").get().asFile.absolutePath,
+        "--name", "SnipSSH",
+        "--app-version", appPackageVersion,
+        "--vendor", "flipall srl",
+        "--description", "SSH client with SFTP and command snippets",
+        "--resource-dir", wixResourcesDir.get().asFile.absolutePath,
+        "--win-dir-chooser",
+        "--win-per-user-install",
+        "--win-menu",
+        "--win-menu-group", "SnipSSH",
+        "--win-upgrade-uuid", wixUpgradeUuid,
+    )
+}
+val packageMsiWix = registerJpackageTask("packageMsiWix", "msi")
+val packageExeWix = registerJpackageTask("packageExeWix", "exe")
+tasks.matching { it.name == "packageMsi" }.configureEach { finalizedBy(packageMsiWix) }
+tasks.matching { it.name == "packageExe" }.configureEach { finalizedBy(packageExeWix) }
+
 compose.desktop {
     application {
         mainClass = "com.example.sshsnippets.DesktopMainKt"
@@ -150,13 +186,13 @@ compose.desktop {
             // jdk.crypto.ec fornisce le curve ellittiche usate da SSH: jlink non lo include da solo.
             modules("java.instrument", "jdk.unsupported", "jdk.crypto.ec", "java.naming")
             packageName = "SnipSSH"
-            packageVersion = "0.3.3"
+            packageVersion = appPackageVersion
             description = "SSH client with SFTP and command snippets"
             vendor = "flipall srl"
             windows {
                 menuGroup = "SnipSSH"
                 iconFile.set(windowsIcon)
-                upgradeUuid = "6f1d5a52-3c1e-4c3e-9b9a-6d3b8f4a7e21"
+                upgradeUuid = wixUpgradeUuid
                 perUserInstall = true
                 dirChooser = true
             }
