@@ -11,6 +11,9 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// Shown in the splash credits image as well; keep in sync with APP_VERSION in Credits.kt and packageVersion in desktop/build.gradle.kts.
+val appVersionName = "0.3.2"
+
 android {
     namespace = "com.example.sshsnippets"
     compileSdk = 36
@@ -19,8 +22,8 @@ android {
         applicationId = "io.github.joescaramucci.snipssh"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.3.1"
+        versionCode = 5
+        versionName = appVersionName
     }
 
     signingConfigs {
@@ -117,7 +120,7 @@ val generateSplashCredits by tasks.registering {
             x += g.getFontMetrics(font).stringWidth(text)
         }
 
-        val line2 = "Joe Scaramucci $dot info@flipall.it"
+        val line2 = "Joe Scaramucci $dot info@flipall.it $dot v.$appVersionName"
         g.font = smallFont
         val w2 = g.getFontMetrics(smallFont).stringWidth(line2)
         g.drawString(line2, ((width - w2) / 2).toFloat(), (base + 58).toFloat())
@@ -136,9 +139,14 @@ val generateSplashCredits by tasks.registering {
         val cropped = img.getSubimage(minX, minY, maxX - minX + 1, maxY - minY + 1)
 
         // La splash di Android 12 stira l'immagine in un riquadro 200x80 dp: uso lo stesso rapporto (600x240 a xxhdpi) per non deformare il testo.
+        // Se il contenuto è più largo del riquadro lo riduco in proporzione, così la riga non viene tagliata.
+        val fit = minOf(580.0 / cropped.width, 220.0 / cropped.height, 1.0)
+        val drawW = (cropped.width * fit).toInt()
+        val drawH = (cropped.height * fit).toInt()
         val out = BufferedImage(600, 240, BufferedImage.TYPE_INT_ARGB)
         val og = out.createGraphics()
-        og.drawImage(cropped, (600 - cropped.width) / 2, (240 - cropped.height) / 2, null)
+        og.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+        og.drawImage(cropped, (600 - drawW) / 2, (240 - drawH) / 2, drawW, drawH, null)
         og.dispose()
 
         val outDir = splashCreditsDir.get().asFile.resolve("drawable-xxhdpi")
