@@ -84,9 +84,9 @@ fun DesktopApp(store: Store) {
                     )
                     Box(Modifier.weight(1f).fillMaxWidth()) {
                         if (split && active != null && paneTabs.isNotEmpty()) {
-                            SplitView(paneTabs, OpenSessions.activeId, snippets, store, paneWeights) { OpenSessions.select(it) }
+                            SplitView(paneTabs, OpenSessions.activeId, snippets, store, { snippets = it; store.saveSnippets(it) }, paneWeights) { OpenSessions.select(it) }
                         } else when (active) {
-                            is OpenSession -> key(active.id) { TerminalScreen(active, snippets, store) }
+                            is OpenSession -> key(active.id) { TerminalScreen(active, snippets, store, { snippets = it; store.saveSnippets(it) }) }
                             is OpenSftp -> key(active.id) { SftpScreen(active) }
                             else -> Column(Modifier.fillMaxSize()) {
                                 TabRow(tab) {

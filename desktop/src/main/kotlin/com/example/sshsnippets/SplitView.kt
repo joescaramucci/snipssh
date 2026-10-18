@@ -48,6 +48,7 @@ fun SplitView(
     activeId: String?,
     snippets: List<Snippet>,
     store: Store,
+    onSnippetsChange: (List<Snippet>) -> Unit,
     weights: SnapshotStateMap<String, Float>,
     onFocus: (OpenTab) -> Unit,
 ) {
@@ -103,7 +104,7 @@ fun SplitView(
                         },
                 ) {
                     when (tab) {
-                        is OpenSession -> TerminalScreen(tab, snippets, store, autoFocus = tab.id == activeId, compact = true)
+                        is OpenSession -> TerminalScreen(tab, snippets, store, onSnippetsChange, autoFocus = tab.id == activeId, compact = true)
                         is OpenSftp -> SftpScreen(tab)
                     }
                 }

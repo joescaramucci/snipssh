@@ -2,6 +2,7 @@ package com.example.sshsnippets
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.Orientation
@@ -214,7 +215,14 @@ private const val COMPACT_SNIPPETS_DP = 160f
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, autoFocus: Boolean = true, compact: Boolean = false) {
+fun TerminalScreen(
+    session: OpenSession,
+    snippets: List<Snippet>,
+    store: Store,
+    onSnippetsChange: (List<Snippet>) -> Unit,
+    autoFocus: Boolean = true,
+    compact: Boolean = false,
+) {
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
     val host = session.host
@@ -228,6 +236,9 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
         is SessionState.Failed -> stringResource(R.string.terminal_error, state.message)
     }
     var pending by remember { mutableStateOf<Snippet?>(null) }
+    var addingSnippet by remember { mutableStateOf(false) }
+    var newSnippetName by remember { mutableStateOf("") }
+    var newSnippetCommand by remember { mutableStateOf("") }
     val values = remember { mutableStateMapOf<String, String>() }
     var history by remember(host.id) { mutableStateOf(store.loadHistory(host.id)) }
     // Riga digitata finora, ricostruita dai tasti premuti: serve solo per i suggerimenti dalla cronologia.
@@ -454,7 +465,17 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                 Modifier.width(snippetsColumnWidth.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(stringResource(R.string.tab_snippets), style = MaterialTheme.typography.titleSmall)
+                Text(
+                    stringResource(R.string.tab_snippets),
+                    Modifier
+                        .pointerHoverIcon(PointerIcon(java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)))
+                        .clickable {
+                            newSnippetName = ""
+                            newSnippetCommand = ""
+                            addingSnippet = true
+                        },
+                    style = MaterialTheme.typography.titleSmall,
+                )
                 if (snippets.isEmpty()) {
                     Text(stringResource(R.string.terminal_no_snippets), style = MaterialTheme.typography.labelSmall)
                 }
@@ -490,6 +511,31 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                 }
             }
         }
+    }
+
+    if (addingSnippet) {
+        val canSave = newSnippetName.isNotBlank() && newSnippetCommand.isNotBlank()
+        AlertDialog(
+            onDismissRequest = { addingSnippet = false },
+            title = { Text(stringResource(R.string.snippets_add)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(newSnippetName, { newSnippetName = it }, label = { Text(stringResource(R.string.common_name)) }, singleLine = true)
+                    OutlinedTextField(newSnippetCommand, { newSnippetCommand = it }, label = { Text(stringResource(R.string.snippets_command_hint)) }, singleLine = true)
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    enabled = canSave,
+                    onClick = {
+                        onSnippetsChange(snippets + Snippet(name = newSnippetName, command = newSnippetCommand))
+                        addingSnippet = false
+                        focus.requestFocus()
+                    },
+                ) { Text(stringResource(R.string.common_save)) }
+            },
+            dismissButton = { TextButton(onClick = { addingSnippet = false }) { Text(stringResource(R.string.common_cancel)) } },
+        )
     }
 
     pending?.let { s ->
