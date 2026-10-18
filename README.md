@@ -6,14 +6,14 @@ Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riuti
 
 ## Download
 
-Ultima versione: **0.3.3**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.3).
+Ultima versione: **0.3.4**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.4).
 
 | File | Per |
 |---|---|
-| `SnipSSH-0.3.3-android.apk` | Android 8.0 o successivo (installazione da file, consentire l'origine sconosciuta) |
-| `SnipSSH-0.3.3-windows-setup.exe` | Windows 10/11 64 bit, installazione per utente |
-| `SnipSSH-0.3.3-windows.msi` | Windows 10/11 64 bit, pacchetto MSI per utente |
-| `SnipSSH-0.3.3-windows-portable.zip` | Windows 10/11 64 bit, nessuna installazione: estrai e avvia `SnipSSH.exe` |
+| `SnipSSH-0.3.4-android.apk` | Android 8.0 o successivo (installazione da file, consentire l'origine sconosciuta) |
+| `SnipSSH-0.3.4-windows-setup.exe` | Windows 10/11 64 bit, installazione per utente |
+| `SnipSSH-0.3.4-windows.msi` | Windows 10/11 64 bit, pacchetto MSI per utente |
+| `SnipSSH-0.3.4-windows-portable.zip` | Windows 10/11 64 bit, nessuna installazione: estrai e avvia `SnipSSH.exe` |
 
 Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non sono firmati, quindi SmartScreen può mostrare un avviso alla prima esecuzione.
 
@@ -90,7 +90,7 @@ Traduzioni, icone dei loghi e font vengono copiate dalle risorse Android a ogni 
 
 | Voce | Valore |
 |---|---|
-| Versione | 0.3.3 (`versionCode` 6) |
+| Versione | 0.3.4 (`versionCode` 7) |
 | Android | minSdk 26 (Android 8.0), targetSdk 36, compileSdk 36 |
 | Windows | Windows 10/11 a 64 bit, Compose Desktop 1.6.11, JDK 17; exe portabile, MSI e setup EXE (non firmati, per utente) |
 | Moduli Gradle | `:core` (Kotlin/JVM, logica condivisa), `:app` (Android), `:desktop` (Windows) |
