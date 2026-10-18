@@ -70,7 +70,8 @@ fun App(store: Store, lock: AppLockViewModel, appTheme: AppTheme, onAppThemeChan
         // Il contenuto resta composto sotto la schermata di blocco, così il terminale non viene perso.
         Box(Modifier.fillMaxSize().background(appTheme.brush)) {
             Column(Modifier.fillMaxSize()) {
-                CreditsBar(Modifier.statusBarsPadding())
+                // Nel terminale la barra dei crediti occupa spazio utile: si nasconde.
+                if (active !is OpenSession) CreditsBar(Modifier.statusBarsPadding())
                 Box(Modifier.weight(1f).fillMaxWidth()) {
                     when (active) {
                         is OpenSession -> key(active.id) {
@@ -314,21 +315,47 @@ fun HostsScreen(
 fun SnippetsScreen(snippets: List<Snippet>, onChange: (List<Snippet>) -> Unit) {
     var name by remember { mutableStateOf("") }
     var cmd by remember { mutableStateOf("") }
+    var editingId by remember { mutableStateOf<String?>(null) }
+    fun resetForm() {
+        editingId = null
+        name = ""; cmd = ""
+    }
     Column(Modifier.fillMaxSize().padding(12.dp)) {
         OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.common_name)) }, modifier = Modifier.fillMaxWidth())
         OutlinedTextField(cmd, { cmd = it }, label = { Text(stringResource(R.string.snippets_command_hint)) }, modifier = Modifier.fillMaxWidth())
-        Button(onClick = {
-            if (name.isNotBlank() && cmd.isNotBlank()) {
-                onChange(snippets + Snippet(name = name, command = cmd))
-                name = ""; cmd = ""
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = {
+                if (name.isNotBlank() && cmd.isNotBlank()) {
+                    val id = editingId
+                    onChange(
+                        if (id == null) snippets + Snippet(name = name, command = cmd)
+                        else snippets.map { if (it.id == id) it.copy(name = name, command = cmd) else it },
+                    )
+                    resetForm()
+                }
+            }) { Text(stringResource(if (editingId == null) R.string.snippets_add else R.string.host_save_changes)) }
+            if (editingId != null) {
+                TextButton(onClick = { resetForm() }) { Text(stringResource(R.string.common_cancel)) }
             }
-        }) { Text(stringResource(R.string.snippets_add)) }
+        }
         LazyColumn(Modifier.weight(1f)) {
             items(snippets, key = { it.id }) { s ->
                 ListItem(
                     headlineContent = { Text(s.name) },
                     supportingContent = { Text(s.command, fontFamily = FontFamily.Monospace) },
-                    trailingContent = { TextButton(onClick = { onChange(snippets - s) }) { Text(stringResource(R.string.common_delete)) } },
+                    trailingContent = {
+                        Row {
+                            TextButton(onClick = {
+                                editingId = s.id
+                                name = s.name
+                                cmd = s.command
+                            }) { Text(stringResource(R.string.host_edit)) }
+                            TextButton(onClick = {
+                                if (editingId == s.id) resetForm()
+                                onChange(snippets - s)
+                            }) { Text(stringResource(R.string.common_delete)) }
+                        }
+                    },
                 )
                 HorizontalDivider()
             }

@@ -165,6 +165,13 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
         scope.launch { session.ssh.send(s) }
     }
 
+    // Pulisce subito lo schermo locale, poi invia ^L alla shell per ridisegnare il prompt.
+    fun clearScreen() {
+        synchronized(term) { term.feed("\u001b[H\u001b[2J") }
+        scope.launch { session.version.intValue++ }
+        send("\u000c")
+    }
+
     @Composable
     fun StatusLine() {
         Row(Modifier.fillMaxWidth().padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -265,6 +272,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
             ).forEach { (label, value) ->
                 OutlinedButton(onClick = { send(value) }, contentPadding = PaddingValues(8.dp)) { Text(label) }
             }
+            OutlinedButton(onClick = { clearScreen() }, contentPadding = PaddingValues(8.dp)) { Text("^l") }
         }
     }
 

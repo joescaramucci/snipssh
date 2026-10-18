@@ -194,6 +194,8 @@ class AnsiTerminal(private var cols: Int, private var rows: Int, private val max
                 eraseLine(1)
             }
             else -> {
+                // Drop scrollback too: the view shows everything up to the cursor, so old output would stay visible above it.
+                while (lines.size > rows) lines.removeAt(0)
                 for (y in 0 until rows) lines[top + y] = blankLine()
             }
         }

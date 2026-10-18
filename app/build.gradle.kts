@@ -39,7 +39,7 @@ android {
     }
 
     buildTypes {
-        release {
+    release {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             if (findProperty("SSHSNIPPETS_UPLOAD_STORE_FILE") != null) {
