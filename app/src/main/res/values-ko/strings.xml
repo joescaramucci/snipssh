@@ -113,6 +113,9 @@
     <string name="sftp_refresh">새로 고침</string>
     <string name="sftp_upload">업로드</string>
     <string name="sftp_download">다운로드</string>
+    <string name="sftp_transfer_pause">일시정지</string>
+    <string name="sftp_transfer_resume">계속</string>
+    <string name="sftp_transfer_delete">삭제</string>
     <string name="sftp_delete_title">%1$s을(를) 삭제할까요?</string>
     <string name="sftp_delete_folder">내부의 항목 %1$d개가 영구적으로 삭제됩니다.</string>
     <string name="sftp_delete_folder_empty">폴더가 비어 있습니다.</string>

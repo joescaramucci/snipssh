@@ -2,6 +2,7 @@ package com.example.sshsnippets
 
 import android.content.Context
 import android.net.Uri
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -128,6 +129,7 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
                 } finally {
                     tab.transfer = null
                 }
+                if (progress.isCancelled) runCatching { c.deleteTree(target, false) }
                 load(c, path)
             }
         }
@@ -151,6 +153,7 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
                 } finally {
                     tab.transfer = null
                 }
+                if (progress.isCancelled) runCatching { DocumentsContract.deleteDocument(context.contentResolver, uri) }
             }
         }
     }

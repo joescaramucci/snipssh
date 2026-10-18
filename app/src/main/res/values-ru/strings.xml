@@ -113,6 +113,9 @@
     <string name="sftp_refresh">Обновить</string>
     <string name="sftp_upload">Загрузить</string>
     <string name="sftp_download">Скачать</string>
+    <string name="sftp_transfer_pause">Пауза</string>
+    <string name="sftp_transfer_resume">Продолжить</string>
+    <string name="sftp_transfer_delete">Удалить</string>
     <string name="sftp_delete_title">Удалить %1$s?</string>
     <string name="sftp_delete_folder">Элементов внутри (%1$d) будут безвозвратно удалены.</string>
     <string name="sftp_delete_folder_empty">Папка пуста.</string>

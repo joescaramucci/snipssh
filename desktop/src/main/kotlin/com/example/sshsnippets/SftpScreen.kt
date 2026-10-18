@@ -88,14 +88,17 @@ fun SftpScreen(tab: OpenSftp) {
             if (files.isEmpty()) return@launch
             val target = tab.path
             withClient { c ->
-                files.forEach { f ->
-                    val progress = TransferProgress(f.length())
-                    tab.transfer = progress
-                    try {
-                        withContext(Dispatchers.IO) { f.inputStream().use { c.upload(joinPath(target, f.name), it, progress) } }
-                    } finally {
-                        tab.transfer = null
+                val progress = TransferProgress(files.sumOf { it.length() })
+                tab.transfer = progress
+                try {
+                    for (f in files) {
+                        if (progress.isCancelled) break
+                        val remote = joinPath(target, f.name)
+                        withContext(Dispatchers.IO) { f.inputStream().use { c.upload(remote, it, progress) } }
+                        if (progress.isCancelled) runCatching { c.deleteTree(remote, false) }
                     }
+                } finally {
+                    tab.transfer = null
                 }
                 load(c, target)
             }
@@ -115,6 +118,7 @@ fun SftpScreen(tab: OpenSftp) {
                 } finally {
                     tab.transfer = null
                 }
+                if (progress.isCancelled) withContext(Dispatchers.IO) { file.delete() }
             }
         }
     }
@@ -156,7 +160,13 @@ fun SftpScreen(tab: OpenSftp) {
             }
         }
 
-        ScrollableList(listState, Modifier.weight(1f).padding(top = 4.dp)) {
+        Text(
+            "%-10s %-12s %-12s %9s %s".format("Mode", "Owner", "Group", "Size", "Modified"),
+            style = LsLineStyle.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+            maxLines = 1,
+            modifier = Modifier.padding(start = 12.dp, top = 4.dp),
+        )
+        ScrollableList(listState, Modifier.weight(1f).padding(top = 2.dp)) {
             LazyColumn(Modifier.fillMaxSize(), state = listState) {
                 items(tab.entries, key = { it.name }) { e ->
                     Column(

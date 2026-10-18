@@ -113,6 +113,9 @@
     <string name="sftp_refresh">Actualizar</string>
     <string name="sftp_upload">Subir archivo</string>
     <string name="sftp_download">Descargar</string>
+    <string name="sftp_transfer_pause">Pausar</string>
+    <string name="sftp_transfer_resume">Continuar</string>
+    <string name="sftp_transfer_delete">Eliminar</string>
     <string name="sftp_delete_title">¿Eliminar %1$s?</string>
     <string name="sftp_delete_folder">Se eliminarán permanentemente %1$d elementos que contiene.</string>
     <string name="sftp_delete_folder_empty">La carpeta está vacía.</string>

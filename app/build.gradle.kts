@@ -12,7 +12,7 @@ plugins {
 }
 
 // Shown in the splash credits image as well; keep in sync with APP_VERSION in Credits.kt and packageVersion in desktop/build.gradle.kts.
-val appVersionName = "0.3.2"
+val appVersionName = "0.3.3"
 
 android {
     namespace = "com.example.sshsnippets"
@@ -22,7 +22,7 @@ android {
         applicationId = "io.github.joescaramucci.snipssh"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
+        versionCode = 6
         versionName = appVersionName
     }
 

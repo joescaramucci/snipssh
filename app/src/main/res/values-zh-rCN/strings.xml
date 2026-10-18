@@ -113,6 +113,9 @@
     <string name="sftp_refresh">刷新</string>
     <string name="sftp_upload">上传</string>
     <string name="sftp_download">下载</string>
+    <string name="sftp_transfer_pause">暂停</string>
+    <string name="sftp_transfer_resume">继续</string>
+    <string name="sftp_transfer_delete">删除</string>
     <string name="sftp_delete_title">删除 %1$s？</string>
     <string name="sftp_delete_folder">其中的 %1$d 个项目将被永久删除。</string>
     <string name="sftp_delete_folder_empty">该文件夹为空。</string>

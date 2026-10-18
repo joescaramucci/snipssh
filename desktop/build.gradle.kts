@@ -150,7 +150,7 @@ compose.desktop {
             // jdk.crypto.ec fornisce le curve ellittiche usate da SSH: jlink non lo include da solo.
             modules("java.instrument", "jdk.unsupported", "jdk.crypto.ec", "java.naming")
             packageName = "SnipSSH"
-            packageVersion = "0.3.2"
+            packageVersion = "0.3.3"
             description = "SSH client with SFTP and command snippets"
             vendor = "flipall srl"
             windows {

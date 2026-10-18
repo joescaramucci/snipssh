@@ -113,6 +113,9 @@
     <string name="sftp_refresh">Aktualisieren</string>
     <string name="sftp_upload">Hochladen</string>
     <string name="sftp_download">Herunterladen</string>
+    <string name="sftp_transfer_pause">Anhalten</string>
+    <string name="sftp_transfer_resume">Fortsetzen</string>
+    <string name="sftp_transfer_delete">Löschen</string>
     <string name="sftp_delete_title">%1$s löschen?</string>
     <string name="sftp_delete_folder">%1$d Elemente darin werden dauerhaft gelöscht.</string>
     <string name="sftp_delete_folder_empty">Der Ordner ist leer.</string>
