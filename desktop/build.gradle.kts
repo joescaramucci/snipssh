@@ -76,7 +76,7 @@ val generateAndroidResources by tasks.registering {
 
 // File Compose senza dipendenze Android, condivisi con l'app: si copiano qui così restano identici sulle due piattaforme.
 val sharedFromApp = listOf(
-    "AppThemes.kt", "TerminalThemes.kt", "Distros.kt", "OpenSessions.kt", "SessionBar.kt", "HostKeyDialog.kt", "ChmodDialog.kt", "HostColor.kt", "Credits.kt",
+    "AppThemes.kt", "TerminalThemes.kt", "Distros.kt", "OpenSessions.kt", "SessionBar.kt", "HostKeyDialog.kt", "ChmodDialog.kt",     "HostColor.kt", "Credits.kt", "SftpWidgets.kt",
 )
 val sharedSrc = layout.buildDirectory.dir("generated/sharedFromApp/kotlin")
 

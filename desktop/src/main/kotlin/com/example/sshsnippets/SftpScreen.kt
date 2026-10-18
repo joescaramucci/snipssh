@@ -35,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -87,8 +88,14 @@ fun SftpScreen(tab: OpenSftp) {
             if (files.isEmpty()) return@launch
             val target = tab.path
             withClient { c ->
-                withContext(Dispatchers.IO) {
-                    files.forEach { f -> f.inputStream().use { c.upload(joinPath(target, f.name), it) } }
+                files.forEach { f ->
+                    val progress = TransferProgress(f.length())
+                    tab.transfer = progress
+                    try {
+                        withContext(Dispatchers.IO) { f.inputStream().use { c.upload(joinPath(target, f.name), it, progress) } }
+                    } finally {
+                        tab.transfer = null
+                    }
                 }
                 load(c, target)
             }
@@ -101,7 +108,13 @@ fun SftpScreen(tab: OpenSftp) {
                 ?: return@launch
             val remote = joinPath(tab.path, entry.name)
             withClient { c ->
-                withContext(Dispatchers.IO) { file.outputStream().use { c.download(remote, it) } }
+                val progress = TransferProgress(entry.size)
+                tab.transfer = progress
+                try {
+                    withContext(Dispatchers.IO) { file.outputStream().use { c.download(remote, it, progress) } }
+                } finally {
+                    tab.transfer = null
+                }
             }
         }
     }
@@ -130,7 +143,12 @@ fun SftpScreen(tab: OpenSftp) {
             ) { Text(stringResource(R.string.sftp_refresh)) }
             TextButton(enabled = client != null && !busy, onClick = ::upload) { Text(stringResource(R.string.sftp_upload)) }
         }
-        if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+        val transfer = tab.transfer
+        if (transfer != null) {
+            TransferLedBar(transfer)
+        } else if (busy) {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
         tab.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         if (tab.state.value is SessionState.Failed) {
             TextButton(onClick = { OpenSessions.reconnectSftp(tab) }) {
@@ -151,13 +169,16 @@ fun SftpScreen(tab: OpenSftp) {
                     ) {
                     Text(
                         if (e.isDir) "${e.name}/" else e.name,
-                        style = NameStyle,
+                        style = NameStyle.copy(
+                            color = if (e.isDir) SftpDirColor else SftpFileColor,
+                            fontWeight = FontWeight.Bold,
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            "%s %-12s %-12s %9d %s".format(e.perms, e.owner, e.group, e.size, lsDate(e.mtime)),
+                            styledPerms(e.perms, " %-12s %-12s %9d %s".format(e.owner, e.group, e.size, lsDate(e.mtime))),
                             style = LsLineStyle,
                             maxLines = 1,
                             modifier = Modifier.weight(1f),

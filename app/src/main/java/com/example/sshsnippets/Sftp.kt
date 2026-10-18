@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -60,6 +62,12 @@ private fun displayName(context: Context, uri: Uri): String? =
         if (c.moveToFirst()) c.getString(0) else null
     }
 
+/** Dimensione del file scelto, o -1 se il provider non la dichiara. */
+private fun fileSize(context: Context, uri: Uri): Long =
+    context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)?.use { c ->
+        if (c.moveToFirst() && !c.isNull(0)) c.getLong(0) else null
+    } ?: -1L
+
 /** Schermata di una scheda SFTP. Connessione e cartella corrente stanno in [tab], quindi restano attive cambiando scheda. */
 @Composable
 fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
@@ -77,6 +85,7 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
     var toRename by remember { mutableStateOf<RemoteEntry?>(null) }
     var renameText by remember { mutableStateOf("") }
     var downloadPath by remember { mutableStateOf<String?>(null) }
+    var downloadSize by remember { mutableLongStateOf(-1L) }
     var pathInput by remember { mutableStateOf("") }
 
     LaunchedEffect(path) { pathInput = path }
@@ -109,9 +118,15 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
         if (uri != null) {
             withClient { c ->
                 val target = joinPath(path, displayName(context, uri) ?: "file")
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.use { c.upload(target, it) }
-                        ?: throw IOException(context.getString(R.string.file_unreadable))
+                val progress = TransferProgress(fileSize(context, uri))
+                tab.transfer = progress
+                try {
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.use { c.upload(target, it, progress) }
+                            ?: throw IOException(context.getString(R.string.file_unreadable))
+                    }
+                } finally {
+                    tab.transfer = null
                 }
                 load(c, path)
             }
@@ -122,12 +137,19 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
         ActivityResultContracts.CreateDocument("application/octet-stream"),
     ) { uri ->
         val remote = downloadPath
+        val size = downloadSize
         downloadPath = null
         if (uri != null && remote != null) {
             withClient { c ->
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openOutputStream(uri)?.use { c.download(remote, it) }
-                        ?: throw IOException(context.getString(R.string.file_write_failed))
+                val progress = TransferProgress(size)
+                tab.transfer = progress
+                try {
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openOutputStream(uri)?.use { c.download(remote, it, progress) }
+                            ?: throw IOException(context.getString(R.string.file_write_failed))
+                    }
+                } finally {
+                    tab.transfer = null
                 }
             }
         }
@@ -167,7 +189,12 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
                 },
             ) { Text(stringResource(R.string.sftp_upload)) }
         }
-        if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
+        val transfer = tab.transfer
+        if (transfer != null) {
+            TransferLedBar(transfer)
+        } else if (busy) {
+            LinearProgressIndicator(Modifier.fillMaxWidth())
+        }
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         if (tab.state.value is SessionState.Failed) {
             TextButton(onClick = { OpenSessions.reconnectSftp(tab) }) {
@@ -189,11 +216,14 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
                     Row {
                         Text(
                             displayName,
-                            style = LsLineStyle,
+                            style = LsLineStyle.copy(
+                                color = if (e.isDir) SftpDirColor else SftpFileColor,
+                                fontWeight = FontWeight.Bold,
+                            ),
                             modifier = Modifier.weight(1f),
                         )
                         Text(
-                            "%s %7d %s".format(e.perms, e.size, lsDate(e.mtime)),
+                            styledPerms(e.perms, " %7d %s".format(e.size, lsDate(e.mtime))),
                             style = LsLineStyle,
                             maxLines = 1,
                             modifier = Modifier.padding(start = 8.dp),
@@ -209,6 +239,7 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
                                 contentPadding = small,
                                 onClick = {
                                     downloadPath = joinPath(path, e.name)
+                                    downloadSize = e.size
                                     lock.expectExternalActivity()
                                     saveLauncher.launch(e.name)
                                 },

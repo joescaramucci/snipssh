@@ -51,6 +51,8 @@ class OpenSftp(host: Host) : OpenTab(host) {
     var path by mutableStateOf("")
     var entries by mutableStateOf<List<RemoteEntry>>(emptyList())
     var busy by mutableStateOf(true)
+    /** Trasferimento in corso su questa scheda (upload o download), null quando è fermo. */
+    var transfer by mutableStateOf<TransferProgress?>(null)
     var error by mutableStateOf<String?>(null)
 
     suspend fun load(c: SftpClient, target: String) {

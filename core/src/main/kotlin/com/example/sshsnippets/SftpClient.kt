@@ -77,9 +77,14 @@ class SftpClient private constructor(private val session: Session, private val c
         }
     }
 
-    suspend fun download(remote: String, out: OutputStream) = op { it.get(remote, out) }
+    /** [progress] riceve i byte man mano che arrivano; senza di esso il trasferimento è silenzioso. */
+    suspend fun download(remote: String, out: OutputStream, progress: TransferProgress? = null) = op {
+        if (progress == null) it.get(remote, out) else it.get(remote, out, progress.monitor())
+    }
 
-    suspend fun upload(remote: String, input: InputStream) = op { it.put(input, remote) }
+    suspend fun upload(remote: String, input: InputStream, progress: TransferProgress? = null) = op {
+        if (progress == null) it.put(input, remote) else it.put(input, remote, progress.monitor())
+    }
 
     /** Numero di elementi contenuti in [remote] (ricorsivo); 0 per file o cartelle vuote. */
     suspend fun countTree(remote: String): Int = op { countLocked(it, remote) }
