@@ -102,7 +102,7 @@ Tabs and split view
 
 Snippets
 - Save the commands you use most, with a name and variables such as {{service}}.
-- Run a snippet on the server with one click and a confirmation.
+- Run a snippet on the server with one click; if it has variables, the app asks for their values first.
 
 Hosts
 - Password or private key (OpenSSH or PEM; RSA, ECDSA, Ed25519), with an optional passphrase.
@@ -141,7 +141,7 @@ Schede e vista affiancata
 
 Snippet
 - Salva i comandi che usi più spesso, con nome e variabili tipo {{servizio}}.
-- Lancia uno snippet sul server con un click e conferma.
+- Lancia uno snippet sul server con un click; se ha variabili, l'app chiede prima i valori.
 
 Host
 - Password oppure chiave privata (OpenSSH o PEM; RSA, ECDSA, Ed25519), con passphrase opzionale.
@@ -187,8 +187,8 @@ Limiti noti: i programmi a schermo intero come vim o htop non sono ancora suppor
 | Screenshots | 6 PNG da 2858 x 1609 in [store/windows/](store/windows/), da caricare in quest'ordine: vista affiancata, terminale, SFTP, host, snippet, impostazioni |
 | Privacy policy URL | https://joescaramucci.github.io/snipssh/privacy.html |
 | Website | https://github.com/joescaramucci/snipssh |
-| Support contact info | info@flipall.it |
-| Category | Developer tools |
+| Support contact info | dati dell'account Partner Center (*Use my account details*): indirizzo di Quiliano e supporto@flipall.it, mostrati sullo Store come richiesto dal Digital Services Act |
+| Category | Developer tools; categoria secondaria Utilities & tools |
 | Pricing | Free, tutti i mercati |
 | System requirements | Windows 10 versione 1809 o successiva, x64; tastiera e mouse consigliati |
 
@@ -196,16 +196,27 @@ Gli screenshot sono stati catturati il 19/10/2026 dalla build 0.3.5, con la fine
 
 ## Note per la certificazione
 
-**Notes for certification** (*Submission options*):
+**Notes for certification**: vanno nella pagina *Supplemental info → Additional Testing Information*, non in *Submission options*. Il portale chiede di non mettere credenziali nella descrizione: quelle vanno nella sezione *Credentials* della stessa pagina.
+
+Description:
 
 ```
-SnipSSH is an SSH and SFTP client. To test it you can use the public test server test.rebex.net:
-- Add a host: hostname test.rebex.net, port 22, username demo, password password.
+SnipSSH is an SSH and SFTP client. To test it, use the public test server test.rebex.net (the login details are in Credentials below):
+- Click "New host" and enter hostname, port, username and password from Credentials.
 - Click Connect on the host row: accept the host key, the shell opens in a tab; try "ls".
 - Click SFTP on the host row: the folder lists pub and readme.txt; download readme.txt with Save as.
 The server is read-only, so uploads and deletes are refused by the server, not by the app.
-No account or sign-in is needed. The app collects no data.
+No account or sign-in to our services is needed. The app sends no data to us.
 ```
+
+Credentials (*+ New credential*, una riga ciascuna; sono le credenziali pubbliche del server di prova di Rebex):
+
+| Name | Value |
+|---|---|
+| Hostname | `test.rebex.net` |
+| Port | `22` |
+| Username | `demo` |
+| Password | `password` |
 
 **Restricted capabilities, motivazione per `runFullTrust`:**
 
@@ -237,7 +248,7 @@ SnipSSH is a desktop app built with Compose for Desktop (JVM) and packaged as MS
    - testi, product features, parole chiave, copyright e *Developed by: flipall s.r.l.* come in "Scheda store";
    - i 6 screenshot di `store/windows/` in ordine; i logo dello Store sono facoltativi;
    - *What's new* vuoto per la prima versione.
-6. **Submission options**: *Publish as soon as it passes certification*; note per la certificazione e motivazione per `runFullTrust` come in "Note per la certificazione".
+6. **Submission options**: *Publish as soon as it passes certification*; nel riquadro *Restricted capabilities* solo la motivazione per `runFullTrust`. Le note per il tester vanno in *Supplemental info → Additional Testing Information*.
 7. **Submit to the Store**: la certificazione richiede da qualche ora a 3 giorni lavorativi; l'esito arriva a dev@flipall.it. Se fallisce, il report indica la regola violata.
 
 Per un aggiornamento:
