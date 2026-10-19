@@ -111,7 +111,7 @@ val generateSplashCredits by tasks.registering {
         val line1 = listOf(
             Triple(copy, baseFont, 0.0),
             Triple(reg, regFont, regDy),
-            Triple(" $year flipall srl $dot Italy", baseFont, 0.0),
+            Triple(" $year flipall s.r.l. $dot Italy", baseFont, 0.0),
         )
         var x = (width - line1.sumOf { (text, font, _) -> g.getFontMetrics(font).stringWidth(text) }) / 2.0
         for ((text, font, dy) in line1) {

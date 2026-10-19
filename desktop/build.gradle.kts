@@ -163,7 +163,7 @@ fun registerJpackageTask(taskName: String, type: String) = tasks.register<Exec>(
         "--dest", layout.buildDirectory.dir("compose/binaries/main/$type").get().asFile.absolutePath,
         "--name", "SnipSSH",
         "--app-version", appPackageVersion,
-        "--vendor", "flipall srl",
+        "--vendor", "flipall s.r.l.",
         "--description", "SSH client with SFTP and command snippets",
         "--resource-dir", wixResourcesDir.get().asFile.absolutePath,
         "--win-dir-chooser",
@@ -188,7 +188,7 @@ compose.desktop {
             packageName = "SnipSSH"
             packageVersion = appPackageVersion
             description = "SSH client with SFTP and command snippets"
-            vendor = "flipall srl"
+            vendor = "flipall s.r.l."
             windows {
                 menuGroup = "SnipSSH"
                 iconFile.set(windowsIcon)

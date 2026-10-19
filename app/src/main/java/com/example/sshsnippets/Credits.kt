@@ -18,7 +18,7 @@ const val APP_VERSION = "0.3.5"
 fun CreditsBar(modifier: Modifier = Modifier) {
     val year = remember { Calendar.getInstance().get(Calendar.YEAR) }
     Text(
-        text = "© $year flipall srl · Joe Scaramucci · info@flipall.it · v.$APP_VERSION",
+        text = "© $year flipall s.r.l. · Joe Scaramucci · info@flipall.it · v.$APP_VERSION",
         modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
         style = MaterialTheme.typography.labelSmall,
         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
