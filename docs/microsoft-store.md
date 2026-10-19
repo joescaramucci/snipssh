@@ -176,7 +176,8 @@ Limiti noti: i programmi a schermo intero come vim o htop non sono ancora suppor
 
 ### Search terms (max 7)
 
-`SSH`, `SFTP`, `terminal`, `PuTTY`, `FileZilla`, `snippets`, `server`
+- en-us: `SSH`, `SFTP`, `terminal`, `PuTTY`, `FileZilla`, `snippets`, `server`
+- it-it: `SSH`, `SFTP`, `terminale`, `PuTTY`, `FileZilla`, `snippet`, `server`
 
 ### Altri campi
 
@@ -211,6 +212,38 @@ No account or sign-in is needed. The app collects no data.
 ```
 SnipSSH is a desktop app built with Compose for Desktop (JVM) and packaged as MSIX. It runs as a full-trust Win32 process: it opens SSH and SFTP connections to servers chosen by the user, reads and writes files the user picks for upload and download, and keeps its encrypted settings in the user's AppData folder protected with Windows DPAPI.
 ```
+
+## Procedura in Partner Center
+
+*Apps and games → SnipSSH → Application overview → Start your submission* (per le versioni successive: *Update*). Ogni sezione va salvata finché risulta "Complete". I nomi delle voci possono cambiare leggermente: Microsoft aggiorna spesso il portale.
+
+1. **Pricing and availability**: tutti i mercati; *Public audience*, reperibile nello Store; *Release as soon as it passes certification*; **Free**, senza prova né sconti; licenze per organizzazioni lasciate attive.
+2. **Properties**:
+   - categoria *Developer tools*; privacy policy, sito e contatto di supporto come in "Altri campi";
+   - alla domanda sui dati personali rispondere **Yes**, perché l'app salva in locale credenziali e chiavi;
+   - requisiti minimi tastiera e mouse;
+   - *Product declarations*: **disattivare** il backup automatico dei dati su OneDrive (la chiave DPAPI vale solo su questo PC, quindi un ripristino altrove non sarebbe leggibile); lasciare attiva l'installazione su altre unità; nessun driver o servizio NT; nessun acquisto in-app.
+3. **Age ratings** (questionario IARC):
+   - email dev@flipall.it; categoria *Utility, productivity, communication or other*;
+   - rispondere **No** a contenuti sensibili, interazione tra utenti, condivisione della posizione, acquisti digitali e accesso libero a internet;
+   - risultato atteso: 3+ / Everyone.
+4. **Packages**:
+   - caricare `desktop/build/compose/binaries/main/msix/SnipSSH-<versione>.msix`;
+   - controllare identità, versione, x64 e le lingue en-us e it-it;
+   - in *Device family availability* lasciare solo **Windows 10/11 Desktop**.
+
+   Le schede store delle due lingue compaiono dopo questo passaggio.
+5. **Store listings** (English (United States) e Italian (Italy)):
+   - testi, product features, parole chiave, copyright e *Developed by: flipall s.r.l.* come in "Scheda store";
+   - i 6 screenshot di `store/windows/` in ordine; i logo dello Store sono facoltativi;
+   - *What's new* vuoto per la prima versione.
+6. **Submission options**: *Publish as soon as it passes certification*; note per la certificazione e motivazione per `runFullTrust` come in "Note per la certificazione".
+7. **Submit to the Store**: la certificazione richiede da qualche ora a 3 giorni lavorativi; l'esito arriva a dev@flipall.it. Se fallisce, il report indica la regola violata.
+
+Per un aggiornamento:
+1. aumentare la versione nei punti elencati in CLAUDE.md (per lo Store deve sempre crescere, es. `0.3.6.0`);
+2. rigenerare con `packageMsix`;
+3. creare un nuovo invio con *Update*, caricare il nuovo `.msix` e compilare *What's new*.
 
 ## Checklist prima dell'invio
 
