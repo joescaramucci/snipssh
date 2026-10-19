@@ -145,7 +145,7 @@ tasks.matching {
 // Compose clears jpackage's --resource-dir during packageMsi/packageExe, so the custom WiX templates
 // in packaging/wix never reach jpackage that way. Instead, jpackage is run again on Compose's app image
 // with our own resource folder, and the result overwrites Compose's installer in the same output folder.
-val appPackageVersion = "0.3.4"
+val appPackageVersion = "0.3.5"
 val wixUpgradeUuid = "6f1d5a52-3c1e-4c3e-9b9a-6d3b8f4a7e21"
 val wixResourcesDir = layout.buildDirectory.dir("wix-resources")
 val stageWixResources by tasks.registering(Copy::class) {

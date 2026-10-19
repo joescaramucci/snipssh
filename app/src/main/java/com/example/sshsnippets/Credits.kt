@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import java.util.Calendar
 
 // Keep in sync with versionName in app/build.gradle.kts and packageVersion in desktop/build.gradle.kts.
-const val APP_VERSION = "0.3.4"
+const val APP_VERSION = "0.3.5"
 
 @Composable
 fun CreditsBar(modifier: Modifier = Modifier) {
