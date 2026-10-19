@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -207,19 +208,21 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
     @Composable
     fun TerminalArea(modifier: Modifier) {
         Box(modifier.background(theme.bg).pinchToZoom(onZoom).onSizeChanged { areaSize = it }) {
-            LazyColumn(
-                Modifier.fillMaxSize().padding(8.dp),
-                state = listState,
-                reverseLayout = true,
-            ) {
-                items(snap.lines.size) { i ->
-                    val idx = snap.lines.size - 1 - i
-                    val cursor = if (idx == snap.cursorLine) snap.cursorCol else -1
-                    Text(
-                        renderLine(snap.lines[idx], cursor, theme),
-                        style = textStyle,
-                        softWrap = false,
-                    )
+            SelectionContainer(Modifier.fillMaxSize()) {
+                LazyColumn(
+                    Modifier.fillMaxSize().padding(8.dp),
+                    state = listState,
+                    reverseLayout = true,
+                ) {
+                    items(snap.lines.size) { i ->
+                        val idx = snap.lines.size - 1 - i
+                        val cursor = if (idx == snap.cursorLine) snap.cursorCol else -1
+                        Text(
+                            renderLine(snap.lines[idx], cursor, theme),
+                            style = textStyle,
+                            softWrap = false,
+                        )
+                    }
                 }
             }
         }

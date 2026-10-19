@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.HorizontalDivider
@@ -205,82 +206,84 @@ fun SftpScreen(tab: OpenSftp, lock: AppLockViewModel, onBack: () -> Unit) {
             }
         }
 
-        LazyColumn(Modifier.weight(1f)) {
-            items(entries, key = { it.name }) { e ->
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = !busy && e.isDir) {
-                            withClient { c -> load(c, joinPath(path, e.name)) }
+        SelectionContainer(Modifier.weight(1f)) {
+            LazyColumn(Modifier.fillMaxSize()) {
+                items(entries, key = { it.name }) { e ->
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable(enabled = !busy && e.isDir) {
+                                withClient { c -> load(c, joinPath(path, e.name)) }
+                            }
+                            .padding(horizontal = 12.dp, vertical = 2.dp),
+                    ) {
+                        val displayName = if (e.isDir) "${e.name}/" else e.name
+                        Row {
+                            Text(
+                                displayName,
+                                style = LsLineStyle.copy(
+                                    color = if (e.isDir) SftpDirColor else SftpFileColor,
+                                    fontWeight = FontWeight.Bold,
+                                ),
+                                modifier = Modifier.weight(1f),
+                            )
+                            Text(
+                                styledPerms(e.perms, " %7d %s".format(e.size, lsDate(e.mtime))),
+                                style = LsLineStyle,
+                                maxLines = 1,
+                                modifier = Modifier.padding(start = 8.dp),
+                            )
                         }
-                        .padding(horizontal = 12.dp, vertical = 2.dp),
-                ) {
-                    val displayName = if (e.isDir) "${e.name}/" else e.name
-                    Row {
-                        Text(
-                            displayName,
-                            style = LsLineStyle.copy(
-                                color = if (e.isDir) SftpDirColor else SftpFileColor,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                            modifier = Modifier.weight(1f),
-                        )
-                        Text(
-                            styledPerms(e.perms, " %7d %s".format(e.size, lsDate(e.mtime))),
-                            style = LsLineStyle,
-                            maxLines = 1,
-                            modifier = Modifier.padding(start = 8.dp),
-                        )
-                    }
-                    Row {
-                        val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
-                        val buttonModifier = Modifier.height(26.dp)
-                        if (!e.isDir) {
+                        Row {
+                            val small = PaddingValues(horizontal = 6.dp, vertical = 0.dp)
+                            val buttonModifier = Modifier.height(26.dp)
+                            if (!e.isDir) {
+                                TextButton(
+                                    enabled = !busy,
+                                    modifier = buttonModifier,
+                                    contentPadding = small,
+                                    onClick = {
+                                        downloadPath = joinPath(path, e.name)
+                                        downloadSize = e.size
+                                        lock.expectExternalActivity()
+                                        saveLauncher.launch(e.name)
+                                    },
+                                ) { Text(stringResource(R.string.sftp_download), style = SmallActionStyle) }
+                            }
+                            TextButton(
+                                enabled = !busy,
+                                modifier = buttonModifier,
+                                contentPadding = small,
+                                onClick = { toChmod = e },
+                            ) { Text(stringResource(R.string.sftp_chmod), style = SmallActionStyle) }
                             TextButton(
                                 enabled = !busy,
                                 modifier = buttonModifier,
                                 contentPadding = small,
                                 onClick = {
-                                    downloadPath = joinPath(path, e.name)
-                                    downloadSize = e.size
-                                    lock.expectExternalActivity()
-                                    saveLauncher.launch(e.name)
+                                    renameText = e.name
+                                    toRename = e
                                 },
-                            ) { Text(stringResource(R.string.sftp_download), style = SmallActionStyle) }
-                        }
-                        TextButton(
-                            enabled = !busy,
-                            modifier = buttonModifier,
-                            contentPadding = small,
-                            onClick = { toChmod = e },
-                        ) { Text(stringResource(R.string.sftp_chmod), style = SmallActionStyle) }
-                        TextButton(
-                            enabled = !busy,
-                            modifier = buttonModifier,
-                            contentPadding = small,
-                            onClick = {
-                                renameText = e.name
-                                toRename = e
-                            },
-                        ) { Text(stringResource(R.string.sftp_rename), style = SmallActionStyle) }
-                        TextButton(
-                            enabled = !busy,
-                            modifier = buttonModifier,
-                            contentPadding = small,
-                            onClick = {
-                                if (e.isDir) {
-                                    withClient { c ->
-                                        deleteCount = c.countTree(joinPath(path, e.name))
+                            ) { Text(stringResource(R.string.sftp_rename), style = SmallActionStyle) }
+                            TextButton(
+                                enabled = !busy,
+                                modifier = buttonModifier,
+                                contentPadding = small,
+                                onClick = {
+                                    if (e.isDir) {
+                                        withClient { c ->
+                                            deleteCount = c.countTree(joinPath(path, e.name))
+                                            toDelete = e
+                                        }
+                                    } else {
                                         toDelete = e
                                     }
-                                } else {
-                                    toDelete = e
-                                }
-                            },
-                        ) { Text(stringResource(R.string.common_delete), style = SmallActionStyle) }
+                                },
+                            ) { Text(stringResource(R.string.common_delete), style = SmallActionStyle) }
+                        }
                     }
+                    HorizontalDivider()
                 }
-                HorizontalDivider()
             }
         }
     }
