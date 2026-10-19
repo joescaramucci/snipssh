@@ -183,13 +183,15 @@ Limiti noti: i programmi a schermo intero come vim o htop non sono ancora suppor
 | Campo | Valore |
 |---|---|
 | Copyright and trademark info | `© 2026 flipall s.r.l.` |
-| Screenshots | almeno 1, PNG, 1366 x 768 o più grande, con dati fittizi come quelli del Play Store (host `db-01 staging`, `web-01 production`); da fare |
+| Screenshots | 6 PNG da 2858 x 1609 in [store/windows/](store/windows/), da caricare in quest'ordine: vista affiancata, terminale, SFTP, host, snippet, impostazioni |
 | Privacy policy URL | https://joescaramucci.github.io/snipssh/privacy.html |
 | Website | https://github.com/joescaramucci/snipssh |
 | Support contact info | info@flipall.it |
 | Category | Developer tools |
 | Pricing | Free, tutti i mercati |
 | System requirements | Windows 10 versione 1809 o successiva, x64; tastiera e mouse consigliati |
+
+Gli screenshot sono stati catturati il 19/10/2026 dalla build 0.3.5, con la finestra a 1440 x 810 punti su uno schermo al 200%, in inglese, tema app Ocean e tema terminale Solarized. Usano solo dati fittizi: host `*.example.com` e indirizzi di esempio, server SSH di prova in locale con prompt `deploy@db-01` e file inventati. Non contengono hostname, IP o nomi utente reali.
 
 ## Note per la certificazione
 
@@ -219,5 +221,6 @@ SnipSSH is a desktop app built with Compose for Desktop (JVM) and packaged as MS
 - [ ] Properties: categoria, privacy policy, sito, contatto di supporto.
 - [ ] Age ratings (questionario IARC).
 - [ ] Packages: caricare `SnipSSH-0.3.5.msix`.
+- [x] Screenshot Windows in `docs/store/windows/`.
 - [ ] Store listings in inglese e italiano, con gli screenshot.
 - [ ] Submission options: note per la certificazione e motivazione per `runFullTrust`.
