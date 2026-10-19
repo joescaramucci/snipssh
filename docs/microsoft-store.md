@@ -1,6 +1,6 @@
 # SnipSSH: pacchetto MSIX per il Microsoft Store
 
-Editore: flipall s.r.l. (account Partner Center registrato il 19/10/2026 con dev@flipall.it, approvato). In Partner Center il prodotto è di tipo *MSIX or PWA app*: il pacchetto viene caricato e lo firma Microsoft. *EXE or MSI app* richiederebbe un installer ospitato da noi e firmato con un certificato di firma del codice.
+Editore: flipall s.r.l. (account Partner Center registrato il 19/10/2026 con dev@flipall.it, approvato). App pubblicata il 20/10/2026: https://apps.microsoft.com/detail/9N8SQQV503LP. In Partner Center il prodotto è di tipo *MSIX or PWA app*: il pacchetto viene caricato e lo firma Microsoft. *EXE or MSI app* richiederebbe un installer ospitato da noi e firmato con un certificato di firma del codice.
 
 ## Come si costruisce
 
@@ -270,4 +270,5 @@ Per un aggiornamento:
 - [x] Screenshot Windows in `docs/store/windows/`.
 - [x] Store listings in inglese e italiano, con gli screenshot.
 - [x] Submission options e Additional Testing Information: motivazione per `runFullTrust`, note e credenziali per il tester.
-- [x] Inviata in certificazione il 19/10/2026.
+- [x] Inviata in certificazione il 19/10/2026; respinta per le parole chiave PuTTY e FileZilla (10.1.3), corretta e reinviata lo stesso giorno.
+- [x] Pubblicata nel Microsoft Store il 20/10/2026: https://apps.microsoft.com/detail/9N8SQQV503LP
