@@ -261,10 +261,11 @@ Per un aggiornamento:
 - [x] Account Partner Center approvato.
 - [x] Nome SnipSSH prenotato (Store ID `9N8SQQV503LP`), identità scritta in `desktop/build.gradle.kts`.
 - [x] `packageMsix` con l'identità definitiva (`SnipSSH-0.3.5.msix`, 0.3.5.0).
-- [ ] Pricing and availability: gratis, mercati.
-- [ ] Properties: categoria, privacy policy, sito, contatto di supporto.
-- [ ] Age ratings (questionario IARC).
-- [ ] Packages: caricare `SnipSSH-0.3.5.msix`.
+- [x] Pricing and availability: gratis, tutti i mercati.
+- [x] Properties: categoria, privacy policy, contatto di supporto.
+- [x] Age ratings (questionario IARC).
+- [x] Packages: `SnipSSH-0.3.5.msix` caricato e validato.
 - [x] Screenshot Windows in `docs/store/windows/`.
-- [ ] Store listings in inglese e italiano, con gli screenshot.
-- [ ] Submission options: note per la certificazione e motivazione per `runFullTrust`.
+- [x] Store listings in inglese e italiano, con gli screenshot.
+- [x] Submission options e Additional Testing Information: motivazione per `runFullTrust`, note e credenziali per il tester.
+- [x] Inviata in certificazione il 19/10/2026.

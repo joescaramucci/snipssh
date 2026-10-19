@@ -51,4 +51,4 @@ La versione è scritta in più punti, da tenere allineati:
 ## Stato
 
 - Google Play: app in revisione dal 19/10/2026 (account flipall s.r.l.); il revisore usa il server di prova `test.rebex.net`. Dettagli e checklist in [docs/play-store.md](docs/play-store.md).
-- Microsoft Store: account sviluppatore flipall s.r.l. (email dev@flipall.it) registrato il 19/10/2026 e approvato. Prodotto di tipo "MSIX or PWA app"; l'app Windows non è ancora stata inviata. Dettagli in [docs/microsoft-store.md](docs/microsoft-store.md).
+- Microsoft Store: account sviluppatore flipall s.r.l. (email dev@flipall.it), prodotto "MSIX or PWA app" con Store ID `9N8SQQV503LP`. Versione 0.3.5 inviata in certificazione il 19/10/2026, pubblicazione automatica appena certificata; il revisore usa `test.rebex.net`. Dettagli in [docs/microsoft-store.md](docs/microsoft-store.md).
