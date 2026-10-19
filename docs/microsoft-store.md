@@ -86,7 +86,7 @@ Testi pronti da incollare in Partner Center (*Store listings*). La lingua predef
 ### Description (en-us)
 
 ```
-SnipSSH is PuTTY + FileZilla for Windows, with command snippets: SSH terminal and SFTP in one app, with no subscription and no account. It is made for people who work on servers every day. The same app is available for Android, and backups move between the two.
+SnipSSH is an SSH terminal and an SFTP file manager in one app, with command snippets, no subscription and no account. It is made for people who work on servers every day. The same app is available for Android, and backups move between the two.
 
 Terminal
 - SSH sessions with ANSI terminal emulation (colours, cursor, scrollback).
@@ -125,7 +125,7 @@ Known limits: full-screen terminal programs such as vim or htop are not supporte
 ### Description (it-it)
 
 ```
-SnipSSH è PuTTY + FileZilla per Windows, con snippet di comandi: terminale SSH e SFTP in un'unica app, senza abbonamento e senza account. È pensato per chi lavora ogni giorno sui server. La stessa app esiste per Android, e i backup passano dall'una all'altra.
+SnipSSH è un terminale SSH e un file manager SFTP in un'unica app, con snippet di comandi, senza abbonamento e senza account. È pensato per chi lavora ogni giorno sui server. La stessa app esiste per Android, e i backup passano dall'una all'altra.
 
 Terminale
 - Sessioni SSH con emulazione ANSI (colori, cursore, scroll).
@@ -176,8 +176,10 @@ Limiti noti: i programmi a schermo intero come vim o htop non sono ancora suppor
 
 ### Search terms (max 7)
 
-- en-us: `SSH`, `SFTP`, `terminal`, `PuTTY`, `FileZilla`, `snippets`, `server`
-- it-it: `SSH`, `SFTP`, `terminale`, `PuTTY`, `FileZilla`, `snippet`, `server`
+- en-us: `SSH`, `SFTP`, `terminal`, `SSH client`, `file transfer`, `snippets`, `sysadmin`
+- it-it: `SSH`, `SFTP`, `terminale`, `client SSH`, `trasferimento file`, `snippet`, `sistemista`
+
+Regola 10.1.3 dello Store: al massimo 7 termini, pertinenti, e nessun nome di prodotto di altri editori (la prima certificazione è stata respinta per `PuTTY` e `FileZilla`). Per lo stesso motivo le descrizioni non dicono che SnipSSH "è PuTTY + FileZilla".
 
 ### Altri campi
 
