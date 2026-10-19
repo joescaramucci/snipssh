@@ -65,7 +65,7 @@ SnipSSH non raccoglie, non trasmette e non condivide dati personali.
 - L'app non usa analytics, pubblicità o SDK di tracciamento.
 - Per eliminare tutti i dati: disinstalla l'app oppure cancella i dati dalle impostazioni Android. Su Windows, elimina anche la cartella %APPDATA%\SnipSSH.
 
-Titolare: flipall srl
+Titolare: flipall s.r.l.
 Contatto: info@flipall.it
 Data di ultimo aggiornamento: 17 ottobre 2026
 ```
@@ -125,7 +125,7 @@ SnipSSH does not collect, transmit or share personal data.
 - The app uses no analytics, advertising or tracking SDKs.
 - To delete all data: uninstall the app, or clear its data from Android settings. On Windows, also delete the %APPDATA%\SnipSSH folder.
 
-Controller: flipall srl
+Controller: flipall s.r.l.
 Contact: info@flipall.it
 Last updated: 17 October 2026
 ```
@@ -147,7 +147,7 @@ Permessi dichiarati in `AndroidManifest.xml`: solo `INTERNET`. Il blocco biometr
 
 - `minSdk` 26 (Android 8.0).
 - `targetSdk` e `compileSdk` 36. Verifica nella Console il requisito corrente per le nuove app e gli aggiornamenti.
-- Versione 0.2.0 (`versionCode` 2, `versionName` "0.2.0" in `app/build.gradle.kts`).
+- Versione 0.3.5 (`versionCode` 8, `versionName` "0.3.5" in `app/build.gradle.kts`).
 - Formato: Android App Bundle (`app/build/outputs/bundle/release/app-release.aab`), firmato con la upload key.
 - Play App Signing: abilitalo al primo caricamento. Google gestisce la chiave di firma finale.
 - Upload key: `C:\Users\joe\.android\release\sshsnippets-upload.jks`. Fanne una copia di sicurezza fuori dal computer. Se perdi la password, serve il supporto Google per reimpostarla.
@@ -164,18 +164,22 @@ Le schermate sono state prese dall'emulatore Pixel 7 (Android 16) con un server 
 
 Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prompt `>_` su sfondo `#1C1B1F`.
 
+## Stato della pubblicazione
+
+In revisione su Google Play dal 19/10/2026, con l'account di flipall s.r.l. Il revisore usa il server di prova `test.rebex.net`.
+
 ## Checklist prima del caricamento
 
-- [x] Account sviluppatore verificato e quota una tantum pagata (già fatto con l'app beep; nome sviluppatore: flipall srl, da verificare nella Console).
-- [ ] Icona, feature graphic e screenshot caricati.
+- [x] Account sviluppatore verificato e quota una tantum pagata (già fatto con l'app beep; nome sviluppatore: flipall s.r.l., da verificare nella Console).
+- [x] Icona, feature graphic e screenshot caricati.
 - [x] Privacy policy pubblicata: https://joescaramucci.github.io/snipssh/privacy.html
-- [ ] Scheda store compilata nella Console con il testo in inglese sopra.
-- [ ] Modulo Data Safety compilato come sopra.
-- [ ] Questionario contenuti e classificazione età compilati.
-- [ ] Dichiarazione di sicurezza per le app con crittografia (export compliance): l'app usa crittografia standard (SSH, AES-GCM).
-- [x] Test chiuso con 12 tester non richiesto: l'account Play è aziendale (flipall srl), non personale.
+- [x] Scheda store compilata nella Console con il testo in inglese sopra.
+- [x] Modulo Data Safety compilato come sopra.
+- [x] Questionario contenuti e classificazione età compilati.
+- [x] Dichiarazione di sicurezza per le app con crittografia (export compliance): l'app usa crittografia standard (SSH, AES-GCM).
+- [x] Test chiuso con 12 tester non richiesto: l'account Play è aziendale (flipall s.r.l.), non personale.
 - [x] Screenshot rifatti in inglese, con dati fittizi (vedi sopra).
-- [ ] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino, cambio lingua.
+- [x] Test su dispositivo reale: blocco biometrico, selettore file, SFTP, backup e ripristino, cambio lingua.
 
 ## Limiti da dichiarare agli utenti
 
