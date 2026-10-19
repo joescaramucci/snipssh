@@ -181,9 +181,10 @@ tasks.matching { it.name == "packageExe" }.configureEach { finalizedBy(packageEx
 
 // Pacchetto MSIX per il Microsoft Store. Compose Desktop non lo produce: si parte dalla sua app image (createDistributable),
 // si aggiungono manifest, icone e resources.pri, e si impacchetta con makeappx del Windows SDK.
-// Identity Name e Publisher li assegna Partner Center: vanno in ~/.gradle/gradle.properties o con -P, finché non sono definitivi.
-val msixIdentityName = findProperty("SNIPSSH_MSIX_IDENTITY_NAME") as String? ?: "flipall.SnipSSH"
-val msixPublisher = findProperty("SNIPSSH_MSIX_PUBLISHER") as String? ?: "CN=flipall s.r.l."
+// Identità assegnata da Partner Center (Gestione prodotto > Identità prodotto, Store ID 9N8SQQV503LP): non va cambiata.
+// Con -P si può sostituire solo per prove locali.
+val msixIdentityName = findProperty("SNIPSSH_MSIX_IDENTITY_NAME") as String? ?: "flipalls.r.l.SnipSSH"
+val msixPublisher = findProperty("SNIPSSH_MSIX_PUBLISHER") as String? ?: "CN=4C7E3FE8-5D0B-4551-979A-D40C248BFFF3"
 val msixPublisherDisplayName = "flipall s.r.l."
 // Lo Store vuole quattro numeri, con l'ultimo a 0.
 val msixVersion = "$appPackageVersion.0"
