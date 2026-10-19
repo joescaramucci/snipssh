@@ -1,4 +1,5 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
@@ -177,6 +178,141 @@ val packageMsiWix = registerJpackageTask("packageMsiWix", "msi")
 val packageExeWix = registerJpackageTask("packageExeWix", "exe")
 tasks.matching { it.name == "packageMsi" }.configureEach { finalizedBy(packageMsiWix) }
 tasks.matching { it.name == "packageExe" }.configureEach { finalizedBy(packageExeWix) }
+
+// Pacchetto MSIX per il Microsoft Store. Compose Desktop non lo produce: si parte dalla sua app image (createDistributable),
+// si aggiungono manifest, icone e resources.pri, e si impacchetta con makeappx del Windows SDK.
+// Identity Name e Publisher li assegna Partner Center: vanno in ~/.gradle/gradle.properties o con -P, finché non sono definitivi.
+val msixIdentityName = findProperty("SNIPSSH_MSIX_IDENTITY_NAME") as String? ?: "flipall.SnipSSH"
+val msixPublisher = findProperty("SNIPSSH_MSIX_PUBLISHER") as String? ?: "CN=flipall s.r.l."
+val msixPublisherDisplayName = "flipall s.r.l."
+// Lo Store vuole quattro numeri, con l'ultimo a 0.
+val msixVersion = "$appPackageVersion.0"
+val msixDir = layout.buildDirectory.dir("msix")
+val msixPriSource = msixDir.map { it.dir("pri-src") }
+val msixPri = msixDir.map { it.file("resources.pri") }
+val msixLayout = msixDir.map { it.dir("layout") }
+val msixFile = layout.buildDirectory.file("compose/binaries/main/msix/SnipSSH-$appPackageVersion.msix")
+
+fun windowsSdkTool(name: String): String {
+    (findProperty("SNIPSSH_WINDOWS_SDK_BIN") as String?)?.let { return File(it, name).absolutePath }
+    val bin = File(System.getenv("ProgramFiles(x86)") ?: "C:/Program Files (x86)", "Windows Kits/10/bin")
+    return bin.listFiles { f -> f.isDirectory && f.name.startsWith("10.") }.orEmpty()
+        .sortedByDescending { dir -> dir.name.split('.').joinToString("") { it.padStart(6, '0') } }
+        .map { File(it, "x64/$name") }
+        .firstOrNull { it.exists() }?.absolutePath
+        ?: throw GradleException("$name non trovato: installa il Windows SDK oppure imposta SNIPSSH_WINDOWS_SDK_BIN")
+}
+
+val generateMsixAssets by tasks.registering {
+    val template = layout.projectDirectory.file("packaging/msix/AppxManifest.xml")
+    inputs.file(storeIcon)
+    inputs.file(template)
+    inputs.property("identity", listOf(msixIdentityName, msixPublisher, msixPublisherDisplayName, msixVersion))
+    outputs.dir(msixPriSource)
+    doLast {
+        val out = msixPriSource.get().asFile.apply { deleteRecursively(); mkdirs() }
+        out.resolve("AppxManifest.xml").writeText(
+            template.asFile.readText()
+                .replace("@IDENTITY_NAME@", msixIdentityName)
+                .replace("@PUBLISHER@", msixPublisher)
+                .replace("@PUBLISHER_DISPLAY_NAME@", msixPublisherDisplayName)
+                .replace("@VERSION@", msixVersion)
+        )
+
+        // L'icona dello store è opaca: le tile rettangolari si riempiono con il suo colore di sfondo.
+        val source = ImageIO.read(storeIcon.asFile)
+        val background = Color(source.getRGB(0, 0), true)
+        val assets = out.resolve("Assets").apply { mkdirs() }
+        fun tile(file: String, width: Int, height: Int) {
+            val img = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+            val g = img.createGraphics()
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC)
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+            g.color = background
+            g.fillRect(0, 0, width, height)
+            val size = minOf(width, height)
+            g.drawImage(source, (width - size) / 2, (height - size) / 2, size, size, null)
+            g.dispose()
+            ImageIO.write(img, "png", assets.resolve(file))
+        }
+        for ((scale, factor) in listOf(100 to 1, 200 to 2, 400 to 4)) {
+            tile("Square44x44Logo.scale-$scale.png", 44 * factor, 44 * factor)
+            tile("Square150x150Logo.scale-$scale.png", 150 * factor, 150 * factor)
+            tile("Wide310x150Logo.scale-$scale.png", 310 * factor, 150 * factor)
+            tile("StoreLogo.scale-$scale.png", 50 * factor, 50 * factor)
+        }
+        // Barra delle applicazioni, menu Start ed Esplora file usano queste dimensioni fisse.
+        for (size in listOf(16, 24, 32, 48, 256)) {
+            tile("Square44x44Logo.targetsize-$size.png", size, size)
+            tile("Square44x44Logo.targetsize-${size}_altform-unplated.png", size, size)
+        }
+    }
+}
+
+// resources.pri dice a Windows quale variante delle icone usare per scala e dimensione.
+val generateMsixPri by tasks.registering {
+    dependsOn(generateMsixAssets)
+    inputs.dir(msixPriSource)
+    outputs.file(msixPri)
+    doLast {
+        val makepri = windowsSdkTool("makepri.exe")
+        val config = msixDir.get().file("priconfig.xml").asFile.absolutePath
+        val source = msixPriSource.get().asFile
+        exec { commandLine(makepri, "createconfig", "/cf", config, "/dq", "en-US", "/pv", "10.0.0", "/o") }
+        exec {
+            commandLine(
+                makepri, "new", "/pr", source.absolutePath, "/cf", config,
+                "/mn", source.resolve("AppxManifest.xml").absolutePath,
+                "/of", msixPri.get().asFile.absolutePath, "/o",
+            )
+        }
+    }
+}
+
+val stageMsixLayout by tasks.registering(Sync::class) {
+    dependsOn("createDistributable", generateMsixPri)
+    from(layout.buildDirectory.dir("compose/binaries/main/app/SnipSSH"))
+    from(msixPriSource)
+    from(msixPri)
+    into(msixLayout)
+}
+
+// Pacchetto non firmato, da caricare in Partner Center: lo Store lo firma con il certificato di flipall s.r.l.
+val packageMsix by tasks.registering {
+    group = "compose desktop"
+    description = "Builds the unsigned MSIX package for the Microsoft Store."
+    dependsOn(stageMsixLayout)
+    outputs.file(msixFile)
+    doLast {
+        val out = msixFile.get().asFile.apply { parentFile.mkdirs() }
+        exec {
+            commandLine(windowsSdkTool("makeappx.exe"), "pack", "/d", msixLayout.get().asFile.absolutePath, "/p", out.absolutePath, "/o")
+        }
+    }
+}
+
+// Copia firmata con un certificato di prova, per installare il pacchetto su questo PC prima dell'invio.
+// Il soggetto del certificato deve essere uguale a SNIPSSH_MSIX_PUBLISHER.
+val signMsixForTest by tasks.registering {
+    group = "compose desktop"
+    description = "Signs a copy of the MSIX package with a test certificate for local installation."
+    dependsOn(packageMsix)
+    doLast {
+        val cert = findProperty("SNIPSSH_MSIX_TEST_CERT_FILE") as String?
+            ?: throw GradleException("Imposta SNIPSSH_MSIX_TEST_CERT_FILE (file .pfx) e SNIPSSH_MSIX_TEST_CERT_PASSWORD")
+        val password = findProperty("SNIPSSH_MSIX_TEST_CERT_PASSWORD") as String?
+        val unsigned = msixFile.get().asFile
+        val signed = unsigned.resolveSibling("SnipSSH-$appPackageVersion-test.msix")
+        unsigned.copyTo(signed, overwrite = true)
+        exec {
+            commandLine(
+                listOf(windowsSdkTool("signtool.exe"), "sign", "/fd", "SHA256", "/f", cert) +
+                    (if (password != null) listOf("/p", password) else emptyList()) +
+                    signed.absolutePath
+            )
+        }
+    }
+}
 
 compose.desktop {
     application {

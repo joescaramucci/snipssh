@@ -13,7 +13,10 @@ Serve JDK 17; per Android anche l'SDK con platform 36. Non ci sono test automati
 .\gradlew.bat :desktop:run              # avvia l'app Windows
 .\gradlew.bat :desktop:createDistributable              # cartella portabile
 .\gradlew.bat :desktop:packageMsi :desktop:packageExe   # installer (servono jpackage e WiX 3.14 nel PATH)
+.\gradlew.bat :desktop:packageMsix                      # MSIX per il Microsoft Store (serve il Windows SDK)
 ```
+
+Dettagli sul pacchetto MSIX, l'identità di Partner Center e la prova in locale in [docs/microsoft-store.md](docs/microsoft-store.md).
 
 ## Moduli e codice condiviso
 

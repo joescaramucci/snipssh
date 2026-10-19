@@ -15,6 +15,7 @@ local.properties
 # Firma: le chiavi e le password non vanno mai nel repository
 *.jks
 *.keystore
+*.pfx
 keystore.properties
 
 # OS

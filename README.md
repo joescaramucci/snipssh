@@ -74,7 +74,10 @@ App per Windows 10/11 (64 bit) con le stesse funzioni di quella Android: host, s
 .\gradlew.bat :desktop:run                              # avvia l'app
 .\gradlew.bat :desktop:createDistributable              # cartella portabile con SnipSSH.exe
 .\gradlew.bat :desktop:packageMsi :desktop:packageExe   # installer MSI e setup EXE
+.\gradlew.bat :desktop:packageMsix                      # pacchetto MSIX per il Microsoft Store
 ```
+
+Per l'MSIX serve il Windows SDK 10 (`makeappx`, `makepri`): vedi [docs/microsoft-store.md](docs/microsoft-store.md).
 
 Per gli installer servono JDK 17 (include `jpackage`) e [WiX Toolset 3.14](https://github.com/wixtoolset/wix3/releases/tag/wix3141rtm), con `candle.exe` e `light.exe` nel `PATH`; basta estrarre l'archivio dei binari, senza installarlo. I risultati sono in `desktop/build/compose/binaries/main/` (`app/`, `msi/`, `exe/`). L'installer lavora per utente in `%LOCALAPPDATA%\SnipSSH` e non richiede privilegi di amministratore. L'eseguibile non è firmato: alla prima esecuzione SmartScreen può mostrare un avviso.
 
