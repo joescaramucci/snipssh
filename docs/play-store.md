@@ -9,12 +9,12 @@ Documento di supporto per la pubblicazione. Il testo è pronto da incollare nell
 **Package name** (applicationId): `io.github.joescaramucci.snipssh`. Non è modificabile dopo il primo caricamento.
 
 **Descrizione breve** (max 80 caratteri):
-`PuTTY + FileZilla per Android e Windows, con snippet. Gratis, senza account.`
+`Terminale SSH e SFTP con snippet, per Android e Windows. Gratis, senza account.`
 
 **Descrizione completa** (max 4000 caratteri):
 
 ```
-SnipSSH è PuTTY + FileZilla per Android, con snippet di comandi: terminale SSH e SFTP in un'unica app, senza abbonamento. È pensato per chi lavora spesso sui server. La versione per Windows ha le stesse funzioni e si scarica dal repository GitHub.
+SnipSSH è un terminale SSH e un file manager SFTP in un'unica app, con snippet di comandi e senza abbonamento. È pensato per chi lavora spesso sui server. La versione per Windows ha le stesse funzioni e si scarica dal repository GitHub.
 
 Terminale
 - Sessioni SSH con emulazione terminale ANSI (colori, cursore, scroll).
@@ -75,12 +75,12 @@ Data di ultimo aggiornamento: 17 ottobre 2026
 **Title:** `SnipSSH`
 
 **Short description** (max 80 characters):
-`PuTTY + FileZilla for Android and Windows, with snippets. Free, no account.`
+`SSH terminal and SFTP with snippets, for Android and Windows. Free, no account.`
 
 **Full description** (max 4000 characters):
 
 ```
-SnipSSH is PuTTY + FileZilla for Android, with command snippets: SSH terminal and SFTP in one app, with no subscription. It is made for people who work on servers every day. The Windows version has the same features and is available from the GitHub repository.
+SnipSSH is an SSH terminal and an SFTP file manager in one app, with command snippets and no subscription. It is made for people who work on servers every day. The Windows version has the same features and is available from the GitHub repository.
 
 Terminal
 - SSH sessions with ANSI terminal emulation (colours, cursor, scrollback).
