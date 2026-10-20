@@ -50,5 +50,5 @@ La versione è scritta in più punti, da tenere allineati:
 
 ## Stato
 
-- Google Play: app in revisione dal 19/10/2026 (account flipall s.r.l.); il revisore usa il server di prova `test.rebex.net`. Dettagli e checklist in [docs/play-store.md](docs/play-store.md).
+- Google Play: app pubblicata il 20/10/2026 (account flipall s.r.l.): https://play.google.com/store/apps/details?id=io.github.joescaramucci.snipssh. Il revisore usa il server di prova `test.rebex.net`. Dettagli e checklist in [docs/play-store.md](docs/play-store.md).
 - Microsoft Store: account sviluppatore flipall s.r.l. (email dev@flipall.it), prodotto "MSIX or PWA app" con Store ID `9N8SQQV503LP`. Versione 0.3.5 pubblicata il 20/10/2026 (https://apps.microsoft.com/detail/9N8SQQV503LP), dopo un primo rifiuto per le parole chiave PuTTY e FileZilla (regola 10.1.3): nei testi degli store non si citano prodotti di altri. Il revisore usa `test.rebex.net`. Dettagli in [docs/microsoft-store.md](docs/microsoft-store.md).

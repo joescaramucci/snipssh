@@ -6,7 +6,12 @@ Client SSH e SFTP per Android e Windows con gestione di snippet di comandi riuti
 
 ## Download
 
-Per Windows 10/11 il modo più semplice è il **[Microsoft Store](https://apps.microsoft.com/detail/9N8SQQV503LP)**: installazione con un click, aggiornamenti automatici e pacchetto firmato da Microsoft, quindi niente avvisi di SmartScreen.
+Il modo più semplice è installarla dallo store, con aggiornamenti automatici:
+
+- **Android**: [Google Play](https://play.google.com/store/apps/details?id=io.github.joescaramucci.snipssh)
+- **Windows 10/11**: [Microsoft Store](https://apps.microsoft.com/detail/9N8SQQV503LP). Il pacchetto è firmato da Microsoft, quindi niente avvisi di SmartScreen.
+
+In alternativa, i file si scaricano da GitHub.
 
 Ultima versione: **0.3.5**, nella [pagina delle release](https://github.com/joescaramucci/snipssh/releases/tag/v0.3.5).
 

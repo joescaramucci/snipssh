@@ -166,7 +166,7 @@ Icona launcher: adaptive icon in `app/src/main/res/mipmap-anydpi-v26/`, con prom
 
 ## Stato della pubblicazione
 
-In revisione su Google Play dal 19/10/2026, con l'account di flipall s.r.l. Il revisore usa il server di prova `test.rebex.net`.
+Inviata in revisione il 19/10/2026 con l'account di flipall s.r.l. e pubblicata su Google Play il 20/10/2026: https://play.google.com/store/apps/details?id=io.github.joescaramucci.snipssh. Il revisore usa il server di prova `test.rebex.net`.
 
 ## Checklist prima del caricamento
 
