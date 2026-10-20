@@ -141,13 +141,29 @@ class AnsiTerminal(private var cols: Int, private var rows: Int, private val max
             'B' -> cursorY = (cursorY + count(0)).coerceAtMost(rows - 1)
             'C' -> cursorX = (cursorX + count(0)).coerceAtMost(cols - 1)
             'D' -> cursorX = (cursorX - count(0)).coerceAtLeast(0)
+            'E' -> {
+                cursorX = 0
+                cursorY = (cursorY + count(0)).coerceAtMost(rows - 1)
+            }
+            'F' -> {
+                cursorX = 0
+                cursorY = (cursorY - count(0)).coerceAtLeast(0)
+            }
             'G' -> cursorX = (count(0) - 1).coerceIn(0, cols - 1)
             'H', 'f' -> {
                 cursorY = (count(0) - 1).coerceIn(0, rows - 1)
                 cursorX = (count(1) - 1).coerceIn(0, cols - 1)
             }
+            'a' -> cursorX = (cursorX + count(0)).coerceAtMost(cols - 1)
+            'd' -> cursorY = (count(0) - 1).coerceIn(0, rows - 1)
+            'e' -> cursorY = (cursorY + count(0)).coerceAtMost(rows - 1)
             'J' -> eraseDisplay(arg(0, 0))
             'K' -> eraseLine(arg(0, 0))
+            'X' -> {
+                // ECH: cancella N caratteri a partire dal cursore, senza spostarlo.
+                val line = lineAt(cursorY)
+                for (x in cursorX until minOf(cols, cursorX + count(0))) line[x] = AnsiCell(bg = bg)
+            }
         }
     }
 
