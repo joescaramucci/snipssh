@@ -43,7 +43,7 @@ Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non 
     <td><img src="docs/store/screenshots/09-sftp.png" width="220" alt="SFTP con file"></td>
   </tr>
   <tr>
-    <td colspan="3"><img src="docs/store/windows/01-split-view.png" width="660" alt="Windows: vista affiancata con SFTP e terminale"></td>
+    <td colspan="3"><img src="docs/store/windows/01-split-view.png" width="100%" alt="Windows: vista affiancata con SFTP e terminale"></td>
   </tr>
 </table>
 
