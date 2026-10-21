@@ -59,6 +59,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.isCtrlPressed
@@ -412,8 +413,16 @@ fun TerminalScreen(
                             return Cell(first + row, col)
                         }
                         awaitEachGesture {
-                            val down = awaitFirstDown()
+                            val first = awaitPointerEvent()
+                            val down = first.changes.first()
                             focus.requestFocus()
+                            if (first.buttons.isSecondaryPressed) {
+                                // Tasto destro: incolla gli appunti alla posizione del cursore, come PuTTY.
+                                paste()
+                                first.changes.forEach { it.consume() }
+                                while (awaitPointerEvent().changes.any { it.pressed }) Unit
+                                return@awaitEachGesture
+                            }
                             val start = cellAt(down.position)
                             selection = null
                             var moved = false
