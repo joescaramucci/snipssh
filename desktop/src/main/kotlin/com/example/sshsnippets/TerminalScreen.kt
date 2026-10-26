@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -249,7 +250,11 @@ fun TerminalScreen(
     var visibleRows by remember { mutableIntStateOf(24) }
     var scrollBack by remember { mutableIntStateOf(0) }
     var selection by remember { mutableStateOf<Pair<Cell, Cell>?>(null) }
+    // Vero quando l'ultimo gesto è stato un trascinamento: al rilascio la selezione va negli appunti.
+    var selectionDragged by remember { mutableStateOf(false) }
     var snippetsWidth by remember { mutableFloatStateOf(store.snippetsWidthDp().toFloat()) }
+    // Colonna snippet ridotta a una striscia stretta: si riapre dalla stessa connessione.
+    var snippetsOpen by remember { mutableStateOf(true) }
     // In vista affiancata la colonna resta stretta e fissa: la larghezza salvata non cambia.
     val snippetsColumnWidth = if (compact) COMPACT_SNIPPETS_DP else snippetsWidth
     val focus = remember { FocusRequester() }
@@ -404,6 +409,12 @@ fun TerminalScreen(
                             scrollBack = (scrollBack - (dy * 3).roundToInt()).coerceIn(0, maxScrollBackNow)
                         }
                     }
+                    .onPointerEvent(PointerEventType.Release) {
+                        if (selectionDragged) {
+                            selectionDragged = false
+                            copySelection()
+                        }
+                    }
                     .pointerInput(cellW, cellH) {
                         fun cellAt(p: Offset): Cell {
                             val (first, columns, rows) = geometry
@@ -429,12 +440,24 @@ fun TerminalScreen(
                             while (true) {
                                 val change = awaitPointerEvent().changes.first()
                                 if (!change.pressed) break
+                                // Trascinando sopra o sotto il riquadro il testo scorre, così la selezione può coprire tutto.
+                                // Più il puntatore è lontano dal riquadro, più righe scorrono per evento (max 5).
+                                val y = change.position.y
+                                if (y < 0) {
+                                    val step = ((-y / cellH).toInt() + 1).coerceAtMost(5)
+                                    scrollBack = (scrollBack + step).coerceAtMost(maxScrollBackNow)
+                                } else if (y > areaSize.height) {
+                                    val step = (((y - areaSize.height) / cellH).toInt() + 1).coerceAtMost(5)
+                                    scrollBack = (scrollBack - step).coerceAtLeast(0)
+                                }
                                 val p = cellAt(change.position)
                                 if (moved || p != start) {
                                     moved = true
                                     selection = start to p
                                 }
                             }
+                            // Come PuTTY: il testo selezionato va negli appunti appena rilasci il mouse (vedi onPointerEvent sotto).
+                            selectionDragged = moved
                         }
                     },
             ) {
@@ -454,7 +477,15 @@ fun TerminalScreen(
                     }
                 }
             }
-            if (!compact) Box(
+            if (!compact && !snippetsOpen) {
+                Column(Modifier.width(24.dp).fillMaxHeight().padding(top = 8.dp)) {
+                    TextButton(
+                        onClick = { snippetsOpen = true },
+                        contentPadding = PaddingValues(0.dp),
+                    ) { Text("‹", style = MaterialTheme.typography.titleSmall) }
+                }
+            }
+            if (!compact && snippetsOpen) Box(
                 Modifier
                     .width(6.dp)
                     .fillMaxHeight()
@@ -470,27 +501,34 @@ fun TerminalScreen(
             ) {
                 Box(Modifier.width(1.dp).fillMaxHeight().background(MaterialTheme.colorScheme.outlineVariant))
             }
-            Column(
+            if (compact || snippetsOpen) Column(
                 Modifier.width(snippetsColumnWidth.dp).fillMaxHeight().padding(8.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(3.dp),
             ) {
-                Text(
-                    stringResource(R.string.tab_snippets),
-                    Modifier
-                        .pointerHoverIcon(PointerIcon(java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)))
-                        .clickable {
-                            newSnippetName = ""
-                            newSnippetCommand = ""
-                            addingSnippet = true
-                        },
-                    style = MaterialTheme.typography.titleSmall,
-                )
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.tab_snippets),
+                        Modifier
+                            .pointerHoverIcon(PointerIcon(java.awt.Cursor(java.awt.Cursor.HAND_CURSOR)))
+                            .clickable {
+                                newSnippetName = ""
+                                newSnippetCommand = ""
+                                addingSnippet = true
+                            },
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                    if (!compact) TextButton(
+                        onClick = { snippetsOpen = false },
+                        contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
+                    ) { Text("›", style = MaterialTheme.typography.titleSmall) }
+                }
                 if (snippets.isEmpty()) {
                     Text(stringResource(R.string.terminal_no_snippets), style = MaterialTheme.typography.labelSmall)
                 }
                 snippets.forEach { s ->
                     OutlinedButton(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(30.dp),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                         onClick = {
                             if (s.variables().isEmpty()) {
                                 send(s.render(emptyMap()) + if (s.sendEnter) "\r" else "")
