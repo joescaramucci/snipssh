@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="lang_en">English</string>
     <string name="lang_it">Italiano</string>
@@ -95,6 +95,7 @@
     <string name="terminal_disconnected">Disconnesso da %1$s</string>
     <string name="terminal_reconnect">Riconnetti</string>
     <string name="terminal_run">Esegui</string>
+    <string name="terminal_copy_last">Copia ultimo output</string>
     <string name="terminal_send">Invia</string>
     <string name="terminal_ctrl">Ctrl</string>
 

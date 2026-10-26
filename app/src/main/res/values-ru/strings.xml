@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="lang_en">English</string>
     <string name="lang_it">Italiano</string>
@@ -95,6 +95,7 @@
     <string name="terminal_disconnected">Соединение с %1$s разорвано</string>
     <string name="terminal_reconnect">Переподключиться</string>
     <string name="terminal_run">Выполнить</string>
+    <string name="terminal_copy_last">Копировать последний вывод</string>
     <string name="terminal_send">Отправить</string>
     <string name="terminal_ctrl">Ctrl</string>
 

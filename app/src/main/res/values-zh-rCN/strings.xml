@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="lang_en">English</string>
     <string name="lang_it">Italiano</string>
@@ -95,6 +95,7 @@
     <string name="terminal_disconnected">与 %1$s 的连接已断开</string>
     <string name="terminal_reconnect">重新连接</string>
     <string name="terminal_run">运行</string>
+    <string name="terminal_copy_last">复制上次输出</string>
     <string name="terminal_send">发送</string>
     <string name="terminal_ctrl">Ctrl</string>
 

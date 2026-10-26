@@ -12,6 +12,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -162,8 +164,26 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
     // Back torna alla lista host: la sessione resta aperta nella barra delle sessioni.
     BackHandler(onBack = onHosts)
 
+    // Riga del buffer in cui è iniziato l'ultimo comando inviato con Invio (-1 = nessuno).
+    var commandStartLine by remember { mutableIntStateOf(-1) }
+
     fun send(s: String) {
+        // Invio arriva come \n dalla tastiera Android e come \r dai tasti rapidi: entrambi iniziano un comando.
+        if (s.contains('\r') || s.contains('\n')) commandStartLine = synchronized(term) { term.snapshot().cursorLine }
         scope.launch { session.ssh.send(s) }
+    }
+
+    // Copia solo l'output dell'ultimo comando: dalla riga del comando fino al prompt attuale, escluso.
+    fun copyLastOutput(clipboard: ClipboardManager) {
+        val start = commandStartLine
+        if (start < 0) return
+        val s = synchronized(term) { term.snapshot() }
+        val end = s.cursorLine
+        if (start >= end) return
+        val text = (start until end).joinToString("\n") { i ->
+            buildString { s.lines[i].forEach { append(it.ch) } }.trimEnd()
+        }
+        clipboard.setText(AnnotatedString(text.trimEnd()))
     }
 
     // Pulisce subito lo schermo locale, poi invia ^L alla shell per ridisegnare il prompt.
@@ -175,8 +195,12 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
 
     @Composable
     fun StatusLine() {
+        val clipboard = LocalClipboardManager.current
         Row(Modifier.fillMaxWidth().padding(start = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(status, Modifier.weight(1f), style = MaterialTheme.typography.labelSmall)
+            TextButton({ copyLastOutput(clipboard) }) {
+                Text(stringResource(R.string.terminal_copy_last), maxLines = 1, softWrap = false)
+            }
             if (state == SessionState.Disconnected || state is SessionState.Failed) {
                 TextButton({ OpenSessions.reconnect(session) }) {
                     Text(stringResource(R.string.terminal_reconnect), maxLines = 1, softWrap = false)
