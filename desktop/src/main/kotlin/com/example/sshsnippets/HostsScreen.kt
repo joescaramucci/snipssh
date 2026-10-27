@@ -268,6 +268,12 @@ private fun HostEditorDialog(initial: Host, onSave: (Host) -> Unit, onDismiss: (
 fun SnippetsScreen(snippets: List<Snippet>, onChange: (List<Snippet>) -> Unit) {
     var name by remember { mutableStateOf("") }
     var cmd by remember { mutableStateOf("") }
+    // Id dello snippet in modifica: null = il modulo aggiunge uno snippet nuovo.
+    var editingId by remember { mutableStateOf<String?>(null) }
+    fun resetForm() {
+        editingId = null
+        name = ""; cmd = ""
+    }
     val listState = rememberLazyListState()
     Column(Modifier.fillMaxSize().padding(12.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -275,10 +281,17 @@ fun SnippetsScreen(snippets: List<Snippet>, onChange: (List<Snippet>) -> Unit) {
             OutlinedTextField(cmd, { cmd = it }, label = { Text(stringResource(R.string.snippets_command_hint)) }, singleLine = true, modifier = Modifier.weight(1f))
             Button(onClick = {
                 if (name.isNotBlank() && cmd.isNotBlank()) {
-                    onChange(snippets + Snippet(name = name, command = cmd))
-                    name = ""; cmd = ""
+                    val id = editingId
+                    onChange(
+                        if (id == null) snippets + Snippet(name = name, command = cmd)
+                        else snippets.map { if (it.id == id) it.copy(name = name, command = cmd) else it },
+                    )
+                    resetForm()
                 }
-            }) { Text(stringResource(R.string.snippets_add)) }
+            }) { Text(stringResource(if (editingId == null) R.string.snippets_add else R.string.host_save_changes)) }
+            if (editingId != null) {
+                TextButton(onClick = { resetForm() }) { Text(stringResource(R.string.common_cancel)) }
+            }
         }
         ScrollableList(listState, Modifier.weight(1f).padding(top = 8.dp)) {
             LazyColumn(Modifier.fillMaxSize(), state = listState) {
@@ -286,7 +299,19 @@ fun SnippetsScreen(snippets: List<Snippet>, onChange: (List<Snippet>) -> Unit) {
                     ListItem(
                         headlineContent = { Text(s.name) },
                         supportingContent = { Text(s.command, fontFamily = FontFamily.Monospace) },
-                        trailingContent = { TextButton(onClick = { onChange(snippets - s) }) { Text(stringResource(R.string.common_delete)) } },
+                        trailingContent = {
+                            Row {
+                                TextButton(onClick = {
+                                    editingId = s.id
+                                    name = s.name
+                                    cmd = s.command
+                                }) { Text(stringResource(R.string.host_edit)) }
+                                TextButton(onClick = {
+                                    if (editingId == s.id) resetForm()
+                                    onChange(snippets - s)
+                                }) { Text(stringResource(R.string.common_delete)) }
+                            }
+                        },
                     )
                     HorizontalDivider()
                 }
