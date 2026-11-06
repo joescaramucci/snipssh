@@ -7,6 +7,8 @@ import com.jcraft.jsch.Session
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStreamReader
@@ -169,8 +171,13 @@ class SshSession(
     }
 
 
-    suspend fun send(text: String) = withContext(Dispatchers.IO) {
-        out?.apply { write(text.toByteArray(Charsets.UTF_8)); flush() }
+    // JSch non è pensato per scritture concorrenti: più invii insieme (es. trascinamento con le frecce) fanno cadere il canale.
+    private val writeLock = Mutex()
+
+    suspend fun send(text: String) = writeLock.withLock {
+        withContext(Dispatchers.IO) {
+            out?.apply { write(text.toByteArray(Charsets.UTF_8)); flush() }
+        }
     }
 
     suspend fun resize(newCols: Int, newRows: Int) = withContext(Dispatchers.IO) {

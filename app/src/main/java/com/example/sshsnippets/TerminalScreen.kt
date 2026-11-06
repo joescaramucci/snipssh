@@ -91,6 +91,47 @@ private fun renderLine(cells: Array<AnsiCell>, cursorCol: Int, theme: TerminalTh
     }
 }
 
+/**
+ * Con un programma a schermo intero (nano, less) non c'è storico da scorrere: come negli altri terminali,
+ * il trascinamento verticale con un dito manda le frecce ↑↓, una per ogni riga percorsa.
+ */
+private fun Modifier.altScreenArrows(rowHeightPx: Float, altScreen: Boolean, appKeys: Boolean, send: (String) -> Unit): Modifier =
+    pointerInput(rowHeightPx, altScreen, appKeys) {
+        if (!altScreen) return@pointerInput
+        // Fase Initial: arriva prima della lista, che altrimenti consuma il trascinamento (anche con l'effetto di bordo).
+        awaitPointerEventScope {
+            var acc = 0f
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val down = event.changes.filter { it.pressed }
+                if (down.size == 1) {
+                    val c = down[0]
+                    if (c.positionChanged()) {
+                        c.consume()
+                        acc += c.position.y - c.previousPosition.y
+                        // Dito verso l'alto (dy < 0) = freccia giù, come lo scroll nei terminali.
+                        // Le frecce di un movimento partono in un solo invio, così non si accumulano scritture.
+                        var steps = 0
+                        while (acc <= -rowHeightPx) {
+                            acc += rowHeightPx
+                            steps++
+                        }
+                        while (acc >= rowHeightPx) {
+                            acc -= rowHeightPx
+                            steps--
+                        }
+                        if (steps != 0) {
+                            val arrow = (if (appKeys) "\u001bO" else "\u001b[") + if (steps > 0) "B" else "A"
+                            send(arrow.repeat(kotlin.math.abs(steps)))
+                        }
+                    }
+                } else {
+                    acc = 0f
+                }
+            }
+        }
+    }
+
 /** Pinch a due dita: chiama [onZoom] con il rapporto tra la distanza attuale e quella precedente. Con un dito non consuma nulla, così lo scroll resta attivo. */
 private fun Modifier.pinchToZoom(onZoom: (Float) -> Unit): Modifier = pointerInput(Unit) {
     awaitPointerEventScope {
@@ -231,7 +272,11 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
 
     @Composable
     fun TerminalArea(modifier: Modifier) {
-        Box(modifier.background(theme.bg).pinchToZoom(onZoom).onSizeChanged { areaSize = it }) {
+        Box(
+            modifier.background(theme.bg).pinchToZoom(onZoom)
+                .altScreenArrows(cellH.toFloat(), snap.altScreen, snap.appCursorKeys) { send(it) }
+                .onSizeChanged { areaSize = it },
+        ) {
             SelectionContainer(Modifier.fillMaxSize()) {
                 LazyColumn(
                     Modifier.fillMaxSize().padding(8.dp),
