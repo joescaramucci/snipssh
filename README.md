@@ -50,7 +50,7 @@ Ogni file ha il proprio SHA-256 in `SHA256SUMS.txt`. Gli eseguibili Windows non 
 ## Funzionalità
 
 - **Terminale SSH** con emulazione ANSI (colori, cursore, scroll) e tasti speciali (Esc, Tab, Ctrl, frecce).
-- **Programmi a schermo intero** come `nano`: il terminale usa lo schermo alternativo e, su Android, un trascinamento verticale con un dito manda le frecce ↑↓ per scorrere il file.
+- **Programmi a schermo intero** come `nano` e `htop`: il terminale usa lo schermo alternativo e, su Android, un trascinamento verticale con un dito manda le frecce ↑↓ per scorrere il file.
 - **Lingue**: inglese (predefinito), italiano, spagnolo, francese, tedesco, cinese semplificato, russo e coreano. Si scelgono in Impostazioni e l'app si aggiorna subito.
 - **Aspetto del terminale** in Impostazioni: dimensione del carattere (8–24 sp), font di sistema o JetBrains Mono, tema colori Scuro, Chiaro o Solarized. Con due dita sul terminale si ingrandisce o riduce il testo, e la dimensione viene salvata.
 - **Sessioni multiple**: puoi tenere aperte più connessioni contemporaneamente. Ogni sessione è un chip in alto nel terminale: tocca il nome per passare da una all'altra senza disconnettere le altre. `+ Host` apre un'altra connessione, la × chiude la sessione.
@@ -153,7 +153,7 @@ Le chiavi di firma (`*.jks`, `*.keystore`) e le password non devono mai finire n
 
 ## Limiti noti
 
-- Le applicazioni a schermo intero sono verificate solo con `nano`: `vim` e `htop` non sono ancora stati provati.
+- Le applicazioni a schermo intero sono verificate con `nano` e `htop`; `vim` non è stato provato.
 - Le variabili degli snippet accettano lettere di qualsiasi alfabeto, cifre e `_` (`{{servizio}}`, `{{città}}` o `{{имя}}` sì; spazi e simboli no).
 - Le chiavi sono associate al singolo host, non condivise.
 - Nessuna sincronizzazione cloud: il backup è un file che gestisci tu.
