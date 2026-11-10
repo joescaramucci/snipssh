@@ -322,7 +322,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
             snippets.forEach { s ->
                 AssistChip(
                     onClick = {
-                        if (s.variables().isEmpty()) send(s.render(emptyMap()) + if (s.sendEnter) "\n" else "")
+                        if (s.variables().isEmpty()) send(s.render(emptyMap()) + if (s.sendEnter) "\r" else "")
                         else {
                             values.clear()
                             pending = s
@@ -395,7 +395,8 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
                         store.recordCommand(host.id, command)
                         history = store.loadHistory(host.id)
                     }
-                    send(input.text + "\n")
+                    // Invio è \r come in un terminale vero: i programmi a schermo intero (es. claude) leggono \n come "a capo".
+                    send(input.text + "\r")
                 }
                 input = TextFieldValue()
             }) { Text(stringResource(R.string.terminal_send)) }
@@ -443,7 +444,7 @@ fun TerminalScreen(session: OpenSession, snippets: List<Snippet>, store: Store, 
             },
             confirmButton = {
                 TextButton(onClick = {
-                    send(s.render(values) + if (s.sendEnter) "\n" else "")
+                    send(s.render(values) + if (s.sendEnter) "\r" else "")
                     pending = null
                 }) { Text(stringResource(R.string.terminal_run)) }
             },
