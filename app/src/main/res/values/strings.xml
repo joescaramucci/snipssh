@@ -145,4 +145,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">System</string>
+    <string name="notif_channel">Open sessions</string>
+    <string name="notif_sessions">Active sessions: %1$d</string>
+    <string name="notif_disconnect_all">Disconnect all</string>
 </resources>

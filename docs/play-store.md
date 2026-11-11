@@ -141,7 +141,17 @@ Last updated: 17 October 2026
 | Pubblicità | No |
 | Account utente richiesto | No |
 
-Permessi dichiarati in `AndroidManifest.xml`: solo `INTERNET`. Il blocco biometrico usa `androidx.biometric`: controlla il manifest unito (`app/build/intermediates/merged_manifests`) e allinea la dichiarazione se compare `USE_BIOMETRIC`.
+Permessi dichiarati in `AndroidManifest.xml`: `INTERNET`, più `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_SPECIAL_USE` e `POST_NOTIFICATIONS` per il servizio in primo piano che tiene vive le sessioni in background (`SessionService`). Il blocco biometrico usa `androidx.biometric`: controlla il manifest unito (`app/build/intermediates/merged_manifests`) e allinea la dichiarazione se compare `USE_BIOMETRIC`.
+
+### Dichiarazione del servizio in primo piano (Play Console)
+
+Dalla versione che introduce `SessionService`, Play Console chiede di dichiarare il servizio in primo piano (*Contenuti dell'app → Autorizzazioni per i servizi in primo piano*). Tipo: **special use**. Testo da incollare:
+
+```
+SnipSSH is an SSH and SFTP client. While the user has at least one SSH or SFTP session open, a foreground service with an ongoing notification ("Active sessions: N", with a "Disconnect all" action) keeps the connections alive when the user switches to another app. Without it Android freezes the app in the background and the server closes the connection, so long-running remote commands are lost. The service starts when the user opens the first session and stops as soon as the last one is closed; it does not run otherwise and does not collect or transmit any data.
+```
+
+Google può chiedere un breve video: apertura di una sessione, passaggio a un'altra app, notifica visibile, ritorno a SnipSSH con la sessione ancora attiva, tocco su *Disconnetti tutto*.
 
 ## Requisiti tecnici
 

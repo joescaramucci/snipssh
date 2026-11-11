@@ -145,4 +145,7 @@
     <string name="theme_light">Clair</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Système</string>
+    <string name="notif_channel">Sessions ouvertes</string>
+    <string name="notif_sessions">Sessions actives : %1$d</string>
+    <string name="notif_disconnect_all">Tout déconnecter</string>
 </resources>

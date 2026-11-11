@@ -145,4 +145,7 @@
     <string name="theme_light">Светлая</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">Системный</string>
+    <string name="notif_channel">Открытые сеансы</string>
+    <string name="notif_sessions">Активные сеансы: %1$d</string>
+    <string name="notif_disconnect_all">Отключить все</string>
 </resources>

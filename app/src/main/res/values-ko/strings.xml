@@ -145,4 +145,7 @@
     <string name="theme_light">라이트</string>
     <string name="theme_solarized">Solarized</string>
     <string name="font_system">시스템</string>
+    <string name="notif_channel">열린 세션</string>
+    <string name="notif_sessions">활성 세션: %1$d</string>
+    <string name="notif_disconnect_all">모두 연결 해제</string>
 </resources>

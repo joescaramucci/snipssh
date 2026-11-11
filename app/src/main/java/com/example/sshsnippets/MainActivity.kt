@@ -1,6 +1,9 @@
 package com.example.sshsnippets
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -25,13 +28,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : FragmentActivity() {
     private val lock: AppLockViewModel by viewModels()
+
+    // Da Android 13 la notifica del servizio richiede il permesso: si chiede una volta, alla prima sessione.
+    private val notificationPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    private var askedNotifications = false
+
+    private fun askNotificationPermission() {
+        if (askedNotifications || Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        askedNotifications = true
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(localizedContext(newBase, Store(newBase).appLanguage()))
@@ -41,6 +59,13 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         val store = Store(applicationContext)
         OpenSessions.attach(store, AndroidPlatform(localizedContext(applicationContext, store.appLanguage())))
+        // Il servizio in primo piano tiene vive le sessioni in background: parte con la prima, si ferma con l'ultima.
+        lifecycleScope.launch {
+            snapshotFlow { OpenSessions.list.size }.distinctUntilChanged().collect { count ->
+                if (count > 0) askNotificationPermission()
+                SessionService.update(applicationContext, count)
+            }
+        }
         setContent {
             var appThemeId by remember { mutableStateOf(store.appThemeId()) }
             val appTheme = appThemeById(appThemeId)
